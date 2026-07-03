@@ -8,6 +8,12 @@ export async function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      // Without this, Next.js's fetch cache can serve a stale snapshot of a
+      // Supabase GET (select) response indefinitely on a Server Component,
+      // since PostgREST selects are plain GET requests Next may cache by URL.
+      global: {
+        fetch: (url, options) => fetch(url, { ...options, cache: "no-store" }),
+      },
       cookies: {
         getAll() {
           return cookieStore.getAll();
