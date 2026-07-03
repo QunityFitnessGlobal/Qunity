@@ -53,6 +53,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     const debugSnapshot = selectedChildId
       ? await buildChildTipSnapshot(supabase, selectedChildId)
       : null;
+    const { data: debugRules, error: debugRulesError } = await supabase
+      .from("parent_tip_rules")
+      .select("id, condition_type, priority");
 
     return (
       <div className="flex flex-1 flex-col items-center gap-6 pb-12">
@@ -116,6 +119,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                 <pre className="w-full max-w-md overflow-x-auto rounded-md bg-yellow-50 p-2 text-left text-xs text-yellow-900" dir="ltr">
                   DEBUG selectedChildId={selectedChildId}{"\n"}
                   {JSON.stringify(debugSnapshot, null, 2)}
+                  {"\n\nDEBUG rules count="}{debugRules?.length ?? "null"}{" error="}{debugRulesError?.message ?? "none"}{"\n"}
+                  {JSON.stringify(debugRules, null, 2)}
                 </pre>
               )}
 
