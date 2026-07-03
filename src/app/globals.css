@@ -1,5 +1,31 @@
 @import "tailwindcss";
 
+/*
+ * Qunity brand palette, single source of truth (Prompt 5/7).
+ * This is an MVP palette; exact hex values will likely be refined later.
+ * Change a color once here and every bg/text/border utility below updates
+ * everywhere.
+ *
+ * Tailwind v4 uses this CSS at-theme block instead of a tailwind.config.ts
+ * file (the old JS config is not how this project is set up). A color
+ * variable declared here becomes both a plain CSS custom property and a
+ * Tailwind utility class at the same time, so it already covers theme
+ * extension and global CSS variables in one place.
+ */
+@theme {
+  --color-brand-background: #140e0c;
+  --color-brand-purple: #a32894;
+  --color-text-muted: #606060;
+  --color-text-muted-light: #a8a8a8;
+
+  --color-bracelet-white: #f1f1f4;
+  --color-bracelet-white-outline: #2c2c30;
+  --color-bracelet-orange: #ff8a3d;
+  --color-bracelet-green: #22c55e;
+  --color-bracelet-blue: #3b82f6;
+  --color-bracelet-purple: #a32894;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

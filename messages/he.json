@@ -1,0 +1,182 @@
+{
+  "metadata": {
+    "description": "Qunity — הפעילות הגופנית של הילד שלך הופכת למשחק"
+  },
+  "home": {
+    "tagline": "המסע הצבעוני של הילד שלך לפעילות גופנית מתחיל כאן.",
+    "login": "התחברות",
+    "signup": "הרשמה"
+  },
+  "auth": {
+    "login": {
+      "title": "התחברות ל-Qunity",
+      "email": "אימייל",
+      "password": "סיסמה",
+      "submit": "התחברות",
+      "submitting": "מתחבר/ת...",
+      "noAccount": "עדיין אין לך חשבון?",
+      "signupLink": "הרשמה",
+      "genericError": "שגיאה בהתחברות, נסה שוב",
+      "invalidCredentials": "אימייל או סיסמה שגויים",
+      "emailNotConfirmed": "יש לאשר את כתובת האימייל לפני ההתחברות",
+      "rateLimited": "יותר מדי ניסיונות, נסה שוב בעוד רגע"
+    },
+    "signup": {
+      "title": "הרשמה ל-Qunity",
+      "fullName": "שם מלא",
+      "email": "אימייל",
+      "password": "סיסמה",
+      "roleLabel": "אני נרשם/ת כ...",
+      "roleParent": "הורה",
+      "roleChild": "ילד/ה",
+      "submit": "הרשמה",
+      "submitting": "נרשם/ת...",
+      "haveAccount": "כבר יש לך חשבון?",
+      "loginLink": "התחברות",
+      "genericError": "שגיאה בהרשמה, נסה שוב",
+      "emailTaken": "כתובת האימייל הזו כבר רשומה במערכת",
+      "weakPassword": "הסיסמה חייבת להכיל לפחות 6 תווים",
+      "rateLimited": "יותר מדי ניסיונות, נסה שוב בעוד רגע"
+    }
+  },
+  "linking": {
+    "notAuthenticated": "יש להתחבר מחדש כדי לבצע פעולה זו.",
+    "codeNotFound": "קוד לא קיים.",
+    "codeAlreadyUsed": "This child code has already been used.",
+    "alreadyLinked": "הילד כבר מקושר אליך.",
+    "genericError": "אירעה שגיאה, נסה שוב."
+  },
+  "addChild": {
+    "title": "הוספת ילד לפי קוד",
+    "description": "הזן/י את הקוד שהילד/ה קיבל/ה במסך שלו/ה (בפורמט QNTY-XXXXX).",
+    "codeLabel": "קוד הילד",
+    "submit": "קישור ילד",
+    "submitting": "מקשר/ת...",
+    "success": "{nickname} נוסף/ה בהצלחה!",
+    "backToSettings": "חזרה להגדרות"
+  },
+  "logout": {
+    "button": "התנתקות",
+    "loading": "יוצא/ת..."
+  },
+  "childCode": {
+    "label": "הקוד שלך",
+    "copy": "העתקת הקוד",
+    "copied": "הועתק!"
+  },
+  "nextWorkout": {
+    "none": "אין אימון זמין כרגע.",
+    "label": "האימון הבא",
+    "start": "Start"
+  },
+  "challengeList": {
+    "empty": "עדיין לא פתחת אתגרים."
+  },
+  "colors": {
+    "badge": "צמיד {color}",
+    "white": "לבן",
+    "orange": "כתום",
+    "green": "ירוק",
+    "blue": "כחול",
+    "purple": "סגול"
+  },
+  "encouragement": {
+    "zero": "בוא נתחיל את החודש בתנועה! האימון הראשון מחכה לך 💪",
+    "low": "כבר {count} אימונים החודש - התחלה מצוינת, תמשיך/י כך!",
+    "mid": "וואו, {count} אימונים החודש! את/ה בכושר מעולה 🔥",
+    "high": "{count} אימונים החודש - את/ה ממש אלוף/ת! 🏆"
+  },
+  "recentWorkouts": {
+    "empty": "עדיין אין אימונים שהושלמו.",
+    "date": "תאריך",
+    "workout": "אימון",
+    "duration": "משך",
+    "difficulty": "קושי",
+    "unknownWorkout": "אימון"
+  },
+  "tips": {
+    "heading": "טיפים להורה",
+    "empty": "אין טיפים רלוונטיים כרגע.",
+    "manualTestHint": "מצב בדיקה ידני (זמני): הזן/י מספר 1-5 כדי לדמות תרחיש טיפ ולוודא שהמנוע עובד מקצה לקצה.",
+    "manualTestLabel": "תרחיש (1-5)",
+    "show": "הצג",
+    "showing": "טוען..."
+  },
+  "childSelector": {
+    "label": "הילד שלי"
+  },
+  "workout": {
+    "resultTitle": "כל הכבוד!",
+    "pointsAwarded": "קיבלת {points} נקודות על האימון הזה.",
+    "leveledUp": "עברת לצבע חדש! 🎉",
+    "challengeUnlocked": "פתחת אתגר: {title} +{points}",
+    "nextWorkout": "אימון הבא",
+    "finishSession": "סיום",
+    "loading": "טוען...",
+    "questionnaireTitle": "איך היה האימון?",
+    "activityLabel": "איזו פעילות עשית?",
+    "actualDurationLabel": "זמן אימון בפועל: {duration}",
+    "trainedLongerPraise": "התאמנת {minutes} דקות יותר מהמומלץ, כל הכבוד! 💪",
+    "difficultyLabel": "רמת קושי בפועל (1-5)",
+    "parentTogetherLabel": "האם ההורה התאמן איתך?",
+    "yes": "כן",
+    "no": "לא",
+    "feelingLabel": "איך הרגשת בסוף האימון?",
+    "feelingGreat": "מעולה",
+    "feelingOk": "בסדר",
+    "feelingHard": "קשה",
+    "submit": "שליחה",
+    "submitting": "שולח...",
+    "startError": "שגיאה בהתחלת האימון",
+    "finishError": "שגיאה בסיום האימון",
+    "submitError": "שגיאה בשליחת השאלון",
+    "colorProgress": "צבע {color} · אימון {index} מתוך {total}",
+    "recommended": "זמן מומלץ: {minutes} דקות · רמת קושי מומלצת: {difficulty}",
+    "start": "Start",
+    "finish": "Finish"
+  },
+  "dashboard": {
+    "parentTitle": "Parent Dashboard",
+    "childTitleComingSoon": "Child Dashboard — Coming Soon",
+    "hello": "שלום, {name}",
+    "helloExclaim": "שלום, {name}!",
+    "noChildDefined": "אין ילד מוגדר. לך להגדרות והוסף ילד.",
+    "workoutsInColor": "{count} מתוך {total} אימונים בצבע הנוכחי",
+    "workoutsInColorAndPoints": "{count} מתוך {total} אימונים · {points} נקודות עד הצבע הבא",
+    "totalPointsLine": "סה\"כ {points} נקודות",
+    "stats": {
+      "totalPoints": "סה\"כ נקודות",
+      "pointsInColor": "נקודות בצבע הנוכחי",
+      "totalWorkouts": "אימונים בסה\"כ",
+      "totalActiveTime": "זמן פעילות כולל",
+      "averageDifficulty": "קושי ממוצע מדווח",
+      "parentTogetherCount": "אימונים משותפים עם הורה"
+    }
+  },
+  "leaderboard": {
+    "title": "טבלת מובילים",
+    "comingSoon": "בקרוב!",
+    "empty": "אין עדיין נתונים להצגה.",
+    "you": "(אתה)",
+    "points": "{points} נק'"
+  },
+  "challengesPage": {
+    "myTitle": "האתגרים שלי",
+    "completedTitle": "אתגרים שהושלמו"
+  },
+  "recentWorkoutsPage": {
+    "title": "אימונים אחרונים"
+  },
+  "settings": {
+    "title": "הגדרות",
+    "myCode": "הקוד שלי",
+    "addChild": "הוספת ילד לפי קוד"
+  },
+  "nav": {
+    "home": "בית",
+    "leaderboard": "מובילים",
+    "challenges": "אתגרים",
+    "workouts": "אימונים",
+    "settings": "הגדרות"
+  }
+}

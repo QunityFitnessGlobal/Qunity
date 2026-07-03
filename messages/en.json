@@ -1,0 +1,182 @@
+{
+  "metadata": {
+    "description": "Qunity — your child's physical activity becomes a game"
+  },
+  "home": {
+    "tagline": "Your child's colorful journey to physical activity starts here.",
+    "login": "Log in",
+    "signup": "Sign up"
+  },
+  "auth": {
+    "login": {
+      "title": "Log in to Qunity",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Log in",
+      "submitting": "Logging in...",
+      "noAccount": "Don't have an account yet?",
+      "signupLink": "Sign up",
+      "genericError": "Login error, please try again",
+      "invalidCredentials": "Incorrect email or password",
+      "emailNotConfirmed": "Please confirm your email before logging in",
+      "rateLimited": "Too many attempts, please try again shortly"
+    },
+    "signup": {
+      "title": "Sign up for Qunity",
+      "fullName": "Full name",
+      "email": "Email",
+      "password": "Password",
+      "roleLabel": "I am signing up as...",
+      "roleParent": "Parent",
+      "roleChild": "Child",
+      "submit": "Sign up",
+      "submitting": "Signing up...",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Log in",
+      "genericError": "Signup error, please try again",
+      "emailTaken": "This email address is already registered",
+      "weakPassword": "Password must be at least 6 characters",
+      "rateLimited": "Too many attempts, please try again shortly"
+    }
+  },
+  "linking": {
+    "notAuthenticated": "Please log in again to do this.",
+    "codeNotFound": "This code does not exist.",
+    "codeAlreadyUsed": "This child code has already been used.",
+    "alreadyLinked": "This child is already linked to you.",
+    "genericError": "Something went wrong, please try again."
+  },
+  "addChild": {
+    "title": "Add a child by code",
+    "description": "Enter the code your child received on their screen (format QNTY-XXXXX).",
+    "codeLabel": "Child code",
+    "submit": "Link child",
+    "submitting": "Linking...",
+    "success": "{nickname} was added successfully!",
+    "backToSettings": "Back to settings"
+  },
+  "logout": {
+    "button": "Log out",
+    "loading": "Logging out..."
+  },
+  "childCode": {
+    "label": "Your code",
+    "copy": "Copy code",
+    "copied": "Copied!"
+  },
+  "nextWorkout": {
+    "none": "No workout available right now.",
+    "label": "Next workout",
+    "start": "Start"
+  },
+  "challengeList": {
+    "empty": "You haven't unlocked any challenges yet."
+  },
+  "colors": {
+    "badge": "{color} bracelet",
+    "white": "White",
+    "orange": "Orange",
+    "green": "Green",
+    "blue": "Blue",
+    "purple": "Purple"
+  },
+  "encouragement": {
+    "zero": "Let's start the month moving! Your first workout is waiting for you 💪",
+    "low": "Already {count} workouts this month - great start, keep it up!",
+    "mid": "Wow, {count} workouts this month! You are in great shape 🔥",
+    "high": "{count} workouts this month - you are a real champion! 🏆"
+  },
+  "recentWorkouts": {
+    "empty": "No workouts completed yet.",
+    "date": "Date",
+    "workout": "Workout",
+    "duration": "Duration",
+    "difficulty": "Difficulty",
+    "unknownWorkout": "Workout"
+  },
+  "tips": {
+    "heading": "Tips for parents",
+    "empty": "No relevant tips right now.",
+    "manualTestHint": "Manual test mode (temporary): enter a number 1-5 to simulate a tip scenario and verify the engine works end to end.",
+    "manualTestLabel": "Scenario (1-5)",
+    "show": "Show",
+    "showing": "Loading..."
+  },
+  "childSelector": {
+    "label": "My child"
+  },
+  "workout": {
+    "resultTitle": "Well done!",
+    "pointsAwarded": "You earned {points} points for this workout.",
+    "leveledUp": "You moved up to a new color! 🎉",
+    "challengeUnlocked": "Challenge unlocked: {title} +{points}",
+    "nextWorkout": "Next workout",
+    "finishSession": "Done",
+    "loading": "Loading...",
+    "questionnaireTitle": "How was the workout?",
+    "activityLabel": "What activity did you do?",
+    "actualDurationLabel": "Actual workout time: {duration}",
+    "trainedLongerPraise": "You trained {minutes} minutes longer than recommended, well done! 💪",
+    "difficultyLabel": "Actual difficulty level (1-5)",
+    "parentTogetherLabel": "Did a parent train with you?",
+    "yes": "Yes",
+    "no": "No",
+    "feelingLabel": "How did you feel after the workout?",
+    "feelingGreat": "Great",
+    "feelingOk": "OK",
+    "feelingHard": "Hard",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "startError": "Error starting the workout",
+    "finishError": "Error finishing the workout",
+    "submitError": "Error submitting the questionnaire",
+    "colorProgress": "{color} color · workout {index} of {total}",
+    "recommended": "Recommended time: {minutes} minutes · recommended difficulty: {difficulty}",
+    "start": "Start",
+    "finish": "Finish"
+  },
+  "dashboard": {
+    "parentTitle": "Parent Dashboard",
+    "childTitleComingSoon": "Child Dashboard — Coming Soon",
+    "hello": "Hello, {name}",
+    "helloExclaim": "Hello, {name}!",
+    "noChildDefined": "No child set up yet. Go to Settings and add a child.",
+    "workoutsInColor": "{count} of {total} workouts in the current color",
+    "workoutsInColorAndPoints": "{count} of {total} workouts · {points} points to the next color",
+    "totalPointsLine": "Total {points} points",
+    "stats": {
+      "totalPoints": "Total points",
+      "pointsInColor": "Points in current color",
+      "totalWorkouts": "Total workouts",
+      "totalActiveTime": "Total active time",
+      "averageDifficulty": "Average reported difficulty",
+      "parentTogetherCount": "Workouts together with parent"
+    }
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "comingSoon": "Coming soon!",
+    "empty": "No data to show yet.",
+    "you": "(you)",
+    "points": "{points} pts"
+  },
+  "challengesPage": {
+    "myTitle": "My challenges",
+    "completedTitle": "Completed challenges"
+  },
+  "recentWorkoutsPage": {
+    "title": "Recent workouts"
+  },
+  "settings": {
+    "title": "Settings",
+    "myCode": "My code",
+    "addChild": "Add a child by code"
+  },
+  "nav": {
+    "home": "Home",
+    "leaderboard": "Leaderboard",
+    "challenges": "Challenges",
+    "workouts": "Workouts",
+    "settings": "Settings"
+  }
+}
