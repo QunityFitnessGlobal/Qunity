@@ -56,6 +56,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     const { data: debugRules, error: debugRulesError } = await supabase
       .from("parent_tip_rules")
       .select("id, condition_type, priority");
+    const { data: debugRulesFull, error: debugRulesFullError } = await supabase
+      .from("parent_tip_rules")
+      .select("id, principle, condition_type, condition_params, tip_text, priority");
 
     return (
       <div className="flex flex-1 flex-col items-center gap-6 pb-12">
@@ -121,6 +124,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                   {JSON.stringify(debugSnapshot, null, 2)}
                   {"\n\nDEBUG rules count="}{debugRules?.length ?? "null"}{" error="}{debugRulesError?.message ?? "none"}{"\n"}
                   {JSON.stringify(debugRules, null, 2)}
+                  {"\n\nDEBUG rulesFull count="}{debugRulesFull?.length ?? "null"}{" error="}{debugRulesFullError?.message ?? "none"}{"\n"}
+                  {JSON.stringify(debugRulesFull, null, 2)}
                 </pre>
               )}
 
