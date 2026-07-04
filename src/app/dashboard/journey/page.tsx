@@ -3,7 +3,6 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getJourneyStations } from "@/services/journey.service";
 import { JourneyPath, type JourneyRenderItem } from "@/components/child/JourneyPath";
-import { BRACELET_PAGE_TINT } from "@/lib/colors";
 import type { BraceletColor, Role } from "@/lib/types";
 
 // Purely presentational layout constants — not business data, so these are
@@ -14,7 +13,6 @@ import type { BraceletColor, Role } from "@/lib/types";
 const PATH_WIDTH_PX = 280;
 const STATION_SPACING_PX = 96;
 const ZIGZAG_AMPLITUDE_PX = 70;
-const GRADIENT_BLEND_PERCENT = 4;
 
 export default async function JourneyPage() {
   const supabase = await createClient();
@@ -80,35 +78,6 @@ export default async function JourneyPage() {
 
   const contentHeight = Math.max(top, STATION_SPACING_PX);
 
-  // Belt groups in ascending (bottom-to-top) order, derived from the
-  // already-sorted stations list itself — no hardcoded belt list or count.
-  const beltGroups: { color: BraceletColor; count: number }[] = [];
-  for (const station of stations) {
-    const lastGroup = beltGroups[beltGroups.length - 1];
-    if (lastGroup && lastGroup.color === station.beltColor) {
-      lastGroup.count += 1;
-    } else {
-      beltGroups.push({ color: station.beltColor, count: 1 });
-    }
-  }
-
-  const gradientStops: string[] = [];
-  let cumulativePercent = 0;
-  beltGroups.forEach((group, index) => {
-    const sharePercent = (group.count / stations.length) * 100;
-    const startPercent = cumulativePercent;
-    cumulativePercent += sharePercent;
-    const color = BRACELET_PAGE_TINT[group.color];
-
-    gradientStops.push(`${color} ${startPercent}%`);
-    const isLast = index === beltGroups.length - 1;
-    gradientStops.push(
-      `${color} ${isLast ? 100 : Math.min(cumulativePercent + GRADIENT_BLEND_PERCENT, 100)}%`,
-    );
-  });
-  const backgroundImage =
-    stations.length > 0 ? `linear-gradient(to top, ${gradientStops.join(", ")})` : "none";
-
   return (
     <div className="flex flex-1 flex-col items-center">
       <div className="sticky top-0 z-10 w-full max-w-sm bg-white/95 px-4 py-3 text-center shadow-sm backdrop-blur">
@@ -125,7 +94,6 @@ export default async function JourneyPage() {
           childId={user.id}
           items={items}
           contentHeight={contentHeight}
-          backgroundImage={backgroundImage}
           pathWidth={PATH_WIDTH_PX}
         />
       )}
