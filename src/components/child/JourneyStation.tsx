@@ -3,6 +3,7 @@
 import { useState, type CSSProperties } from "react";
 import { useTranslations } from "next-intl";
 import { BRACELET_BADGE_CLASSES } from "@/lib/colors";
+import { LockIcon, PlayIcon, StarIcon } from "@/components/child/journeyIcons";
 import type { BraceletColor, JourneyStationState } from "@/lib/types";
 
 interface JourneyStationProps {
@@ -10,7 +11,6 @@ interface JourneyStationProps {
   title: string;
   beltColor: BraceletColor;
   localNumber: number;
-  globalNumber: number;
   // Called for "current" (start the workout) and "done" (open its summary).
   // Never called for "locked" — the component handles that tap itself.
   onOpen?: () => void;
@@ -26,7 +26,6 @@ export function JourneyStation({
   title,
   beltColor,
   localNumber,
-  globalNumber,
   onOpen,
   style,
   id,
@@ -62,22 +61,20 @@ export function JourneyStation({
 
         {state === "locked" && (
           <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-zinc-700 text-white">
-            <LockIcon />
+            <LockIcon className="h-3 w-3" />
           </span>
         )}
         {state === "done" && (
           <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-yellow-500 text-white">
-            <StarIcon />
+            <StarIcon className="h-3 w-3" />
           </span>
         )}
         {isCurrent && (
           <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-brand-purple text-white">
-            <PlayIcon />
+            <PlayIcon className="h-3 w-3" />
           </span>
         )}
       </button>
-
-      <span className="text-xs font-medium text-text-muted">{globalNumber}</span>
 
       {showLockedHint && (
         <div className="absolute top-full z-10 mt-1 whitespace-nowrap rounded bg-zinc-800 px-2 py-1 text-xs text-white">
@@ -85,29 +82,5 @@ export function JourneyStation({
         </div>
       )}
     </div>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" className="h-3 w-3">
-      <path d="M5 8V6a5 5 0 0110 0v2h1a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1h1zm2 0h6V6a3 3 0 00-6 0v2z" />
-    </svg>
-  );
-}
-
-function StarIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" className="h-3 w-3">
-      <path d="M10 1.5l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.6-4.1 6.1-.6z" />
-    </svg>
-  );
-}
-
-function PlayIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" className="h-3 w-3">
-      <path d="M6 4l10 6-10 6V4z" />
-    </svg>
   );
 }

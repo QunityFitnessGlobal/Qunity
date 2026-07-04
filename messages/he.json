@@ -66,7 +66,7 @@
   },
   "nextWorkout": {
     "none": "אין אימון זמין כרגע.",
-    "label": "האימון הבא",
+    "label": "האימון הבא - שווי {points} נקודות",
     "start": "Start"
   },
   "challengeList": {
@@ -185,7 +185,6 @@
     "progress": "{done} מתוך {total}",
     "empty": "אין עדיין אימונים במערכת.",
     "lockedHint": "סיימו קודם את האימון שלפני כדי לפתוח את זה",
-    "levelMarker": "מעבר לצמיד {color}",
     "summary": {
       "loading": "טוען...",
       "notFound": "לא נמצא מידע על האימון הזה",

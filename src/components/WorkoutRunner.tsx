@@ -166,7 +166,7 @@ export function WorkoutRunner({
           </Button>
           <Button
             className="w-full bg-zinc-700 hover:bg-zinc-800"
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.push("/dashboard/journey")}
           >
             {t("finishSession")}
           </Button>

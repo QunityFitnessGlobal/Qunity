@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { HomeIcon, JourneyIcon, TrophyIcon, FlagIcon, SettingsIcon, DumbbellIcon } from "@/components/navIcons";
+import type { ComponentType } from "react";
 import type { Role } from "@/lib/types";
 
 interface BottomTabBarProps {
@@ -12,21 +14,22 @@ interface BottomTabBarProps {
 interface TabItem {
   href: string;
   labelKey: string;
+  Icon: ComponentType<{ className?: string }>;
 }
 
 const CHILD_TABS: TabItem[] = [
-  { href: "/dashboard", labelKey: "home" },
-  { href: "/dashboard/journey", labelKey: "journey" },
-  { href: "/dashboard/leaderboard", labelKey: "leaderboard" },
-  { href: "/dashboard/challenges", labelKey: "challenges" },
-  { href: "/dashboard/settings", labelKey: "settings" },
+  { href: "/dashboard", labelKey: "home", Icon: HomeIcon },
+  { href: "/dashboard/journey", labelKey: "journey", Icon: JourneyIcon },
+  { href: "/dashboard/leaderboard", labelKey: "leaderboard", Icon: TrophyIcon },
+  { href: "/dashboard/challenges", labelKey: "challenges", Icon: FlagIcon },
+  { href: "/dashboard/settings", labelKey: "settings", Icon: SettingsIcon },
 ];
 
 const PARENT_TABS: TabItem[] = [
-  { href: "/dashboard", labelKey: "home" },
-  { href: "/dashboard/challenges", labelKey: "challenges" },
-  { href: "/dashboard/recent-workouts", labelKey: "workouts" },
-  { href: "/dashboard/settings", labelKey: "settings" },
+  { href: "/dashboard", labelKey: "home", Icon: HomeIcon },
+  { href: "/dashboard/challenges", labelKey: "challenges", Icon: FlagIcon },
+  { href: "/dashboard/recent-workouts", labelKey: "workouts", Icon: DumbbellIcon },
+  { href: "/dashboard/settings", labelKey: "settings", Icon: SettingsIcon },
 ];
 
 // Persistent bottom navigation. Reads childId from the URL itself (rather
@@ -49,10 +52,11 @@ export function BottomTabBar({ role }: BottomTabBarProps) {
             <Link
               key={tab.href}
               href={`${tab.href}${suffix}`}
-              className={`flex-1 py-3 text-center text-xs font-medium ${
+              className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-center text-xs font-medium ${
                 isActive ? "text-brand-purple" : "text-text-muted"
               }`}
             >
+              <tab.Icon className="h-5 w-5" />
               {t(tab.labelKey)}
             </Link>
           );

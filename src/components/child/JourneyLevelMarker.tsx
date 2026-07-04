@@ -1,7 +1,5 @@
-"use client";
-
-import { useTranslations } from "next-intl";
-import { BRACELET_BADGE_CLASSES } from "@/lib/colors";
+import { BRACELET_CSS_VAR } from "@/lib/colors";
+import { StarIcon } from "@/components/child/journeyIcons";
 import type { BraceletColor } from "@/lib/types";
 import type { CSSProperties } from "react";
 
@@ -12,33 +10,17 @@ interface JourneyLevelMarkerProps {
   style?: CSSProperties;
 }
 
-// Static badge for now (see prompt: "שלב ראשון: תג/מדליה סטטית, בלי אנימציה
-// מיוחדת") — a later pass can add an unlock animation without changing the
-// data this depends on. Client component (not async) so it can sit inline
-// in the same interactive, client-rendered path list as JourneyStation.
+// A milestone, not a workout — rendered as a plain colored star (no circle
+// frame, no caption) so it reads as distinct from the workout stations.
 export function JourneyLevelMarker({ beltColor, style }: JourneyLevelMarkerProps) {
-  const t = useTranslations("journey");
-  const tColors = useTranslations("colors");
-
   return (
-    <div style={style} className="absolute flex flex-col items-center gap-1">
-      <div
-        className={`flex h-14 w-14 items-center justify-center rounded-full border-2 border-yellow-500 shadow-md ${BRACELET_BADGE_CLASSES[beltColor]}`}
-      >
-        <MedalIcon />
-      </div>
-      <span className="max-w-[5rem] text-center text-xs font-semibold text-text-muted">
-        {t("levelMarker", { color: tColors(beltColor) })}
-      </span>
+    <div style={style} className="absolute">
+      <StarIcon
+        className="h-10 w-10 drop-shadow-sm"
+        style={{ color: BRACELET_CSS_VAR[beltColor] }}
+        stroke="#1f1f23"
+        strokeWidth={0.6}
+      />
     </div>
-  );
-}
-
-function MedalIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" className="h-6 w-6 text-yellow-600">
-      <circle cx="10" cy="12" r="6" />
-      <path d="M7 2h2l1.5 4L12 2h2l-2.5 6.5L14 14h-2l-2-4.5-2 4.5H6l2.5-5.5z" />
-    </svg>
   );
 }

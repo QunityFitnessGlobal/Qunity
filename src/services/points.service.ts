@@ -13,7 +13,7 @@ export interface PointsBreakdownItem {
   reason: string;
 }
 
-const BASE_POINTS = 20;
+export const BASE_POINTS = 20;
 const TRAINED_LONGER_BONUS = 5;
 const HARDER_THAN_RECOMMENDED_BONUS = 5;
 const PARENT_TOGETHER_BONUS = 10;

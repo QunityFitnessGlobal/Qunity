@@ -22,3 +22,15 @@ export const BRACELET_CSS_VAR: Record<BraceletColor, string> = {
   blue: "var(--color-bracelet-blue)",
   purple: "var(--color-bracelet-purple)",
 };
+
+// Page-background tint per belt — same as BRACELET_CSS_VAR except white,
+// which is overridden to a visibly darker neutral. The real bracelet-white
+// (#f1f1f4) is what white stations are filled with, so using it as the
+// *page* background too would make white stations disappear entirely.
+export const BRACELET_PAGE_TINT: Record<BraceletColor, string> = {
+  white: "#d4d4d8",
+  orange: "var(--color-bracelet-orange)",
+  green: "var(--color-bracelet-green)",
+  blue: "var(--color-bracelet-blue)",
+  purple: "var(--color-bracelet-purple)",
+};

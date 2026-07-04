@@ -66,7 +66,7 @@
   },
   "nextWorkout": {
     "none": "No workout available right now.",
-    "label": "Next workout",
+    "label": "Next workout - worth {points} points",
     "start": "Start"
   },
   "challengeList": {
@@ -185,7 +185,6 @@
     "progress": "{done} of {total}",
     "empty": "No workouts in the system yet.",
     "lockedHint": "Finish the workout before this one to unlock it",
-    "levelMarker": "Level up to {color}",
     "summary": {
       "loading": "Loading...",
       "notFound": "No information found for this workout",
