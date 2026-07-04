@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { HomeIcon, JourneyIcon, TrophyIcon, FlagIcon, SettingsIcon, DumbbellIcon } from "@/components/navIcons";
+import { HomeIcon, MuscleIcon, TrophyIcon, FlagIcon, SettingsIcon, DumbbellIcon } from "@/components/navIcons";
 import type { ComponentType } from "react";
 import type { Role } from "@/lib/types";
 
@@ -19,7 +19,7 @@ interface TabItem {
 
 const CHILD_TABS: TabItem[] = [
   { href: "/dashboard", labelKey: "home", Icon: HomeIcon },
-  { href: "/dashboard/journey", labelKey: "journey", Icon: JourneyIcon },
+  { href: "/dashboard/journey", labelKey: "journey", Icon: MuscleIcon },
   { href: "/dashboard/leaderboard", labelKey: "leaderboard", Icon: TrophyIcon },
   { href: "/dashboard/challenges", labelKey: "challenges", Icon: FlagIcon },
   { href: "/dashboard/settings", labelKey: "settings", Icon: SettingsIcon },

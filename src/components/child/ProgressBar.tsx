@@ -12,7 +12,7 @@ export function ProgressBar({ percent, color }: ProgressBarProps) {
   return (
     <div className="h-3 w-full overflow-hidden rounded-full bg-black">
       <div
-        className="h-full rounded-full transition-all"
+        className="h-full rounded-full border border-black transition-all"
         style={{ width: `${clamped}%`, backgroundColor: BRACELET_CSS_VAR[color] }}
       />
     </div>

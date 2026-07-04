@@ -11,12 +11,12 @@ export function HomeIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-export function JourneyIcon(props: SVGProps<SVGSVGElement>) {
+export function MuscleIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} {...props}>
-      <path d="M4 20c3-8 5-8 8 0s5-8 8 0" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="4" cy="20" r="1.5" fill="currentColor" stroke="none" />
-      <circle cx="20" cy="20" r="1.5" fill="currentColor" stroke="none" />
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <rect x="2" y="9" width="6" height="6" rx="2" />
+      <rect x="7" y="10" width="7" height="4" rx="1.5" />
+      <path d="M13 8c0-2.8 2.2-5 5-5s5 2.2 5 5c0 2-1.2 3.7-3 4.5V15c0 2.8-2.2 5-5 5h-3v-4h3c1.1 0 2-.9 2-2v-1.6c-2.3-.4-4-2.4-4-4.4z" />
     </svg>
   );
 }
