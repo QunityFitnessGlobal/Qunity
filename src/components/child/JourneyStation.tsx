@@ -45,7 +45,11 @@ export function JourneyStation({
   const isCurrent = state === "current";
   const circleSize = isCurrent ? "h-16 w-16" : "h-12 w-12";
   const emphasis = isCurrent ? "ring-4 ring-brand-purple ring-offset-2" : "";
-  const dimmed = state === "locked" ? "opacity-50" : "";
+  // Locked stations are solid light gray, not a dimmed/transparent version
+  // of the belt color — opacity would let the road SVG underneath show
+  // through the circle, which looked broken for the whole "future" stretch
+  // of the path.
+  const fillClass = state === "locked" ? "bg-zinc-300" : BRACELET_BADGE_CLASSES[beltColor];
 
   return (
     <div id={id} style={style} className="absolute flex flex-col items-center gap-1">
@@ -53,7 +57,7 @@ export function JourneyStation({
         type="button"
         onClick={handleClick}
         aria-label={title}
-        className={`relative flex ${circleSize} items-center justify-center rounded-full font-bold text-zinc-800 shadow-sm transition-transform ${BRACELET_BADGE_CLASSES[beltColor]} ${emphasis} ${dimmed} ${
+        className={`relative flex ${circleSize} items-center justify-center rounded-full font-bold text-zinc-800 shadow-sm transition-transform ${fillClass} ${emphasis} ${
           showLockedHint ? "animate-journey-shake" : ""
         }`}
       >
