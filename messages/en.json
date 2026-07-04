@@ -114,7 +114,6 @@
     "finishSession": "Done",
     "loading": "Loading...",
     "questionnaireTitle": "How was the workout?",
-    "activityLabel": "What activity did you do?",
     "actualDurationLabel": "Actual workout time: {duration}",
     "trainedLongerPraise": "You trained {minutes} minutes longer than recommended, well done! 💪",
     "difficultyLabel": "Actual difficulty level (1-5)",
@@ -133,7 +132,11 @@
     "colorProgress": "{color} color · workout {index} of {total}",
     "recommended": "Recommended time: {minutes} minutes · recommended difficulty: {difficulty}",
     "start": "Start",
-    "finish": "Finish"
+    "finish": "Finish",
+    "phaseWork": "Work",
+    "phaseRest": "Rest",
+    "setLabel": "Set",
+    "setProgress": "{current} of {total}"
   },
   "dashboard": {
     "parentTitle": "Parent Dashboard",

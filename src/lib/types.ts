@@ -45,6 +45,9 @@ export interface BraceletLevel {
   order_index: number;
   required_workouts: number;
   required_points: number;
+  interval_rounds: number | null;
+  interval_work_seconds: number | null;
+  interval_rest_seconds: number | null;
 }
 
 export interface Workout {

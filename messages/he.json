@@ -67,7 +67,7 @@
   "nextWorkout": {
     "none": "אין אימון זמין כרגע.",
     "label": "האימון הבא - שווי {points} נקודות",
-    "start": "Start"
+    "start": "התחל"
   },
   "challengeList": {
     "empty": "עדיין לא פתחת אתגרים."
@@ -114,7 +114,6 @@
     "finishSession": "סיום",
     "loading": "טוען...",
     "questionnaireTitle": "איך היה האימון?",
-    "activityLabel": "איזו פעילות עשית?",
     "actualDurationLabel": "זמן אימון בפועל: {duration}",
     "trainedLongerPraise": "התאמנת {minutes} דקות יותר מהמומלץ, כל הכבוד! 💪",
     "difficultyLabel": "רמת קושי בפועל (1-5)",
@@ -133,7 +132,11 @@
     "colorProgress": "צבע {color} · אימון {index} מתוך {total}",
     "recommended": "זמן מומלץ: {minutes} דקות · רמת קושי מומלצת: {difficulty}",
     "start": "Start",
-    "finish": "Finish"
+    "finish": "Finish",
+    "phaseWork": "אימון",
+    "phaseRest": "מנוחה",
+    "setLabel": "סט",
+    "setProgress": "{current} מתוך {total}"
   },
   "dashboard": {
     "parentTitle": "Parent Dashboard",

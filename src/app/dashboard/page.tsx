@@ -86,7 +86,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                     total: stats.requiredWorkouts,
                   })}
                 </p>
-                <ProgressBar percent={stats.progressPercent} />
+                <ProgressBar percent={stats.progressPercent} color={stats.currentColor} />
               </div>
 
               <StatsGrid
@@ -199,7 +199,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               points: pointsToNextColor,
             })}
           </p>
-          <ProgressBar percent={progressPercent} />
+          <ProgressBar percent={progressPercent} color={currentColor} />
         </div>
 
         <p className="text-lg font-bold">

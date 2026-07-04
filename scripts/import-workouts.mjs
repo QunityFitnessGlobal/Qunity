@@ -114,22 +114,40 @@ async function main() {
     });
   });
 
-  // --- levels_overview (per-belt duration) ---
+  // --- levels_overview (per-belt duration + interval structure) ---
   const levelRows = sheetRows(workbook, "levels_overview");
   if (!levelRows) errors.push('Sheet "levels_overview" not found.');
 
   const durationSecByColor = new Map();
+  const intervalByColor = new Map();
   (levelRows ?? []).forEach((row, i) => {
     const rowNum = i + 2;
     const color = nonEmpty(row.color_id).toLowerCase();
     const durationSec = Number(row.total_duration_sec);
+    const rounds = Number(row.rounds);
+    const workSec = Number(row.work_sec);
+    const restSec = Number(row.rest_sec);
+
     if (!VALID_BELT_COLORS.includes(color)) {
       errors.push(`levels_overview row ${rowNum}: unknown color_id "${row.color_id}"`);
     }
     if (!Number.isFinite(durationSec)) {
       errors.push(`levels_overview row ${rowNum}: total_duration_sec "${row.total_duration_sec}" is not a number`);
     }
+    if (!Number.isInteger(rounds)) errors.push(`levels_overview row ${rowNum}: rounds "${row.rounds}" is not an integer`);
+    if (!Number.isInteger(workSec)) errors.push(`levels_overview row ${rowNum}: work_sec "${row.work_sec}" is not an integer`);
+    if (!Number.isInteger(restSec)) errors.push(`levels_overview row ${rowNum}: rest_sec "${row.rest_sec}" is not an integer`);
+    if (Number.isFinite(durationSec) && Number.isInteger(rounds) && Number.isInteger(workSec) && Number.isInteger(restSec)) {
+      const computed = rounds * (workSec + restSec);
+      if (computed !== durationSec) {
+        errors.push(
+          `levels_overview row ${rowNum}: rounds*(work_sec+rest_sec) = ${computed} does not match total_duration_sec = ${durationSec}`,
+        );
+      }
+    }
+
     durationSecByColor.set(color, durationSec);
+    intervalByColor.set(color, { rounds, workSec, restSec });
   });
 
   // --- bracelet_levels (live, for recommended_difficulty = belt order_index) ---
@@ -206,6 +224,23 @@ async function main() {
   }
 
   console.log(`Validated ${exercises.length} exercises and ${workouts.length} workouts. Writing...`);
+
+  for (const color of VALID_BELT_COLORS) {
+    const interval = intervalByColor.get(color);
+    if (!interval) continue;
+    const { error: levelError } = await supabase
+      .from("bracelet_levels")
+      .update({
+        interval_rounds: interval.rounds,
+        interval_work_seconds: interval.workSec,
+        interval_rest_seconds: interval.restSec,
+      })
+      .eq("color", color);
+    if (levelError) {
+      console.error(`Updating bracelet_levels interval structure for "${color}" failed:`, levelError.message);
+      process.exit(1);
+    }
+  }
 
   const { error: exercisesError } = await supabase
     .from("exercises")

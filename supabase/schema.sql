@@ -688,3 +688,16 @@ create policy "exercises_read" on public.exercises
   for select to authenticated using (true);
 create policy "workout_exercises_read" on public.workout_exercises
   for select to authenticated using (true);
+
+-- ============================================================================
+-- ADDED FOR INTERVAL WORKOUT TIMER
+--
+-- Per-belt Tabata-style structure (from the spreadsheet's levels_overview
+-- sheet: rounds, work_sec, rest_sec) driving WorkoutRunner's countdown
+-- timer. Nullable until scripts/import-workouts.mjs populates them, so the
+-- app falls back to the old plain stopwatch when they're absent.
+-- ============================================================================
+
+alter table public.bracelet_levels add column interval_rounds integer;
+alter table public.bracelet_levels add column interval_work_seconds integer;
+alter table public.bracelet_levels add column interval_rest_seconds integer;

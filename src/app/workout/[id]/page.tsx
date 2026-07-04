@@ -52,6 +52,19 @@ export default async function WorkoutPage({ params }: WorkoutPageProps) {
     .eq("color", child?.current_color ?? "white")
     .single<{ required_workouts: number }>();
 
+  // Interval structure (rounds/work/rest) belongs to the workout's own belt,
+  // not necessarily the child's current one — kept separate from `level`
+  // above in case those ever diverge.
+  const { data: interval } = await supabase
+    .from("bracelet_levels")
+    .select("interval_rounds, interval_work_seconds, interval_rest_seconds")
+    .eq("color", workout.color ?? child?.current_color ?? "white")
+    .single<{
+      interval_rounds: number | null;
+      interval_work_seconds: number | null;
+      interval_rest_seconds: number | null;
+    }>();
+
   const tColors = await getTranslations("colors");
 
   return (
@@ -62,6 +75,9 @@ export default async function WorkoutPage({ params }: WorkoutPageProps) {
         workoutIndex={(child?.workouts_completed_in_color ?? 0) + 1}
         requiredWorkouts={level?.required_workouts ?? 0}
         colorLabel={tColors(workout.color ?? child?.current_color ?? "white")}
+        intervalRounds={interval?.interval_rounds ?? null}
+        intervalWorkSeconds={interval?.interval_work_seconds ?? null}
+        intervalRestSeconds={interval?.interval_rest_seconds ?? null}
       />
     </div>
   );
