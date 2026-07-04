@@ -43,6 +43,7 @@ export function JourneyStation({
   }
 
   const isCurrent = state === "current";
+  const isDone = state === "done";
   const circleSize = isCurrent ? "h-16 w-16" : "h-12 w-12";
   const emphasis = isCurrent ? "ring-4 ring-brand-purple ring-offset-2" : "";
   // Locked stations are solid light gray, not a dimmed/transparent version
@@ -51,7 +52,7 @@ export function JourneyStation({
   // of the path. A colored border (rather than a colored fill) still shows
   // which belt a locked station belongs to.
   const isLocked = state === "locked";
-  const fillClass = isLocked ? "bg-zinc-300" : BRACELET_BADGE_CLASSES[beltColor];
+  const fillClass = isLocked ? "bg-zinc-300" : isDone ? "bg-transparent" : BRACELET_BADGE_CLASSES[beltColor];
   const lockedBorderStyle: CSSProperties = isLocked
     ? { borderWidth: 3, borderStyle: "solid", borderColor: BRACELET_CSS_VAR[beltColor] }
     : {};
@@ -67,16 +68,15 @@ export function JourneyStation({
           showLockedHint ? "animate-journey-shake" : ""
         }`}
       >
-        <span>{localNumber}</span>
+        {isDone ? (
+          <StarIcon className="h-full w-full text-yellow-400" />
+        ) : (
+          <span>{localNumber}</span>
+        )}
 
         {state === "locked" && (
           <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-zinc-700 text-white">
             <LockIcon className="h-3 w-3" />
-          </span>
-        )}
-        {state === "done" && (
-          <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-yellow-500 text-white">
-            <StarIcon className="h-3 w-3" />
           </span>
         )}
         {isCurrent && (
