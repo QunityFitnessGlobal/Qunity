@@ -7,8 +7,7 @@ import { getNextWorkout, getWorkoutsCompletedThisMonth } from "@/services/workou
 import { calculateProgressPercent } from "@/services/progression.service";
 import { getEncouragementKey } from "@/services/encouragement.service";
 import { getChildStatsForParent } from "@/services/parent-stats.service";
-import { getRelevantTips, buildChildTipSnapshot } from "@/services/tips.service";
-import { TIP_CONDITION_REGISTRY } from "@/services/tip-conditions";
+import { getRelevantTips } from "@/services/tips.service";
 import { formatDurationClock } from "@/lib/format";
 import { ChildCodeCard } from "@/components/ChildCodeCard";
 import { ColorBadge } from "@/components/child/ColorBadge";
@@ -51,23 +50,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       ? await getChildStatsForParent(supabase, selectedChildId)
       : null;
     const initialTips = selectedChildId ? await getRelevantTips(supabase, selectedChildId) : [];
-    const debugSnapshot = selectedChildId
-      ? await buildChildTipSnapshot(supabase, selectedChildId)
-      : null;
-    const { data: debugRules, error: debugRulesError } = await supabase
-      .from("parent_tip_rules")
-      .select("id, condition_type, priority");
-    const { data: debugRulesFull, error: debugRulesFullError } = await supabase
-      .from("parent_tip_rules")
-      .select("id, principle, condition_type, condition_params, tip_text, priority");
-    const debugManualMatch = (debugRulesFull ?? []).map((rule) => {
-      const conditionFn = TIP_CONDITION_REGISTRY[rule.condition_type];
-      return {
-        condition_type: rule.condition_type,
-        hasFn: Boolean(conditionFn),
-        result: conditionFn ? conditionFn(debugSnapshot!, rule.condition_params ?? {}, undefined) : null,
-      };
-    });
 
     return (
       <div className="flex flex-1 flex-col items-center gap-6 pb-12">
@@ -126,21 +108,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                   },
                 ]}
               />
-
-              {debugSnapshot && (
-                <pre className="w-full max-w-md overflow-x-auto rounded-md bg-yellow-50 p-2 text-left text-xs text-yellow-900" dir="ltr">
-                  DEBUG selectedChildId={selectedChildId}{"\n"}
-                  {JSON.stringify(debugSnapshot, null, 2)}
-                  {"\n\nDEBUG rules count="}{debugRules?.length ?? "null"}{" error="}{debugRulesError?.message ?? "none"}{"\n"}
-                  {JSON.stringify(debugRules, null, 2)}
-                  {"\n\nDEBUG rulesFull count="}{debugRulesFull?.length ?? "null"}{" error="}{debugRulesFullError?.message ?? "none"}{"\n"}
-                  {JSON.stringify(debugRulesFull, null, 2)}
-                  {"\n\nDEBUG initialTips (from getRelevantTips)="}{"\n"}
-                  {JSON.stringify(initialTips, null, 2)}
-                  {"\n\nDEBUG manual per-rule evaluation="}{"\n"}
-                  {JSON.stringify(debugManualMatch, null, 2)}
-                </pre>
-              )}
 
               <TipsPanel parentId={user.id} childId={selectedChildId} initialTips={initialTips} />
             </>
