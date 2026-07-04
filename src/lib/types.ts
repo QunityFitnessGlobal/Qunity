@@ -55,7 +55,37 @@ export interface Workout {
   recommended_difficulty: number | null;
   color: BraceletColor | null;
   order_in_color: number | null;
+  exercise_code: string | null;
   created_at: string;
+}
+
+export interface Exercise {
+  id: string;
+  pattern_en: string | null;
+  pattern_he: string | null;
+  name_he: string;
+  name_en: string;
+  description_he: string | null;
+  difficulty_tip_he: string | null;
+  created_at: string;
+}
+
+export interface WorkoutExercise {
+  id: string;
+  workout_id: string;
+  slot_number: number;
+  exercise_id: string;
+}
+
+export type JourneyStationState = "locked" | "current" | "done";
+
+export interface JourneyStation {
+  workoutId: string;
+  title: LocalizedText;
+  beltColor: BraceletColor;
+  localNumber: number;
+  globalNumber: number;
+  state: JourneyStationState;
 }
 
 export interface WorkoutSession {

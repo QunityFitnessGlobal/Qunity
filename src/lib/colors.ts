@@ -11,3 +11,14 @@ export const BRACELET_BADGE_CLASSES: Record<BraceletColor, string> = {
   blue: "bg-bracelet-blue",
   purple: "bg-bracelet-purple",
 };
+
+// CSS custom property name for each belt color (defined in globals.css),
+// for contexts (inline styles, gradients) that need the raw color value
+// rather than a Tailwind background-color class.
+export const BRACELET_CSS_VAR: Record<BraceletColor, string> = {
+  white: "var(--color-bracelet-white)",
+  orange: "var(--color-bracelet-orange)",
+  green: "var(--color-bracelet-green)",
+  blue: "var(--color-bracelet-blue)",
+  purple: "var(--color-bracelet-purple)",
+};

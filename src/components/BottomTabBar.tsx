@@ -16,6 +16,7 @@ interface TabItem {
 
 const CHILD_TABS: TabItem[] = [
   { href: "/dashboard", labelKey: "home" },
+  { href: "/dashboard/journey", labelKey: "journey" },
   { href: "/dashboard/leaderboard", labelKey: "leaderboard" },
   { href: "/dashboard/challenges", labelKey: "challenges" },
   { href: "/dashboard/settings", labelKey: "settings" },

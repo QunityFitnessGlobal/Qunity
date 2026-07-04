@@ -633,3 +633,58 @@ as $$
 $$;
 
 grant execute on function public.get_leaderboard(integer) to authenticated;
+
+-- ============================================================================
+-- ADDED FOR JOURNEY MAP — stable upsert key for the Excel workout import
+--
+-- exercise_code is the human/spreadsheet-authored identifier (e.g. "white_01")
+-- used by scripts/import-workouts.mjs as the upsert conflict target, instead
+-- of the internal `id`, so re-importing an updated spreadsheet updates
+-- existing rows rather than duplicating them. Nullable because the current
+-- seed.sql sample rows predate this column; a unique index still allows
+-- multiple NULLs in Postgres, so this does not need a backfill.
+--
+-- The (color, order_in_color) unique constraint guarantees the journey map
+-- can always derive a single unambiguous station ordering per belt color.
+-- ============================================================================
+
+alter table public.workouts add column exercise_code text unique;
+alter table public.workouts add constraint workouts_color_order_unique unique (color, order_in_color);
+
+-- ============================================================================
+-- ADDED FOR JOURNEY MAP — exercise bank + per-workout exercise sequence
+--
+-- The real workout spreadsheet composes each workout from 2-5 exercises
+-- drawn from a shared exercise bank (e.g. "SQ01" = a squat variation), not a
+-- single freeform title/description. Storing this as two related tables
+-- (rather than flattening it into workouts.description) keeps the real
+-- structure available for future screens (e.g. "show me the exercises in
+-- this workout") without another migration.
+-- ============================================================================
+
+create table public.exercises (
+  id text primary key, -- stable code from the spreadsheet's exercise_bank sheet, e.g. "SQ01"
+  pattern_en text,
+  pattern_he text,
+  name_he text not null,
+  name_en text not null,
+  description_he text,
+  difficulty_tip_he text,
+  created_at timestamptz not null default now()
+);
+
+create table public.workout_exercises (
+  id uuid primary key default gen_random_uuid(),
+  workout_id uuid not null references public.workouts (id) on delete cascade,
+  slot_number integer not null,
+  exercise_id text not null references public.exercises (id),
+  unique (workout_id, slot_number)
+);
+
+alter table public.exercises enable row level security;
+alter table public.workout_exercises enable row level security;
+
+create policy "exercises_read" on public.exercises
+  for select to authenticated using (true);
+create policy "workout_exercises_read" on public.workout_exercises
+  for select to authenticated using (true);

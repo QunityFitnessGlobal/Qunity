@@ -174,9 +174,33 @@
   },
   "nav": {
     "home": "בית",
+    "journey": "מסלול",
     "leaderboard": "מובילים",
     "challenges": "אתגרים",
     "workouts": "אימונים",
     "settings": "הגדרות"
+  },
+  "journey": {
+    "belt": "צמיד נוכחי: {color}",
+    "progress": "{done} מתוך {total}",
+    "empty": "אין עדיין אימונים במערכת.",
+    "lockedHint": "סיימו קודם את האימון שלפני כדי לפתוח את זה",
+    "levelMarker": "מעבר לצמיד {color}",
+    "summary": {
+      "loading": "טוען...",
+      "notFound": "לא נמצא מידע על האימון הזה",
+      "unknownWorkout": "אימון",
+      "date": "תאריך",
+      "duration": "משך",
+      "difficulty": "קושי מדווח",
+      "feeling": "הרגשה",
+      "points": "נקודות שנצברו",
+      "close": "סגירה",
+      "feelingValues": {
+        "great": "מעולה",
+        "ok": "בסדר",
+        "hard": "קשה"
+      }
+    }
   }
 }

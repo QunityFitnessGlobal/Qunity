@@ -174,9 +174,33 @@
   },
   "nav": {
     "home": "Home",
+    "journey": "Journey",
     "leaderboard": "Leaderboard",
     "challenges": "Challenges",
     "workouts": "Workouts",
     "settings": "Settings"
+  },
+  "journey": {
+    "belt": "Current belt: {color}",
+    "progress": "{done} of {total}",
+    "empty": "No workouts in the system yet.",
+    "lockedHint": "Finish the workout before this one to unlock it",
+    "levelMarker": "Level up to {color}",
+    "summary": {
+      "loading": "Loading...",
+      "notFound": "No information found for this workout",
+      "unknownWorkout": "Workout",
+      "date": "Date",
+      "duration": "Duration",
+      "difficulty": "Reported difficulty",
+      "feeling": "Feeling",
+      "points": "Points earned",
+      "close": "Close",
+      "feelingValues": {
+        "great": "Great",
+        "ok": "OK",
+        "hard": "Hard"
+      }
+    }
   }
 }
