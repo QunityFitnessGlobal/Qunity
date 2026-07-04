@@ -2,7 +2,7 @@
 
 import { useState, type CSSProperties } from "react";
 import { useTranslations } from "next-intl";
-import { BRACELET_BADGE_CLASSES } from "@/lib/colors";
+import { BRACELET_BADGE_CLASSES, BRACELET_CSS_VAR } from "@/lib/colors";
 import { LockIcon, PlayIcon, StarIcon } from "@/components/child/journeyIcons";
 import type { BraceletColor, JourneyStationState } from "@/lib/types";
 
@@ -48,8 +48,13 @@ export function JourneyStation({
   // Locked stations are solid light gray, not a dimmed/transparent version
   // of the belt color — opacity would let the road SVG underneath show
   // through the circle, which looked broken for the whole "future" stretch
-  // of the path.
-  const fillClass = state === "locked" ? "bg-zinc-300" : BRACELET_BADGE_CLASSES[beltColor];
+  // of the path. A colored border (rather than a colored fill) still shows
+  // which belt a locked station belongs to.
+  const isLocked = state === "locked";
+  const fillClass = isLocked ? "bg-zinc-300" : BRACELET_BADGE_CLASSES[beltColor];
+  const lockedBorderStyle: CSSProperties = isLocked
+    ? { borderWidth: 3, borderStyle: "solid", borderColor: BRACELET_CSS_VAR[beltColor] }
+    : {};
 
   return (
     <div id={id} style={style} className="absolute flex flex-col items-center gap-1">
@@ -57,6 +62,7 @@ export function JourneyStation({
         type="button"
         onClick={handleClick}
         aria-label={title}
+        style={lockedBorderStyle}
         className={`relative flex ${circleSize} items-center justify-center rounded-full font-bold text-zinc-800 shadow-sm transition-transform ${fillClass} ${emphasis} ${
           showLockedHint ? "animate-journey-shake" : ""
         }`}
