@@ -10,7 +10,7 @@ export function ProgressBar({ percent, color }: ProgressBarProps) {
   const clamped = Math.min(100, Math.max(0, percent));
 
   return (
-    <div className="h-3 w-full overflow-hidden rounded-full bg-zinc-200">
+    <div className="h-3 w-full overflow-hidden rounded-full bg-black">
       <div
         className="h-full rounded-full transition-all"
         style={{ width: `${clamped}%`, backgroundColor: BRACELET_CSS_VAR[color] }}
