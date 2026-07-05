@@ -36,9 +36,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   const { data: profile } = await supabase
     .from("users")
-    .select("role, full_name")
+    .select("role, full_name, gender")
     .eq("id", user.id)
-    .single<{ role: Role; full_name: string }>();
+    .single<{ role: Role; full_name: string; gender: Gender | null }>();
 
   if (profile?.role !== "child") {
     const t = await getTranslations("dashboard");
@@ -183,6 +183,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const tEncouragement = await getTranslations("encouragement");
   const encouragementMessage = tEncouragement(getEncouragementKey(workoutsThisMonth), {
     count: workoutsThisMonth,
+    gender: profile?.gender ?? "other",
   });
 
   return (
