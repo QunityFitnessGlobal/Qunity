@@ -701,3 +701,107 @@ create policy "workout_exercises_read" on public.workout_exercises
 alter table public.bracelet_levels add column interval_rounds integer;
 alter table public.bracelet_levels add column interval_work_seconds integer;
 alter table public.bracelet_levels add column interval_rest_seconds integer;
+
+-- ============================================================================
+-- ADDED FOR GENDERED TIP PHRASING
+--
+-- Same underlying value for both roles ("male"/"female") — the signup form
+-- just shows different labels (הורה: אמא/אבא, ילד/ה: זכר/נקבה) depending on
+-- role. Nullable for existing accounts created before this column existed.
+--
+-- Used to pick the correct Hebrew grammatical gender when rendering
+-- parent_tip_rules.tip_text (see resolveGenderedText in i18n-content.ts) —
+-- tips describe the CHILD's behavior, so it's the child's gender that
+-- matters here, not the parent's.
+-- ============================================================================
+
+alter table public.users add column gender text check (gender in ('male', 'female'));
+
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_role text;
+  v_full_name text;
+  v_gender text;
+begin
+  v_role := coalesce(new.raw_user_meta_data ->> 'role', 'parent');
+  v_full_name := coalesce(new.raw_user_meta_data ->> 'full_name', '');
+  v_gender := new.raw_user_meta_data ->> 'gender';
+
+  insert into public.users (id, full_name, role, gender)
+  values (new.id, v_full_name, v_role, v_gender);
+
+  if v_role = 'parent' then
+    insert into public.parents (id) values (new.id);
+  elsif v_role = 'child' then
+    insert into public.children (id, nickname, child_code)
+    values (new.id, v_full_name, public.generate_child_code());
+  end if;
+
+  return new;
+end;
+$$;
+
+-- ============================================================================
+-- ADDED FOR GENDERED TIP PHRASING — rewrite tip_text.he as ICU gender-select
+--
+-- Only 8 of the 10 tips reference the child directly (הילד/ה, התאמן/ה, ...);
+-- low_parent_participation and zero_parent_participation only address the
+-- parent in plural/neutral forms and are left as-is. "other" keeps the
+-- original slash-form as a safety net if gender is ever null/unrecognized.
+-- resolveGenderedText() (src/lib/i18n-content.ts) evaluates this syntax;
+-- plain strings without "{gender" pass through unchanged, so this is safe
+-- even before every row is converted.
+-- ============================================================================
+
+update public.parent_tip_rules
+set tip_text = jsonb_set(tip_text, '{he}', to_jsonb(
+  '{gender, select, male {כבר 3 ימים שהילד לא התאמן. זה הזמן להזכיר לו שהבחירה בידיים שלו - שאלו אותו מתי נוח לו להתחיל שוב, בלי לחץ.} female {כבר 3 ימים שהילדה לא התאמנה. זה הזמן להזכיר לה שהבחירה בידיים שלה - שאלו אותה מתי נוח לה להתחיל שוב, בלי לחץ.} other {כבר 3 ימים שהילד/ה לא התאמן/ה. זה הזמן להזכיר לו/לה שהבחירה בידיים שלו/ה - שאלו אותו/ה מתי נוח לו/לה להתחיל שוב, בלי לחץ.}}'::text
+))
+where condition_type = 'no_workout_3_days';
+
+update public.parent_tip_rules
+set tip_text = jsonb_set(tip_text, '{he}', to_jsonb(
+  '{gender, select, male {עבר שבוע שלם בלי אימון. במקום להזכיר, נסו לשאול את הילד מה יעזור לו לחזור למסלול - התשובה שלו חשובה יותר מהתזכורת שלכם.} female {עבר שבוע שלם בלי אימון. במקום להזכיר, נסו לשאול את הילדה מה יעזור לה לחזור למסלול - התשובה שלה חשובה יותר מהתזכורת שלכם.} other {עבר שבוע שלם בלי אימון. במקום להזכיר, נסו לשאול את הילד/ה מה יעזור לו/לה לחזור למסלול - התשובה שלו/ה חשובה יותר מהתזכורת שלכם.}}'::text
+))
+where condition_type = 'no_workout_7_days';
+
+update public.parent_tip_rules
+set tip_text = jsonb_set(tip_text, '{he}', to_jsonb(
+  '{gender, select, male {הילד דיווח על קושי גבוה באימון האחרון. הרגשות האלה לגיטימיים - הכי חשוב להכיר בהם בלי למזער, ולא בהכרח להוריד את רמת הקושי.} female {הילדה דיווחה על קושי גבוה באימון האחרון. הרגשות האלה לגיטימיים - הכי חשוב להכיר בהם בלי למזער, ולא בהכרח להוריד את רמת הקושי.} other {הילד/ה דיווח/ה על קושי גבוה באימון האחרון. הרגשות האלה לגיטימיים - הכי חשוב להכיר בהם בלי למזער, ולא בהכרח להוריד את רמת הקושי.}}'::text
+))
+where condition_type = 'high_difficulty_reported';
+
+update public.parent_tip_rules
+set tip_text = jsonb_set(tip_text, '{he}', to_jsonb(
+  '{gender, select, male {כמה אימונים ברצף שהילד מדווח שהיה קשה. שווה לשבת יחד ולשאול איך הוא מרגיש, בלי לנסות לתקן מיד.} female {כמה אימונים ברצף שהילדה מדווחת שהיה קשה. שווה לשבת יחד ולשאול איך היא מרגישה, בלי לנסות לתקן מיד.} other {כמה אימונים ברצף שהילד/ה מדווח/ת שהיה קשה. שווה לשבת יחד ולשאול איך הוא/היא מרגיש/ה, בלי לנסות לתקן מיד.}}'::text
+))
+where condition_type = 'negative_feeling_streak';
+
+update public.parent_tip_rules
+set tip_text = jsonb_set(tip_text, '{he}', to_jsonb(
+  '{gender, select, male {הילד ממשיך להתאמן בעקביות אבל רמת הקושי לא עולה - וזה בסדר גמור. ההתמדה עצמה היא ההצלחה, לא בהכרח הקושי.} female {הילדה ממשיכה להתאמן בעקביות אבל רמת הקושי לא עולה - וזה בסדר גמור. ההתמדה עצמה היא ההצלחה, לא בהכרח הקושי.} other {הילד/ה ממשיך/ה להתאמן בעקביות אבל רמת הקושי לא עולה - וזה בסדר גמור. ההתמדה עצמה היא ההצלחה, לא בהכרח הקושי.}}'::text
+))
+where condition_type = 'difficulty_plateau';
+
+update public.parent_tip_rules
+set tip_text = jsonb_set(tip_text, '{he}', to_jsonb(
+  '{gender, select, male {הילד כבר השלים הרבה אימונים לאורך הדרך. שווה להזכיר לו (ולעצמכם) שההשקעה נמדדת בעקביות, לא רק בתגים שנפתחו.} female {הילדה כבר השלימה הרבה אימונים לאורך הדרך. שווה להזכיר לה (ולעצמכם) שההשקעה נמדדת בעקביות, לא רק בתגים שנפתחו.} other {הילד/ה כבר השלים/ה הרבה אימונים לאורך הדרך. שווה להזכיר לו/לה (ולעצמכם) שההשקעה נמדדת בעקביות, לא רק בתגים שנפתחו.}}'::text
+))
+where condition_type = 'high_total_effort_reminder';
+
+update public.parent_tip_rules
+set tip_text = jsonb_set(tip_text, '{he}', to_jsonb(
+  '{gender, select, male {הילד משלים אימונים באופן סדיר אבל עוד לא פתח הרבה אתגרים. כדאי להדגיש את המסע עצמו ולא רק את התגים - ההתמדה כבר הישג.} female {הילדה משלימה אימונים באופן סדיר אבל עוד לא פתחה הרבה אתגרים. כדאי להדגיש את המסע עצמו ולא רק את התגים - ההתמדה כבר הישג.} other {הילד/ה משלים/ה אימונים באופן סדיר אבל עוד לא פתח/ה הרבה אתגרים. כדאי להדגיש את המסע עצמו ולא רק את התגים - ההתמדה כבר הישג.}}'::text
+))
+where condition_type = 'low_challenge_unlock_rate';
+
+update public.parent_tip_rules
+set tip_text = jsonb_set(tip_text, '{he}', to_jsonb(
+  '{gender, select, male {הילד התאמן הרבה החודש! זה הזמן המושלם לחגוג את העקביות עצמה, לא רק תוצאה או מעבר שלב.} female {הילדה התאמנה הרבה החודש! זה הזמן המושלם לחגוג את העקביות עצמה, לא רק תוצאה או מעבר שלב.} other {הילד/ה התאמן/ה הרבה החודש! זה הזמן המושלם לחגוג את העקביות עצמה, לא רק תוצאה או מעבר שלב.}}'::text
+))
+where condition_type = 'consistent_monthly_activity';

@@ -17,7 +17,7 @@ import { EncouragementBanner } from "@/components/child/EncouragementBanner";
 import { ChildSelector } from "@/components/parent/ChildSelector";
 import { StatsGrid } from "@/components/parent/StatsGrid";
 import { TipsPanel } from "@/components/parent/TipsPanel";
-import type { BraceletColor, Role } from "@/lib/types";
+import type { BraceletColor, Gender, Role } from "@/lib/types";
 
 interface DashboardPageProps {
   searchParams: Promise<{ childId?: string }>;
@@ -50,6 +50,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       ? await getChildStatsForParent(supabase, selectedChildId)
       : null;
     const initialTips = selectedChildId ? await getRelevantTips(supabase, selectedChildId) : [];
+    const { data: childUser } = selectedChildId
+      ? await supabase
+          .from("users")
+          .select("gender")
+          .eq("id", selectedChildId)
+          .single<{ gender: Gender | null }>()
+      : { data: null };
+    const childGender = childUser?.gender ?? null;
 
     return (
       <div className="flex flex-1 flex-col items-center gap-6 pb-12">
@@ -109,7 +117,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                 ]}
               />
 
-              <TipsPanel parentId={user.id} childId={selectedChildId} initialTips={initialTips} />
+              <TipsPanel
+                parentId={user.id}
+                childId={selectedChildId}
+                initialTips={initialTips}
+                childGender={childGender}
+              />
             </>
           )}
         </div>

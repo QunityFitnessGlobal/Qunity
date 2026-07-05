@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { signUp } from "@/services/auth";
 import { matchErrorKey } from "@/lib/auth-errors";
-import type { Role } from "@/lib/types";
+import type { Gender, Role } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
 
@@ -23,6 +23,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("parent");
+  const [gender, setGender] = useState<Gender>("female");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -32,7 +33,7 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      await signUp({ fullName, email, password, role });
+      await signUp({ fullName, email, password, role, gender });
       router.push("/dashboard");
       router.refresh();
     } catch (err) {
@@ -89,6 +90,25 @@ export default function SignupPage() {
             >
               <option value="parent">{t("roleParent")}</option>
               <option value="child">{t("roleChild")}</option>
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <label htmlFor="gender" className="block text-sm font-medium text-zinc-700">
+              {t("genderLabel")}
+            </label>
+            <select
+              id="gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value as Gender)}
+              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            >
+              <option value="female">
+                {role === "parent" ? t("genderFemaleParent") : t("genderFemaleChild")}
+              </option>
+              <option value="male">
+                {role === "parent" ? t("genderMaleParent") : t("genderMaleChild")}
+              </option>
             </select>
           </div>
 

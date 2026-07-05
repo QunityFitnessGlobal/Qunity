@@ -1,14 +1,15 @@
 import { createClient } from "@/lib/supabase/client";
-import type { Role } from "@/lib/types";
+import type { Gender, Role } from "@/lib/types";
 
 interface SignUpInput {
   fullName: string;
   email: string;
   password: string;
   role: Role;
+  gender: Gender;
 }
 
-export async function signUp({ fullName, email, password, role }: SignUpInput) {
+export async function signUp({ fullName, email, password, role, gender }: SignUpInput) {
   const supabase = createClient();
 
   const { data, error } = await supabase.auth.signUp({
@@ -18,6 +19,7 @@ export async function signUp({ fullName, email, password, role }: SignUpInput) {
       data: {
         full_name: fullName,
         role,
+        gender,
       },
     },
   });

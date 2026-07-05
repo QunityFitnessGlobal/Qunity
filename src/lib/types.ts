@@ -2,6 +2,8 @@ import type { LocalizedText } from "@/lib/i18n-content";
 
 export type Role = "parent" | "child";
 
+export type Gender = "male" | "female";
+
 export type BraceletColor = "white" | "orange" | "green" | "blue" | "purple";
 
 export type WorkoutSessionStatus = "in_progress" | "completed" | "abandoned";
@@ -10,6 +12,7 @@ export interface User {
   id: string;
   full_name: string;
   role: Role;
+  gender: Gender | null;
   preferred_language: string;
   created_at: string;
 }

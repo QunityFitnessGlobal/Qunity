@@ -7,11 +7,13 @@ import { getRelevantTips, logShownTips, type RelevantTip } from "@/services/tips
 import { TipCard } from "@/components/parent/TipCard";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
+import type { Gender } from "@/lib/types";
 
 interface TipsPanelProps {
   parentId: string;
   childId: string;
   initialTips: RelevantTip[];
+  childGender: Gender | null;
 }
 
 // The numeric field + show button below are a TEMPORARY manual test mode
@@ -20,7 +22,7 @@ interface TipsPanelProps {
 // parent_tips), but force the outcome to a specific scenario (1-5) since the
 // first five condition functions are still stubs. Remove this control once
 // every condition function has its real calculation.
-export function TipsPanel({ parentId, childId, initialTips }: TipsPanelProps) {
+export function TipsPanel({ parentId, childId, initialTips, childGender }: TipsPanelProps) {
   const t = useTranslations("tips");
   const locale = useLocale();
   const [tips, setTips] = useState(initialTips);
@@ -55,7 +57,7 @@ export function TipsPanel({ parentId, childId, initialTips }: TipsPanelProps) {
       {tips.length === 0 && <p className="text-sm text-text-muted">{t("empty")}</p>}
       <div className="space-y-2">
         {tips.map((tip) => (
-          <TipCard key={tip.ruleId} tip={tip} locale={locale} />
+          <TipCard key={tip.ruleId} tip={tip} locale={locale} gender={childGender} />
         ))}
       </div>
 
