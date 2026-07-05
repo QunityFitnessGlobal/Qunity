@@ -52,7 +52,7 @@ export function JourneyStation({
   // of the path. A colored border (rather than a colored fill) still shows
   // which belt a locked station belongs to.
   const isLocked = state === "locked";
-  const fillClass = isLocked ? "bg-zinc-300" : isDone ? "bg-transparent" : BRACELET_BADGE_CLASSES[beltColor];
+  const fillClass = isLocked ? "bg-zinc-300" : BRACELET_BADGE_CLASSES[beltColor];
   const lockedBorderStyle: CSSProperties = isLocked
     ? { borderWidth: 3, borderStyle: "solid", borderColor: BRACELET_CSS_VAR[beltColor] }
     : {};
@@ -69,7 +69,7 @@ export function JourneyStation({
         }`}
       >
         {isDone ? (
-          <StarIcon className="h-full w-full text-yellow-400" />
+          <StarIcon className="h-6 w-6 text-yellow-400" />
         ) : (
           <span>{localNumber}</span>
         )}
