@@ -330,6 +330,12 @@ export function WorkoutRunner({
         {t("colorProgress", { color: colorLabel, index: workoutIndex, total: requiredWorkouts })}
       </p>
       <h1 className="text-2xl font-bold">{resolveLocalizedText(workout.title, locale)}</h1>
+      <p className="text-sm text-zinc-500">
+        {t("recommended", {
+          minutes: workout.recommended_duration_minutes ?? "-",
+          difficulty: workout.recommended_difficulty ?? "-",
+        })}
+      </p>
 
       {stage === "idle" && exercises.length > 0 && (
         <div className="w-full space-y-2 text-right">
@@ -372,12 +378,6 @@ export function WorkoutRunner({
       {workout.description && (
         <p className="text-zinc-600">{resolveLocalizedText(workout.description, locale)}</p>
       )}
-      <p className="text-sm text-zinc-500">
-        {t("recommended", {
-          minutes: workout.recommended_duration_minutes ?? "-",
-          difficulty: workout.recommended_difficulty ?? "-",
-        })}
-      </p>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
