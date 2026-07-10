@@ -22,6 +22,18 @@ export function difficultyLabelKey(value: number | null | undefined): string | n
   return DIFFICULTY_LABEL_KEYS[value as DifficultyValue];
 }
 
+// For an *average* (e.g. StatsGrid's "average difficulty reported" — a mean
+// across many sessions, so it's rarely a whole number): round to the
+// nearest ordinal and clamp into the valid 1-4 range before mapping to a
+// word, rather than displaying the raw float.
+export function averageDifficultyLabelKey(average: number | null | undefined): string | null {
+  if (average == null) {
+    return null;
+  }
+  const rounded = Math.min(4, Math.max(1, Math.round(average))) as DifficultyValue;
+  return DIFFICULTY_LABEL_KEYS[rounded];
+}
+
 // Stable, locale-independent codes stored in workout_results.feeling_after
 // (see tip-conditions/all-feelings-are-allowed.ts, which matches against
 // these same codes). Only the displayed label/icon is translated/gendered.

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { logShownTips, type ManualMenuTip } from "@/services/tips.service";
 import { resolveGenderedText } from "@/lib/i18n-content";
+import { TipLikeDismissButtons } from "@/components/parent/TipLikeDismissButtons";
 import type { Gender } from "@/lib/types";
 
 interface WhatsHappeningNowMenuProps {
@@ -28,6 +29,17 @@ const GROUP_TITLE_KEYS: Record<(typeof GROUP_ORDER)[number], string> = {
   5: "group5",
 };
 
+const FADE_DURATION_MS = 300;
+
+// The ChildSelector switch does a full Next.js navigation (childId lives in
+// the URL), which remounts this component and would otherwise silently wipe
+// the tip the parent was just reading. The tip content itself isn't
+// child-specific (category 3 is the same 34 generic items for every child),
+// so sessionStorage — keyed by ruleId, resolved back against the `tips`
+// prop on mount — is enough to survive that remount without any URL/query
+// plumbing.
+const SELECTED_TIP_STORAGE_KEY = "qunity:empowerment-selected-tip";
+
 export function WhatsHappeningNowMenu({
   tips,
   parentId,
@@ -39,9 +51,30 @@ export function WhatsHappeningNowMenu({
   const [expandedGroup, setExpandedGroup] = useState<number | null>(null);
   const [selectedTip, setSelectedTip] = useState<ManualMenuTip | null>(null);
   const [logging, setLogging] = useState(false);
+  const [fading, setFading] = useState(false);
+
+  useEffect(() => {
+    const storedRuleId = sessionStorage.getItem(SELECTED_TIP_STORAGE_KEY);
+    if (!storedRuleId) return;
+    const restored = tips.find((tip) => tip.ruleId === storedRuleId);
+    if (restored) {
+      // Deliberate one-time restoration from sessionStorage on mount, not a
+      // React-state sync — must run in an effect since sessionStorage isn't
+      // available during SSR, and running it in a lazy useState initializer
+      // instead would produce a client/server hydration mismatch (server
+      // always renders null, since it has no sessionStorage).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedTip(restored);
+    }
+    // Only restore once, on mount — tips content is static so this doesn't
+    // need to re-run when the tips prop reference changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleSelect(tip: ManualMenuTip) {
     setSelectedTip(tip);
+    setFading(false);
+    sessionStorage.setItem(SELECTED_TIP_STORAGE_KEY, tip.ruleId);
     setLogging(true);
     try {
       const supabase = createClient();
@@ -49,6 +82,16 @@ export function WhatsHappeningNowMenu({
     } finally {
       setLogging(false);
     }
+  }
+
+  function dismissSelectedTip() {
+    setSelectedTip(null);
+    sessionStorage.removeItem(SELECTED_TIP_STORAGE_KEY);
+  }
+
+  function handleLike() {
+    setFading(true);
+    setTimeout(dismissSelectedTip, FADE_DURATION_MS);
   }
 
   const grouped = GROUP_ORDER.map((group) => ({
@@ -88,7 +131,16 @@ export function WhatsHappeningNowMenu({
       ))}
 
       {selectedTip && (
-        <div className="mt-3 rounded-md border border-brand-purple/20 bg-brand-purple/5 p-3">
+        <div
+          className={`relative mt-3 rounded-md border border-brand-purple/20 bg-brand-purple/5 p-3 pt-8 transition-opacity duration-300 ${
+            fading ? "opacity-0" : "opacity-100"
+          }`}
+        >
+          <TipLikeDismissButtons
+            ruleId={selectedTip.ruleId}
+            onLike={handleLike}
+            onDismiss={dismissSelectedTip}
+          />
           {selectedTip.principle && (
             <p className="mb-1 text-xs font-semibold text-brand-purple">{selectedTip.principle}</p>
           )}

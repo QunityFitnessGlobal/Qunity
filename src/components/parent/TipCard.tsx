@@ -1,4 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import { resolveGenderedText } from "@/lib/i18n-content";
+import { TipLikeDismissButtons } from "@/components/parent/TipLikeDismissButtons";
 import type { RelevantTip } from "@/services/tips.service";
 import type { Gender } from "@/lib/types";
 
@@ -8,9 +12,28 @@ interface TipCardProps {
   gender: Gender | null;
 }
 
+const FADE_DURATION_MS = 300;
+
 export function TipCard({ tip, locale, gender }: TipCardProps) {
+  const [dismissed, setDismissed] = useState(false);
+  const [fading, setFading] = useState(false);
+
+  if (dismissed) {
+    return null;
+  }
+
+  function handleLike() {
+    setFading(true);
+    setTimeout(() => setDismissed(true), FADE_DURATION_MS);
+  }
+
   return (
-    <div className="rounded-md border border-brand-purple/20 bg-brand-purple/5 p-3">
+    <div
+      className={`relative rounded-md border border-brand-purple/20 bg-brand-purple/5 p-3 pt-8 transition-opacity duration-300 ${
+        fading ? "opacity-0" : "opacity-100"
+      }`}
+    >
+      <TipLikeDismissButtons ruleId={tip.ruleId} onLike={handleLike} onDismiss={() => setDismissed(true)} />
       {tip.principle && (
         <p className="mb-1 text-xs font-semibold text-brand-purple">{tip.principle}</p>
       )}

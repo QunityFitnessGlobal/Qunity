@@ -126,7 +126,7 @@
     "questionnaireTitle": "איך היה האימון?",
     "actualDurationLabel": "זמן אימון בפועל: {duration}",
     "trainedLongerPraise": "התאמנת {minutes} דקות יותר מהמומלץ, כל הכבוד! 💪",
-    "exercisesHeading": "תרגילים באימון",
+    "currentExerciseLabel": "התרגיל הנוכחי",
     "difficultyTipLabel": "טיפ לפי רמת קושי",
     "difficultyLabel": "רמת קושי בפועל",
     "difficultyLight": "קליל",
@@ -157,7 +157,7 @@
     "setProgress": "{current} מתוך {total}"
   },
   "dashboard": {
-    "parentTitle": "Parent Dashboard",
+    "parentTitle": "לוח הורה",
     "childTitleComingSoon": "Child Dashboard — Coming Soon",
     "hello": "שלום, {name}",
     "helloExclaim": "שלום, {name}!",

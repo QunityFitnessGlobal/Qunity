@@ -79,6 +79,16 @@ export function WorkoutRunner({
   const recommendedDurationMinutes = workout.recommended_duration_minutes ?? 0;
   const extraMinutes = Math.round(actualDurationSeconds / 60) - recommendedDurationMinutes;
 
+  // Which exercise corresponds to "right now": set 1 before starting, then
+  // cycling through the workout's exercise list as timer.currentSet
+  // advances (modulo, in case there are fewer exercises than rounds — same
+  // defensive pattern as getNextWorkout's belt-workout cycling). This is
+  // pure derived client state, so it updates instantly on every set change
+  // with no refresh or network round-trip.
+  const currentSetNumber = stage === "running" && timer ? timer.currentSet : 1;
+  const currentExercise =
+    exercises.length > 0 ? exercises[(currentSetNumber - 1) % exercises.length].exercise : null;
+
   // Belt-wide Tabata structure (rounds/work/rest, from the spreadsheet's
   // levels_overview sheet — see bracelet_levels.interval_*). Falls back to
   // a plain count-up stopwatch (the pre-existing behavior) if a belt hasn't
@@ -320,6 +330,24 @@ export function WorkoutRunner({
         {t("colorProgress", { color: colorLabel, index: workoutIndex, total: requiredWorkouts })}
       </p>
       <h1 className="text-2xl font-bold">{resolveLocalizedText(workout.title, locale)}</h1>
+
+      {currentExercise && (
+        <div className="w-full rounded-md border border-zinc-200 bg-zinc-50 p-3 text-right">
+          <p className="text-xs font-semibold text-text-muted">{t("currentExerciseLabel")}</p>
+          <p className="mt-0.5 font-semibold">
+            {locale === "en" ? currentExercise.name_en : currentExercise.name_he}
+          </p>
+          {currentExercise.description_he && (
+            <p className="mt-1 text-sm text-zinc-600">{currentExercise.description_he}</p>
+          )}
+          {currentExercise.difficulty_tip_he && (
+            <p className="mt-1 text-xs text-brand-purple">
+              {t("difficultyTipLabel")}: {currentExercise.difficulty_tip_he}
+            </p>
+          )}
+        </div>
+      )}
+
       {workout.description && (
         <p className="text-zinc-600">{resolveLocalizedText(workout.description, locale)}</p>
       )}
@@ -329,27 +357,6 @@ export function WorkoutRunner({
           difficulty: workout.recommended_difficulty ?? "-",
         })}
       </p>
-
-      {stage === "idle" && exercises.length > 0 && (
-        <div className="w-full space-y-2 text-right">
-          <h2 className="text-sm font-semibold text-text-muted">{t("exercisesHeading")}</h2>
-          {exercises.map(({ slotNumber, exercise }) => (
-            <div key={exercise.id} className="rounded-md border border-zinc-200 bg-zinc-50 p-3">
-              <p className="font-semibold">
-                {slotNumber}. {locale === "en" ? exercise.name_en : exercise.name_he}
-              </p>
-              {exercise.description_he && (
-                <p className="mt-1 text-sm text-zinc-600">{exercise.description_he}</p>
-              )}
-              {exercise.difficulty_tip_he && (
-                <p className="mt-1 text-xs text-brand-purple">
-                  {t("difficultyTipLabel")}: {exercise.difficulty_tip_he}
-                </p>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 

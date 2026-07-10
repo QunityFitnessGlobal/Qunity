@@ -1130,3 +1130,29 @@ Example: "Luck didn''t train. You did."'), 0),
   ('Personal Example & Praise', 'manual_selection',
    jsonb_build_object('menuGroup', 5, 'labelHe', 'הילד מזלזל בעצמו', 'labelEn', 'Child is putting themselves down'),
    jsonb_build_object('he', 'משפט לדוגמה: "איזה דבר אחד כן הלך לך טוב?"', 'en', 'Example: "What''s one thing that did go well for you?"'), 0);
+
+-- ============================================================================
+-- ADDED FOR TIP LIKE/DISMISS FEATURE
+--
+-- One counter per tip overall (not per-child, per the product decision —
+-- we only want to know how often a card is liked in general, not who liked
+-- it). Incremented via a security-definer RPC rather than a raw UPDATE RLS
+-- policy, since parents otherwise have no write access to parent_tip_rules
+-- (team-authored content) and this keeps the writable surface to exactly
+-- one counter column.
+-- ============================================================================
+
+alter table public.parent_tip_rules add column like_count integer not null default 0;
+
+create or replace function public.increment_tip_like_count(p_rule_id uuid)
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  update public.parent_tip_rules
+  set like_count = like_count + 1
+  where id = p_rule_id;
+$$;
+
+grant execute on function public.increment_tip_like_count(uuid) to authenticated;

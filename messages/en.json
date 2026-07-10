@@ -126,7 +126,7 @@
     "questionnaireTitle": "How was the workout?",
     "actualDurationLabel": "Actual workout time: {duration}",
     "trainedLongerPraise": "You trained {minutes} minutes longer than recommended, well done! 💪",
-    "exercisesHeading": "Exercises in this workout",
+    "currentExerciseLabel": "Current exercise",
     "difficultyTipLabel": "Difficulty tip",
     "difficultyLabel": "Actual difficulty level",
     "difficultyLight": "Light",

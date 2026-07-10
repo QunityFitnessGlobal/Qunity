@@ -9,6 +9,7 @@ import { getEncouragementKey } from "@/services/encouragement.service";
 import { getChildStatsForParent } from "@/services/parent-stats.service";
 import { getRelevantTips, logShownTips } from "@/services/tips.service";
 import { formatDurationClock } from "@/lib/format";
+import { averageDifficultyLabelKey } from "@/lib/workout-labels";
 import { ChildCodeCard } from "@/components/ChildCodeCard";
 import { ColorBadge } from "@/components/child/ColorBadge";
 import { ProgressBar } from "@/components/child/ProgressBar";
@@ -42,6 +43,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   if (profile?.role !== "child") {
     const t = await getTranslations("dashboard");
+    const tWorkout = await getTranslations("workout");
     const linkedChildren = await getLinkedChildren(supabase, user.id);
     const { childId } = await searchParams;
     const selectedChildId = childId ?? linkedChildren[0]?.id ?? null;
@@ -117,7 +119,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                   },
                   {
                     label: t("stats.averageDifficulty"),
-                    value: stats.averageDifficultyReported?.toString() ?? "-",
+                    value: (() => {
+                      const key = averageDifficultyLabelKey(stats.averageDifficultyReported);
+                      return key ? tWorkout(key) : "-";
+                    })(),
                   },
                   {
                     label: t("stats.parentTogetherCount"),
