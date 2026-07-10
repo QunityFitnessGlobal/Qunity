@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { HomeIcon, TrophyIcon, FlagIcon, SettingsIcon, DumbbellIcon } from "@/components/navIcons";
+import { HomeIcon, TrophyIcon, FlagIcon, SettingsIcon, DumbbellIcon, HeartHandIcon } from "@/components/navIcons";
 import { StarIcon } from "@/components/child/journeyIcons";
 import type { ComponentType } from "react";
 import type { Role } from "@/lib/types";
@@ -30,6 +30,7 @@ const PARENT_TABS: TabItem[] = [
   { href: "/dashboard", labelKey: "home", Icon: HomeIcon },
   { href: "/dashboard/challenges", labelKey: "challenges", Icon: FlagIcon },
   { href: "/dashboard/recent-workouts", labelKey: "workouts", Icon: DumbbellIcon },
+  { href: "/dashboard/empowerment", labelKey: "empowerment", Icon: HeartHandIcon },
   { href: "/dashboard/settings", labelKey: "settings", Icon: SettingsIcon },
 ];
 

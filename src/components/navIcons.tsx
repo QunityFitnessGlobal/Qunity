@@ -52,3 +52,17 @@ export function DumbbellIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function HeartHandIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} {...props}>
+      <path
+        d="M12 8.5c-1-2-3-2.8-4.5-1.6-1.5 1.2-1.6 3.3-.2 4.8L12 17l4.7-5.3c1.4-1.5 1.3-3.6-.2-4.8-1.5-1.2-3.5-.4-4.5 1.6z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M4 20c1.5-1.3 3.3-2 5-2h4.5c.8 0 1.5-.7 1.5-1.5S14.3 15 13.5 15H10" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M13 15l4.5-1.3c.8-.2 1.6.2 1.9 1 .3.8-.1 1.6-.9 1.9L14 18" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}

@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { getWorkoutExercises } from "@/services/workout.service";
 import { WorkoutRunner } from "@/components/WorkoutRunner";
 import type { BraceletColor, Gender, Role, Workout } from "@/lib/types";
 
@@ -65,6 +66,7 @@ export default async function WorkoutPage({ params }: WorkoutPageProps) {
       interval_rest_seconds: number | null;
     }>();
 
+  const exercises = await getWorkoutExercises(supabase, workout.id);
   const tColors = await getTranslations("colors");
 
   return (
@@ -79,6 +81,7 @@ export default async function WorkoutPage({ params }: WorkoutPageProps) {
         intervalWorkSeconds={interval?.interval_work_seconds ?? null}
         intervalRestSeconds={interval?.interval_rest_seconds ?? null}
         gender={profile?.gender ?? null}
+        exercises={exercises}
       />
     </div>
   );

@@ -13,7 +13,7 @@
       "email": "אימייל",
       "password": "סיסמה",
       "submit": "התחברות",
-      "submitting": "מתחבר/ת...",
+      "submitting": "מתחבר...",
       "noAccount": "עדיין אין לך חשבון?",
       "signupLink": "הרשמה",
       "genericError": "שגיאה בהתחברות, נסה שוב",
@@ -62,7 +62,7 @@
   },
   "logout": {
     "button": "התנתקות",
-    "loading": "יוצא/ת..."
+    "loading": "מתנתק..."
   },
   "childCode": {
     "label": "הקוד שלך",
@@ -126,6 +126,8 @@
     "questionnaireTitle": "איך היה האימון?",
     "actualDurationLabel": "זמן אימון בפועל: {duration}",
     "trainedLongerPraise": "התאמנת {minutes} דקות יותר מהמומלץ, כל הכבוד! 💪",
+    "exercisesHeading": "תרגילים באימון",
+    "difficultyTipLabel": "טיפ לפי רמת קושי",
     "difficultyLabel": "רמת קושי בפועל",
     "difficultyLight": "קליל",
     "difficultyMedium": "בינוני",
@@ -197,6 +199,7 @@
     "leaderboard": "מובילים",
     "challenges": "אתגרים",
     "workouts": "אימונים",
+    "empowerment": "העצמה",
     "settings": "הגדרות"
   },
   "journey": {

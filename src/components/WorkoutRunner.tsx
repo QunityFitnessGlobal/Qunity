@@ -10,6 +10,7 @@ import {
   completeWorkout,
   getNextWorkout,
   type CompleteWorkoutResult,
+  type WorkoutExerciseEntry,
 } from "@/services/workout.service";
 import { Button } from "@/components/ui/Button";
 import { formatDurationClock } from "@/lib/format";
@@ -34,6 +35,7 @@ interface WorkoutRunnerProps {
   intervalWorkSeconds: number | null;
   intervalRestSeconds: number | null;
   gender: Gender | null;
+  exercises: WorkoutExerciseEntry[];
 }
 
 type Stage = "idle" | "running" | "questionnaire" | "result";
@@ -55,6 +57,7 @@ export function WorkoutRunner({
   intervalWorkSeconds,
   intervalRestSeconds,
   gender,
+  exercises,
 }: WorkoutRunnerProps) {
   const t = useTranslations("workout");
   const locale = useLocale();
@@ -326,6 +329,27 @@ export function WorkoutRunner({
           difficulty: workout.recommended_difficulty ?? "-",
         })}
       </p>
+
+      {stage === "idle" && exercises.length > 0 && (
+        <div className="w-full space-y-2 text-right">
+          <h2 className="text-sm font-semibold text-text-muted">{t("exercisesHeading")}</h2>
+          {exercises.map(({ slotNumber, exercise }) => (
+            <div key={exercise.id} className="rounded-md border border-zinc-200 bg-zinc-50 p-3">
+              <p className="font-semibold">
+                {slotNumber}. {locale === "en" ? exercise.name_en : exercise.name_he}
+              </p>
+              {exercise.description_he && (
+                <p className="mt-1 text-sm text-zinc-600">{exercise.description_he}</p>
+              )}
+              {exercise.difficulty_tip_he && (
+                <p className="mt-1 text-xs text-brand-purple">
+                  {t("difficultyTipLabel")}: {exercise.difficulty_tip_he}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 

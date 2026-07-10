@@ -7,7 +7,7 @@ import { getNextWorkout, getWorkoutsCompletedThisMonth } from "@/services/workou
 import { calculateProgressPercent } from "@/services/progression.service";
 import { getEncouragementKey } from "@/services/encouragement.service";
 import { getChildStatsForParent } from "@/services/parent-stats.service";
-import { getRelevantTips, getManualMenuTips, logShownTips } from "@/services/tips.service";
+import { getRelevantTips, logShownTips } from "@/services/tips.service";
 import { formatDurationClock } from "@/lib/format";
 import { ChildCodeCard } from "@/components/ChildCodeCard";
 import { ColorBadge } from "@/components/child/ColorBadge";
@@ -17,7 +17,6 @@ import { EncouragementBanner } from "@/components/child/EncouragementBanner";
 import { ChildSelector } from "@/components/parent/ChildSelector";
 import { StatsGrid } from "@/components/parent/StatsGrid";
 import { TipsPanel } from "@/components/parent/TipsPanel";
-import { WhatsHappeningNowMenu } from "@/components/parent/WhatsHappeningNowMenu";
 import type { BraceletColor, Gender, Role } from "@/lib/types";
 
 interface DashboardPageProps {
@@ -68,7 +67,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           .single<{ gender: Gender | null }>()
       : { data: null };
     const childGender = childUser?.gender ?? null;
-    const manualMenuTips = selectedChildId ? await getManualMenuTips(supabase) : [];
 
     return (
       <div className="flex flex-1 flex-col items-center gap-6 pb-12">
@@ -129,15 +127,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               />
 
               <TipsPanel tips={initialTips} childGender={childGender} />
-
-              {selectedChildId && (
-                <WhatsHappeningNowMenu
-                  tips={manualMenuTips}
-                  parentId={user.id}
-                  childId={selectedChildId}
-                  childGender={childGender}
-                />
-              )}
             </>
           )}
         </div>

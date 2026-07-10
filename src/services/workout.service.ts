@@ -4,7 +4,7 @@ import { calculateWorkoutPoints, awardPoints } from "@/services/points.service";
 import { checkColorProgression } from "@/services/progression.service";
 import { checkAndAwardChallenges } from "@/services/challenge.service";
 import type { ChallengeDefinition } from "@/data/challenges.data";
-import type { BraceletColor, Workout } from "@/lib/types";
+import type { BraceletColor, Exercise, Workout } from "@/lib/types";
 
 export interface NextWorkoutInfo {
   workout: Workout;
@@ -60,6 +60,37 @@ export async function getNextWorkout(
     requiredWorkouts: level?.required_workouts ?? 0,
     currentColor: child.current_color,
   };
+}
+
+export interface WorkoutExerciseEntry {
+  slotNumber: number;
+  exercise: Exercise;
+}
+
+interface WorkoutExerciseRow {
+  slot_number: number;
+  exercises: Exercise | Exercise[] | null;
+}
+
+// Accepts either the browser or server Supabase client (see linking.service.ts).
+export async function getWorkoutExercises(
+  supabase: SupabaseClient,
+  workoutId: string,
+): Promise<WorkoutExerciseEntry[]> {
+  const { data } = await supabase
+    .from("workout_exercises")
+    .select("slot_number, exercises(*)")
+    .eq("workout_id", workoutId)
+    .order("slot_number", { ascending: true });
+
+  const rows = (data ?? []) as WorkoutExerciseRow[];
+
+  return rows
+    .map((row) => ({
+      slotNumber: row.slot_number,
+      exercise: Array.isArray(row.exercises) ? row.exercises[0] : row.exercises,
+    }))
+    .filter((row): row is WorkoutExerciseEntry => row.exercise != null);
 }
 
 // Accepts either the browser or server Supabase client (see linking.service.ts).

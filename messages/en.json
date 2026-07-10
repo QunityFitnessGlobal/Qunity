@@ -126,6 +126,8 @@
     "questionnaireTitle": "How was the workout?",
     "actualDurationLabel": "Actual workout time: {duration}",
     "trainedLongerPraise": "You trained {minutes} minutes longer than recommended, well done! 💪",
+    "exercisesHeading": "Exercises in this workout",
+    "difficultyTipLabel": "Difficulty tip",
     "difficultyLabel": "Actual difficulty level",
     "difficultyLight": "Light",
     "difficultyMedium": "Medium",
@@ -197,6 +199,7 @@
     "leaderboard": "Leaderboard",
     "challenges": "Challenges",
     "workouts": "Workouts",
+    "empowerment": "Empowerment",
     "settings": "Settings"
   },
   "journey": {

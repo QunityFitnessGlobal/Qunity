@@ -36,7 +36,6 @@ export function WhatsHappeningNowMenu({
 }: WhatsHappeningNowMenuProps) {
   const t = useTranslations("whatsHappeningNow");
   const locale = useLocale();
-  const [open, setOpen] = useState(false);
   const [expandedGroup, setExpandedGroup] = useState<number | null>(null);
   const [selectedTip, setSelectedTip] = useState<ManualMenuTip | null>(null);
   const [logging, setLogging] = useState(false);
@@ -58,48 +57,35 @@ export function WhatsHappeningNowMenu({
   })).filter((g) => g.items.length > 0);
 
   return (
-    <div className="w-full max-w-md rounded-lg border border-zinc-200 bg-white p-4">
-      <button
-        type="button"
-        className="flex w-full items-center justify-between text-sm font-semibold text-text-muted"
-        onClick={() => setOpen((v) => !v)}
-      >
-        <span>{t("heading")}</span>
-        <span>{open ? "▲" : "▼"}</span>
-      </button>
-
-      {open && (
-        <div className="mt-3 space-y-2">
-          {grouped.map(({ group, items }) => (
-            <div key={group} className="rounded-md border border-zinc-100">
-              <button
-                type="button"
-                className="flex w-full items-center justify-between px-3 py-2 text-right text-sm font-medium"
-                onClick={() => setExpandedGroup((g) => (g === group ? null : group))}
-              >
-                <span>{t(GROUP_TITLE_KEYS[group as (typeof GROUP_ORDER)[number]])}</span>
-                <span>{expandedGroup === group ? "−" : "+"}</span>
-              </button>
-              {expandedGroup === group && (
-                <div className="space-y-1 border-t border-zinc-100 px-3 py-2">
-                  {items.map((item) => (
-                    <button
-                      key={item.ruleId}
-                      type="button"
-                      className={`block w-full rounded px-2 py-1 text-right text-sm hover:bg-zinc-50 ${
-                        selectedTip?.ruleId === item.ruleId ? "bg-brand-purple/10 font-medium" : ""
-                      }`}
-                      onClick={() => handleSelect(item)}
-                    >
-                      {locale === "he" ? item.labelHe : item.labelEn}
-                    </button>
-                  ))}
-                </div>
-              )}
+    <div className="w-full max-w-md space-y-2">
+      {grouped.map(({ group, items }) => (
+        <div key={group} className="rounded-md border border-zinc-200 bg-white">
+          <button
+            type="button"
+            className="flex w-full items-center justify-between px-3 py-2 text-right text-sm font-medium"
+            onClick={() => setExpandedGroup((g) => (g === group ? null : group))}
+          >
+            <span>{t(GROUP_TITLE_KEYS[group as (typeof GROUP_ORDER)[number]])}</span>
+            <span>{expandedGroup === group ? "−" : "+"}</span>
+          </button>
+          {expandedGroup === group && (
+            <div className="space-y-1 border-t border-zinc-100 px-3 py-2">
+              {items.map((item) => (
+                <button
+                  key={item.ruleId}
+                  type="button"
+                  className={`block w-full rounded px-2 py-1 text-right text-sm hover:bg-zinc-50 ${
+                    selectedTip?.ruleId === item.ruleId ? "bg-brand-purple/10 font-medium" : ""
+                  }`}
+                  onClick={() => handleSelect(item)}
+                >
+                  {locale === "he" ? item.labelHe : item.labelEn}
+                </button>
+              ))}
             </div>
-          ))}
+          )}
         </div>
-      )}
+      ))}
 
       {selectedTip && (
         <div className="mt-3 rounded-md border border-brand-purple/20 bg-brand-purple/5 p-3">
