@@ -73,6 +73,7 @@ export interface Exercise {
   name_en: string;
   description_he: string | null;
   difficulty_tip_he: string | null;
+  image_url: string | null;
   created_at: string;
 }
 

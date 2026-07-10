@@ -3,9 +3,21 @@
 // specific to tip cards rather than nav tabs.
 import type { SVGProps } from "react";
 
-export function ThumbsUpIcon(props: SVGProps<SVGSVGElement>) {
+interface ThumbsUpIconProps extends SVGProps<SVGSVGElement> {
+  // Solid fill for the brief "just liked" moment before the card fades out —
+  // separate from the standard SVG `fill` prop, which callers shouldn't need.
+  filled?: boolean;
+}
+
+export function ThumbsUpIcon({ filled, ...props }: ThumbsUpIconProps) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} {...props}>
+    <svg
+      viewBox="0 0 24 24"
+      fill={filled ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth={2}
+      {...props}
+    >
       <path
         d="M7 11v9H4a1 1 0 01-1-1v-7a1 1 0 011-1h3zm0 0l4.5-8a2 2 0 013.6 1.4L14 9h5a2 2 0 012 2l-1.6 7.2A2 2 0 0117.5 20H10a3 3 0 01-3-3v-6z"
         strokeLinecap="round"

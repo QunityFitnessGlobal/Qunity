@@ -1156,3 +1156,34 @@ as $$
 $$;
 
 grant execute on function public.increment_tip_like_count(uuid) to authenticated;
+
+-- ============================================================================
+-- ADDED FOR POINTS HEADROOM
+--
+-- required_points used to equal exactly base_points(20) * required_workouts
+-- for every color, i.e. zero headroom for any bonus (trained_longer +5,
+-- harder_than_recommended +5, parent_together +10, first_in_color +10 —
+-- see points.service.ts). The moment a child earned even one bonus,
+-- points_in_color raced past required_points before workouts_completed_in_color
+-- reached required_workouts, so the dashboard showed "0 points left" while
+-- a workout was still required (progression needs BOTH thresholds — see
+-- evaluateProgression). Bumped required_points to 1.5x (30/workout) so
+-- typical bonus-earning play doesn't hit 0 early.
+-- ============================================================================
+
+update public.bracelet_levels set required_points = 300 where color = 'white';
+update public.bracelet_levels set required_points = 420 where color = 'orange';
+update public.bracelet_levels set required_points = 540 where color = 'green';
+update public.bracelet_levels set required_points = 660 where color = 'blue';
+update public.bracelet_levels set required_points = 780 where color = 'purple';
+
+-- ============================================================================
+-- ADDED FOR EXERCISE IMAGES
+--
+-- Nullable — the UI only renders an <img> when this is set, so exercises
+-- without one just show as before. Upload the image to Supabase Storage
+-- (or any public host) and update this column with the resulting URL; see
+-- the app's reply for the step-by-step.
+-- ============================================================================
+
+alter table public.exercises add column image_url text;

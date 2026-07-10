@@ -118,7 +118,7 @@
   "workout": {
     "resultTitle": "Well done!",
     "pointsAwarded": "You earned {points} points for this workout.",
-    "leveledUp": "You moved up to a new color! 🎉",
+    "leveledUp": "Well done! You moved up to the {color} level! 🎉",
     "challengeUnlocked": "Challenge unlocked: {title} +{points}",
     "nextWorkout": "Next workout",
     "finishSession": "Done",

@@ -60,6 +60,7 @@ export function WorkoutRunner({
   exercises,
 }: WorkoutRunnerProps) {
   const t = useTranslations("workout");
+  const tColors = useTranslations("colors");
   const locale = useLocale();
   const router = useRouter();
   const [stage, setStage] = useState<Stage>("idle");
@@ -221,7 +222,7 @@ export function WorkoutRunner({
 
         {result.didLevelUp && result.newColor && (
           <div className="rounded-lg bg-yellow-50 p-4 text-lg font-bold text-yellow-800">
-            {t("leveledUp")}
+            {t("leveledUp", { color: tColors(result.newColor) })}
           </div>
         )}
 
@@ -339,17 +340,25 @@ export function WorkoutRunner({
 
       {stage === "idle" && exercises.length > 0 && (
         <div className="w-full space-y-2 text-right">
-          <h2 className="text-sm font-semibold text-text-muted">{t("exercisesHeading")}</h2>
+          <h2 className="text-base font-semibold text-text-muted">{t("exercisesHeading")}</h2>
           {exercises.map(({ slotNumber, exercise }) => (
             <div key={exercise.id} className="rounded-md border border-zinc-200 bg-zinc-50 p-3">
-              <p className="font-semibold">
+              {exercise.image_url && (
+                // eslint-disable-next-line @next/next/no-img-element -- external Storage URLs, no remotePatterns configured
+                <img
+                  src={exercise.image_url}
+                  alt={locale === "en" ? exercise.name_en : exercise.name_he}
+                  className="mb-2 h-40 w-full rounded-md object-cover"
+                />
+              )}
+              <p className="text-lg font-semibold">
                 {slotNumber}. {locale === "en" ? exercise.name_en : exercise.name_he}
               </p>
               {exercise.description_he && (
-                <p className="mt-1 text-sm text-zinc-600">{exercise.description_he}</p>
+                <p className="mt-1 text-base text-zinc-600">{exercise.description_he}</p>
               )}
               {exercise.difficulty_tip_he && (
-                <p className="mt-1 text-xs text-brand-purple">
+                <p className="mt-1 text-sm text-brand-purple">
                   {t("difficultyTipLabel")}: {exercise.difficulty_tip_he}
                 </p>
               )}
@@ -360,15 +369,23 @@ export function WorkoutRunner({
 
       {stage === "running" && currentExercise && (
         <div className="w-full rounded-md border border-zinc-200 bg-zinc-50 p-3 text-right">
-          <p className="text-xs font-semibold text-text-muted">{t("currentExerciseLabel")}</p>
-          <p className="mt-0.5 font-semibold">
+          <p className="text-sm font-semibold text-text-muted">{t("currentExerciseLabel")}</p>
+          {currentExercise.image_url && (
+            // eslint-disable-next-line @next/next/no-img-element -- external Storage URLs, no remotePatterns configured
+            <img
+              src={currentExercise.image_url}
+              alt={locale === "en" ? currentExercise.name_en : currentExercise.name_he}
+              className="mt-1 h-40 w-full rounded-md object-cover"
+            />
+          )}
+          <p className="mt-0.5 text-lg font-semibold">
             {locale === "en" ? currentExercise.name_en : currentExercise.name_he}
           </p>
           {currentExercise.description_he && (
-            <p className="mt-1 text-sm text-zinc-600">{currentExercise.description_he}</p>
+            <p className="mt-1 text-base text-zinc-600">{currentExercise.description_he}</p>
           )}
           {currentExercise.difficulty_tip_he && (
-            <p className="mt-1 text-xs text-brand-purple">
+            <p className="mt-1 text-sm text-brand-purple">
               {t("difficultyTipLabel")}: {currentExercise.difficulty_tip_he}
             </p>
           )}

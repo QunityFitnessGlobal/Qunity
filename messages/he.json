@@ -118,7 +118,7 @@
   "workout": {
     "resultTitle": "כל הכבוד!",
     "pointsAwarded": "קיבלת {points} נקודות על האימון הזה.",
-    "leveledUp": "עברת לצבע חדש! 🎉",
+    "leveledUp": "כל הכבוד! עברת לשלב ה{color}! 🎉",
     "challengeUnlocked": "פתחת אתגר: {title} +{points}",
     "nextWorkout": "אימון הבא",
     "finishSession": "סיום",
