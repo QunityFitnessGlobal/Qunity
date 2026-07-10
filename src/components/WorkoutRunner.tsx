@@ -14,7 +14,15 @@ import {
 import { Button } from "@/components/ui/Button";
 import { formatDurationClock } from "@/lib/format";
 import { resolveLocalizedText } from "@/lib/i18n-content";
-import type { Workout } from "@/lib/types";
+import {
+  DIFFICULTY_VALUES,
+  DIFFICULTY_LABEL_KEYS,
+  FEELING_CODES,
+  FEELING_LABEL_KEYS,
+  FEELING_ICONS,
+  type FeelingCode,
+} from "@/lib/workout-labels";
+import type { Gender, Workout } from "@/lib/types";
 
 interface WorkoutRunnerProps {
   childId: string;
@@ -25,6 +33,7 @@ interface WorkoutRunnerProps {
   intervalRounds: number | null;
   intervalWorkSeconds: number | null;
   intervalRestSeconds: number | null;
+  gender: Gender | null;
 }
 
 type Stage = "idle" | "running" | "questionnaire" | "result";
@@ -36,17 +45,6 @@ interface IntervalTimerState {
   totalRemaining: number;
 }
 
-// Stable, locale-independent codes stored in workout_results.feeling_after
-// (tip-conditions/all-feelings-are-allowed.ts matches against "hard"). Only
-// the displayed label ("workout.feeling*" message keys) is translated.
-const FEELING_CODES = ["great", "ok", "hard"] as const;
-type FeelingCode = (typeof FEELING_CODES)[number];
-const FEELING_LABEL_KEYS: Record<FeelingCode, string> = {
-  great: "feelingGreat",
-  ok: "feelingOk",
-  hard: "feelingHard",
-};
-
 export function WorkoutRunner({
   childId,
   workout,
@@ -56,6 +54,7 @@ export function WorkoutRunner({
   intervalRounds,
   intervalWorkSeconds,
   intervalRestSeconds,
+  gender,
 }: WorkoutRunnerProps) {
   const t = useTranslations("workout");
   const locale = useLocale();
@@ -69,7 +68,7 @@ export function WorkoutRunner({
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<CompleteWorkoutResult | null>(null);
 
-  const [difficultyReported, setDifficultyReported] = useState("3");
+  const [difficultyReported, setDifficultyReported] = useState("2");
   const [parentTrainedTogether, setParentTrainedTogether] = useState("no");
   const [feelingAfter, setFeelingAfter] = useState<FeelingCode>(FEELING_CODES[0]);
   const [nextWorkoutLoading, setNextWorkoutLoading] = useState(false);
@@ -266,9 +265,9 @@ export function WorkoutRunner({
             onChange={(e) => setDifficultyReported(e.target.value)}
             className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
           >
-            {[1, 2, 3, 4, 5].map((n) => (
+            {DIFFICULTY_VALUES.map((n) => (
               <option key={n} value={n}>
-                {n}
+                {t(DIFFICULTY_LABEL_KEYS[n])}
               </option>
             ))}
           </select>
@@ -297,7 +296,7 @@ export function WorkoutRunner({
           >
             {FEELING_CODES.map((code) => (
               <option key={code} value={code}>
-                {t(FEELING_LABEL_KEYS[code])}
+                {FEELING_ICONS[code]} {t(FEELING_LABEL_KEYS[code], { gender: gender ?? "male" })}
               </option>
             ))}
           </select>

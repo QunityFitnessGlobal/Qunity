@@ -6,13 +6,15 @@ import { createClient } from "@/lib/supabase/client";
 import { getStationWorkoutSummary, type StationWorkoutSummary } from "@/services/journey.service";
 import { resolveLocalizedText } from "@/lib/i18n-content";
 import { formatDurationClock } from "@/lib/format";
+import { difficultyLabelKey, feelingLabelKey, FEELING_ICONS, type FeelingCode } from "@/lib/workout-labels";
 import { Button } from "@/components/ui/Button";
-import type { BraceletColor } from "@/lib/types";
+import type { BraceletColor, Gender } from "@/lib/types";
 
 interface WorkoutSummaryModalProps {
   childId: string;
   beltColor: BraceletColor;
   localNumber: number;
+  gender: Gender | null;
   onClose: () => void;
 }
 
@@ -24,9 +26,11 @@ export function WorkoutSummaryModal({
   childId,
   beltColor,
   localNumber,
+  gender,
   onClose,
 }: WorkoutSummaryModalProps) {
   const t = useTranslations("journey.summary");
+  const tWorkout = useTranslations("workout");
   const locale = useLocale();
   const [summary, setSummary] = useState<StationWorkoutSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -74,11 +78,23 @@ export function WorkoutSummaryModal({
               </div>
               <div className="flex justify-between">
                 <dt className="text-text-muted">{t("difficulty")}</dt>
-                <dd>{summary.difficultyReported ?? "-"}</dd>
+                <dd>
+                  {(() => {
+                    const key = difficultyLabelKey(summary.difficultyReported);
+                    return key ? tWorkout(key) : "-";
+                  })()}
+                </dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-text-muted">{t("feeling")}</dt>
-                <dd>{summary.feelingAfter ? t(`feelingValues.${summary.feelingAfter}`) : "-"}</dd>
+                <dd>
+                  {(() => {
+                    const key = feelingLabelKey(summary.feelingAfter);
+                    if (!key) return "-";
+                    const icon = FEELING_ICONS[summary.feelingAfter as FeelingCode];
+                    return `${icon} ${tWorkout(key, { gender: gender ?? "male" })}`;
+                  })()}
+                </dd>
               </div>
               <div className="flex justify-between font-semibold">
                 <dt>{t("points")}</dt>

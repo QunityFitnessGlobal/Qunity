@@ -1,54 +1,21 @@
-"use client";
-
-import { useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
-import { createClient } from "@/lib/supabase/client";
-import { getRelevantTips, logShownTips, type RelevantTip } from "@/services/tips.service";
+import { getLocale, getTranslations } from "next-intl/server";
 import { TipCard } from "@/components/parent/TipCard";
-import { Button } from "@/components/ui/Button";
-import { TextField } from "@/components/ui/TextField";
+import type { RelevantTip } from "@/services/tips.service";
 import type { Gender } from "@/lib/types";
 
 interface TipsPanelProps {
-  parentId: string;
-  childId: string;
-  initialTips: RelevantTip[];
+  tips: RelevantTip[];
   childGender: Gender | null;
 }
 
-// The numeric field + show button below are a TEMPORARY manual test mode
-// (Prompt 6/7, section 3.1): they run the real engine end-to-end (registry
-// lookup -> getRelevantTips -> priority selection -> TipCard -> logging to
-// parent_tips), but force the outcome to a specific scenario (1-5) since the
-// first five condition functions are still stubs. Remove this control once
-// every condition function has its real calculation.
-export function TipsPanel({ parentId, childId, initialTips, childGender }: TipsPanelProps) {
-  const t = useTranslations("tips");
-  const locale = useLocale();
-  const [tips, setTips] = useState(initialTips);
-  const [manualIndex, setManualIndex] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  async function handleShow() {
-    setLoading(true);
-    try {
-      const supabase = createClient();
-      const parsed = Number(manualIndex);
-      const manualTestIndex = parsed >= 1 && parsed <= 5 ? parsed : undefined;
-
-      const relevant = await getRelevantTips(supabase, childId, manualTestIndex);
-      setTips(relevant);
-
-      await logShownTips(
-        supabase,
-        parentId,
-        childId,
-        relevant.map((tip) => tip.ruleId),
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
+// Read-only display of the tips getRelevantTips() already selected — the
+// old manual-test-mode number field (Prompt 6/7) was removed here since
+// every condition function now has a real implementation (see
+// tip-conditions/) instead of stubs. Prompt 8's parent-initiated equivalent
+// is the "What's happening now" accordion (WhatsHappeningNowMenu.tsx).
+export async function TipsPanel({ tips, childGender }: TipsPanelProps) {
+  const t = await getTranslations("tips");
+  const locale = await getLocale();
 
   return (
     <div className="w-full max-w-md space-y-3 rounded-lg border border-zinc-200 bg-white p-4">
@@ -59,26 +26,6 @@ export function TipsPanel({ parentId, childId, initialTips, childGender }: TipsP
         {tips.map((tip) => (
           <TipCard key={tip.ruleId} tip={tip} locale={locale} gender={childGender} />
         ))}
-      </div>
-
-      <div className="space-y-2 border-t border-zinc-100 pt-3">
-        <p className="text-xs text-text-muted-light">{t("manualTestHint")}</p>
-        <div className="flex items-end gap-2">
-          <div className="w-24">
-            <TextField
-              label={t("manualTestLabel")}
-              name="manualTipIndex"
-              type="number"
-              min={1}
-              max={5}
-              value={manualIndex}
-              onChange={setManualIndex}
-            />
-          </div>
-          <Button disabled={loading} onClick={handleShow}>
-            {loading ? t("showing") : t("show")}
-          </Button>
-        </div>
       </div>
     </div>
   );

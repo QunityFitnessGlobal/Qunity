@@ -8,7 +8,7 @@ import { JourneyLevelMarker } from "@/components/child/JourneyLevelMarker";
 import { WorkoutSummaryModal } from "@/components/child/WorkoutSummaryModal";
 import { resolveLocalizedText } from "@/lib/i18n-content";
 import { BRACELET_ROAD_COLOR } from "@/lib/colors";
-import type { BraceletColor, JourneyStation as JourneyStationData } from "@/lib/types";
+import type { BraceletColor, Gender, JourneyStation as JourneyStationData } from "@/lib/types";
 
 export type JourneyRenderItem =
   | { type: "station"; station: JourneyStationData; top: number; left: number }
@@ -31,6 +31,7 @@ function itemBeltColor(item: JourneyRenderItem): BraceletColor {
 
 interface JourneyPathProps {
   childId: string;
+  gender: Gender | null;
   items: JourneyRenderItem[];
   contentHeight: number;
   pathWidth: number;
@@ -41,7 +42,7 @@ interface JourneyPathProps {
 // Server Component can't do. The page itself computes the pure layout data
 // (positions, totals, background gradient) server-side and just hands it
 // down as props.
-export function JourneyPath({ childId, items, contentHeight, pathWidth }: JourneyPathProps) {
+export function JourneyPath({ childId, gender, items, contentHeight, pathWidth }: JourneyPathProps) {
   const router = useRouter();
   const locale = useLocale();
   const [openSummary, setOpenSummary] = useState<{
@@ -144,6 +145,7 @@ export function JourneyPath({ childId, items, contentHeight, pathWidth }: Journe
             childId={childId}
             beltColor={openSummary.beltColor}
             localNumber={openSummary.localNumber}
+            gender={gender}
             onClose={() => setOpenSummary(null)}
           />
         )}

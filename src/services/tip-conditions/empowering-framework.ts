@@ -5,14 +5,9 @@ export function daysSinceLastWorkout(snapshot: ChildTipSnapshot): number {
 }
 
 // condition_type: no_workout_3_days
-// TEMP: replace with real calculation (see Prompt 6/7 summary) — for now
-// only responds to Manual Test Mode scenario #1.
-export function noWorkoutInDays(
-  _snapshot: ChildTipSnapshot,
-  _params: Record<string, unknown>,
-  manualTestIndex?: number,
-): boolean {
-  return manualTestIndex === 1;
+export function noWorkoutInDays(snapshot: ChildTipSnapshot, params: Record<string, unknown>): boolean {
+  const threshold = typeof params.days === "number" ? params.days : 3;
+  return daysSinceLastWorkout(snapshot) >= threshold;
 }
 
 // condition_type: no_workout_7_days
@@ -22,4 +17,9 @@ export function longNoWorkoutStreak(
 ): boolean {
   const threshold = typeof params.days === "number" ? params.days : 7;
   return daysSinceLastWorkout(snapshot) >= threshold;
+}
+
+// condition_type: abandoned_session (card #10 — Prompt 8)
+export function hasAbandonedSession(snapshot: ChildTipSnapshot): boolean {
+  return snapshot.hasAbandonedSession;
 }

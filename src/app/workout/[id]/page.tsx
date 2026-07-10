@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { WorkoutRunner } from "@/components/WorkoutRunner";
-import type { BraceletColor, Role, Workout } from "@/lib/types";
+import type { BraceletColor, Gender, Role, Workout } from "@/lib/types";
 
 interface WorkoutPageProps {
   params: Promise<{ id: string }>;
@@ -22,9 +22,9 @@ export default async function WorkoutPage({ params }: WorkoutPageProps) {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("role")
+    .select("role, gender")
     .eq("id", user.id)
-    .single<{ role: Role }>();
+    .single<{ role: Role; gender: Gender | null }>();
 
   if (profile?.role !== "child") {
     redirect("/dashboard");
@@ -78,6 +78,7 @@ export default async function WorkoutPage({ params }: WorkoutPageProps) {
         intervalRounds={interval?.interval_rounds ?? null}
         intervalWorkSeconds={interval?.interval_work_seconds ?? null}
         intervalRestSeconds={interval?.interval_rest_seconds ?? null}
+        gender={profile?.gender ?? null}
       />
     </div>
   );

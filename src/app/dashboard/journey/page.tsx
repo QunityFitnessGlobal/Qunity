@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getJourneyStations } from "@/services/journey.service";
 import { JourneyPath, type JourneyRenderItem } from "@/components/child/JourneyPath";
-import type { BraceletColor, Role } from "@/lib/types";
+import type { BraceletColor, Gender, Role } from "@/lib/types";
 
 // Purely presentational layout constants — not business data, so these are
 // fine to hardcode. Every count that actually matters (how many stations,
@@ -27,9 +27,9 @@ export default async function JourneyPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("role")
+    .select("role, gender")
     .eq("id", user.id)
-    .single<{ role: Role }>();
+    .single<{ role: Role; gender: Gender | null }>();
 
   if (profile?.role !== "child") {
     redirect("/dashboard");
@@ -92,6 +92,7 @@ export default async function JourneyPage() {
       ) : (
         <JourneyPath
           childId={user.id}
+          gender={profile?.gender ?? null}
           items={items}
           contentHeight={contentHeight}
           pathWidth={PATH_WIDTH_PX}

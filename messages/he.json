@@ -101,11 +101,16 @@
   },
   "tips": {
     "heading": "טיפים להורה",
-    "empty": "אין טיפים רלוונטיים כרגע.",
-    "manualTestHint": "מצב בדיקה ידני (זמני): הזן/י מספר 1-5 כדי לדמות תרחיש טיפ ולוודא שהמנוע עובד מקצה לקצה.",
-    "manualTestLabel": "תרחיש (1-5)",
-    "show": "הצג",
-    "showing": "טוען..."
+    "empty": "אין טיפים רלוונטיים כרגע."
+  },
+  "whatsHappeningNow": {
+    "heading": "מה קורה עכשיו?",
+    "group1": "הוא לא רוצה להתחיל / מתווכח",
+    "group2": "הוא מרגיש שהוא לא מספיק טוב",
+    "group3": "הוא מראה רגש חזק",
+    "group4": "הוא הצליח או התאמץ",
+    "group5": "זה קשור אליי, כהורה",
+    "saving": "שומר..."
   },
   "childSelector": {
     "label": "הילד שלי"
@@ -121,14 +126,20 @@
     "questionnaireTitle": "איך היה האימון?",
     "actualDurationLabel": "זמן אימון בפועל: {duration}",
     "trainedLongerPraise": "התאמנת {minutes} דקות יותר מהמומלץ, כל הכבוד! 💪",
-    "difficultyLabel": "רמת קושי בפועל (1-5)",
+    "difficultyLabel": "רמת קושי בפועל",
+    "difficultyLight": "קליל",
+    "difficultyMedium": "בינוני",
+    "difficultyChallenging": "מאתגר",
+    "difficultyVeryHard": "קשה מאוד",
     "parentTogetherLabel": "האם ההורה התאמן איתך?",
     "yes": "כן",
     "no": "לא",
     "feelingLabel": "איך הרגשת בסוף האימון?",
-    "feelingGreat": "מעולה",
-    "feelingOk": "בסדר",
-    "feelingHard": "קשה",
+    "feelingFun": "כיף",
+    "feelingFine": "בסדר גמור",
+    "feelingFrustrated": "{gender, select, female {מתוסכלת} other {מתוסכל}}",
+    "feelingTired": "{gender, select, female {עייפה} other {עייף}}",
+    "feelingExhausted": "{gender, select, female {מותשת} other {מותש}}",
     "submit": "שליחה",
     "submitting": "שולח...",
     "startError": "שגיאה בהתחלת האימון",
@@ -202,12 +213,7 @@
       "difficulty": "קושי מדווח",
       "feeling": "הרגשה",
       "points": "נקודות שנצברו",
-      "close": "סגירה",
-      "feelingValues": {
-        "great": "מעולה",
-        "ok": "בסדר",
-        "hard": "קשה"
-      }
+      "close": "סגירה"
     }
   }
 }

@@ -50,25 +50,33 @@ const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
 
 const DEMO_PASSWORD = "Demo1234!";
 
-async function createDemoUser({ email, fullName, role }) {
+async function createDemoUser({ email, fullName, role, gender }) {
   const { data, error } = await supabase.auth.admin.createUser({
     email,
     password: DEMO_PASSWORD,
     email_confirm: true,
-    user_metadata: { full_name: fullName, role },
+    user_metadata: { full_name: fullName, role, gender },
   });
 
+  let id;
   if (error) {
     const { data: list } = await supabase.auth.admin.listUsers();
     const existing = list?.users.find((u) => u.email === email);
-    if (existing) {
-      console.log(`  ${email} already exists, reusing it.`);
-      return existing.id;
-    }
-    throw error;
+    if (!existing) throw error;
+    console.log(`  ${email} already exists, reusing it.`);
+    id = existing.id;
+  } else {
+    id = data.user.id;
   }
 
-  return data.user.id;
+  // handle_new_user() only sets public.users.gender on the auth.users INSERT
+  // trigger, so a reused (pre-existing) account needs this set explicitly to
+  // stay in sync with the gender passed here on every re-run.
+  if (gender) {
+    await supabase.from("users").update({ gender }).eq("id", id);
+  }
+
+  return id;
 }
 
 function sessionTimes(daysAgoCount, durationMinutes) {
@@ -145,14 +153,17 @@ async function seedChildHistory({ childId, current_color, total_points, points_i
 
 async function main() {
   console.log("Creating demo parents...");
-  const parent1Id = await createDemoUser({ email: "parent1@qunity-demo.test", fullName: "רות לוי", role: "parent" });
-  const parent2Id = await createDemoUser({ email: "parent2@qunity-demo.test", fullName: "דני כהן", role: "parent" });
+  const parent1Id = await createDemoUser({ email: "parent1@qunity-demo.test", fullName: "רות לוי", role: "parent", gender: "female" });
+  const parent2Id = await createDemoUser({ email: "parent2@qunity-demo.test", fullName: "דני כהן", role: "parent", gender: "male" });
 
+  // One male + one female child per parent, so the gendered questionnaire
+  // labels (WorkoutRunner) and gendered tip/encouragement text can both be
+  // tested against real demo accounts.
   console.log("Creating demo children...");
-  const child1Id = await createDemoUser({ email: "child1@qunity-demo.test", fullName: "נועה", role: "child" });
-  const child2Id = await createDemoUser({ email: "child2@qunity-demo.test", fullName: "איתי", role: "child" });
-  const child3Id = await createDemoUser({ email: "child3@qunity-demo.test", fullName: "מיה", role: "child" });
-  const child4Id = await createDemoUser({ email: "child4@qunity-demo.test", fullName: "עומר", role: "child" });
+  const child1Id = await createDemoUser({ email: "child1@qunity-demo.test", fullName: "נועה", role: "child", gender: "female" });
+  const child2Id = await createDemoUser({ email: "child2@qunity-demo.test", fullName: "איתי", role: "child", gender: "male" });
+  const child3Id = await createDemoUser({ email: "child3@qunity-demo.test", fullName: "מיה", role: "child", gender: "female" });
+  const child4Id = await createDemoUser({ email: "child4@qunity-demo.test", fullName: "עומר", role: "child", gender: "male" });
 
   console.log("Linking parents to children...");
   const { error: linkError } = await supabase.from("parent_child_links").upsert(
@@ -198,7 +209,9 @@ async function main() {
         difficulty: 2,
         trainedLonger: false,
         parentTogether: false,
-        feeling: "great",
+        // "fun" (not just "fine") so this child's dashboard demonstrates
+        // the #31/#43 dual-trigger card pair (feeling_positive_last_session).
+        feeling: "fun",
         transactions: [{ points: 20, reason: "base_workout" }],
       },
     ],
@@ -221,7 +234,7 @@ async function main() {
         difficulty: 1,
         trainedLonger: false,
         parentTogether: false,
-        feeling: "great",
+        feeling: "fun",
         transactions: [
           { points: 20, reason: "base_workout" },
           { points: 10, reason: "first_in_color" },
@@ -234,7 +247,7 @@ async function main() {
         difficulty: 2,
         trainedLonger: false,
         parentTogether: false,
-        feeling: "ok",
+        feeling: "fine",
         transactions: [{ points: 20, reason: "base_workout" }],
       },
       {
@@ -244,7 +257,7 @@ async function main() {
         difficulty: 2,
         trainedLonger: false,
         parentTogether: false,
-        feeling: "great",
+        feeling: "fun",
         transactions: [{ points: 20, reason: "base_workout" }],
       },
       {
@@ -254,7 +267,7 @@ async function main() {
         difficulty: 2,
         trainedLonger: true,
         parentTogether: true,
-        feeling: "great",
+        feeling: "fun",
         transactions: [
           { points: 20, reason: "base_workout" },
           { points: 10, reason: "parent_together" },
@@ -267,18 +280,26 @@ async function main() {
         difficulty: 3,
         trainedLonger: false,
         parentTogether: false,
-        feeling: "hard",
+        feeling: "frustrated",
         transactions: [{ points: 20, reason: "base_workout" }],
       },
       {
+        // Difficulty 3 two sessions in a row + a frustrated last session —
+        // demo data for two_consecutive_hard_difficulty (category 1),
+        // difficulty_high_last_session, and feeling_frustrated_last_session
+        // (both category 2, see tip-conditions/liberating-belief.ts and
+        // all-feelings-are-allowed.ts).
         ...sessionTimes(1, 15),
         workoutId: whiteWorkoutId,
         activity: "ריצה קלה בחצר",
-        difficulty: 2,
+        difficulty: 3,
         trainedLonger: false,
         parentTogether: false,
-        feeling: "ok",
-        transactions: [{ points: 20, reason: "base_workout" }],
+        feeling: "frustrated",
+        transactions: [
+          { points: 20, reason: "base_workout" },
+          { points: 5, reason: "harder_than_recommended" },
+        ],
       },
     ],
     challenges: ["first_workout"],
@@ -292,7 +313,7 @@ async function main() {
     difficulty: i === 5 ? 3 : 2,
     trainedLonger: false,
     parentTogether: i === 3,
-    feeling: "great",
+    feeling: "fun",
     transactions:
       i === 0
         ? [{ points: 20, reason: "base_workout" }, { points: 10, reason: "first_in_color" }]
@@ -309,7 +330,7 @@ async function main() {
     difficulty: 2,
     trainedLonger: false,
     parentTogether: false,
-    feeling: "great",
+    feeling: "fun",
     transactions:
       i === 0
         ? [{ points: 20, reason: "base_workout" }, { points: 10, reason: "first_in_color" }]
@@ -341,7 +362,7 @@ async function main() {
       difficulty: 2,
       trainedLonger: false,
       parentTogether: false,
-      feeling: "ok",
+      feeling: "fine",
       transactions: [{ points: 20, reason: "base_workout" }],
     })),
     challenges: [],
@@ -351,8 +372,8 @@ async function main() {
   console.log(`  password: ${DEMO_PASSWORD}`);
   console.log("  parent1@qunity-demo.test  (רות לוי — linked to נועה + איתי)");
   console.log("  parent2@qunity-demo.test  (דני כהן — linked to מיה + עומר)");
-  console.log("  child1@qunity-demo.test   (נועה — white, 1 workout)");
-  console.log("  child2@qunity-demo.test   (איתי — white, 6 workouts, 140 pts)");
+  console.log("  child1@qunity-demo.test   (נועה — white, 1 workout, feeling 'fun' -> #31/#43 dual card)");
+  console.log("  child2@qunity-demo.test   (איתי — white, 6 workouts, last 2 difficulty 3 + frustrated -> category 1+2 tips)");
   console.log("  child3@qunity-demo.test   (מיה — orange, already leveled up)");
   console.log("  child4@qunity-demo.test   (עומר — white, no workout in 9 days -> real tip)");
 }

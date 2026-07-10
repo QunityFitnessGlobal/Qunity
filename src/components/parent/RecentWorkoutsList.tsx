@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { formatDurationClock } from "@/lib/format";
 import { resolveLocalizedText } from "@/lib/i18n-content";
+import { difficultyLabelKey } from "@/lib/workout-labels";
 import type { RecentWorkoutEntry } from "@/services/parent-stats.service";
 
 interface RecentWorkoutsListProps {
@@ -9,6 +10,7 @@ interface RecentWorkoutsListProps {
 
 export async function RecentWorkoutsList({ workouts }: RecentWorkoutsListProps) {
   const t = await getTranslations("recentWorkouts");
+  const tWorkout = await getTranslations("workout");
   const locale = await getLocale();
 
   if (workouts.length === 0) {
@@ -36,7 +38,12 @@ export async function RecentWorkoutsList({ workouts }: RecentWorkoutsListProps) 
               <td className="px-3 py-2">
                 {workout.durationSeconds !== null ? formatDurationClock(workout.durationSeconds) : "-"}
               </td>
-              <td className="px-3 py-2">{workout.difficultyReported ?? "-"}</td>
+              <td className="px-3 py-2">
+                {(() => {
+                  const key = difficultyLabelKey(workout.difficultyReported);
+                  return key ? tWorkout(key) : "-";
+                })()}
+              </td>
             </tr>
           ))}
         </tbody>

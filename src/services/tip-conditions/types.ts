@@ -11,6 +11,13 @@ export interface ChildTipSnapshot {
   totalChallengesAvailable: number;
   totalWorkoutsCompleted: number;
   workoutsThisMonth: number;
+  // Added for the Prompt 8 tip expansion:
+  durationHistory: number[]; // actual_duration_seconds, chronological (oldest first)
+  consecutiveStreakDays: number; // same calculation as challenge.service.ts's streak_3/streak_5
+  hasAbandonedSession: boolean; // an in_progress session left open well past the workout's expected length
+  gapBeforeLastWorkoutDays: number | null; // days between the two most recent completed sessions
+  lastSessionDifficultyReported: number | null; // from the single most recent session's own result row (not an independently-filtered array, so it can't drift out of sync with lastSessionFeelingAfter)
+  lastSessionFeelingAfter: string | null;
 }
 
 // One function per condition_type. Registered in ./index.ts against the

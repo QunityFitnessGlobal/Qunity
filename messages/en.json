@@ -101,11 +101,16 @@
   },
   "tips": {
     "heading": "Tips for parents",
-    "empty": "No relevant tips right now.",
-    "manualTestHint": "Manual test mode (temporary): enter a number 1-5 to simulate a tip scenario and verify the engine works end to end.",
-    "manualTestLabel": "Scenario (1-5)",
-    "show": "Show",
-    "showing": "Loading..."
+    "empty": "No relevant tips right now."
+  },
+  "whatsHappeningNow": {
+    "heading": "What's happening now?",
+    "group1": "He doesn't want to start / is arguing",
+    "group2": "He feels like he's not good enough",
+    "group3": "He's showing a strong emotion",
+    "group4": "He succeeded or made an effort",
+    "group5": "It's about me, as a parent",
+    "saving": "Saving..."
   },
   "childSelector": {
     "label": "My child"
@@ -121,14 +126,20 @@
     "questionnaireTitle": "How was the workout?",
     "actualDurationLabel": "Actual workout time: {duration}",
     "trainedLongerPraise": "You trained {minutes} minutes longer than recommended, well done! 💪",
-    "difficultyLabel": "Actual difficulty level (1-5)",
+    "difficultyLabel": "Actual difficulty level",
+    "difficultyLight": "Light",
+    "difficultyMedium": "Medium",
+    "difficultyChallenging": "Challenging",
+    "difficultyVeryHard": "Very hard",
     "parentTogetherLabel": "Did a parent train with you?",
     "yes": "Yes",
     "no": "No",
     "feelingLabel": "How did you feel after the workout?",
-    "feelingGreat": "Great",
-    "feelingOk": "OK",
-    "feelingHard": "Hard",
+    "feelingFun": "Fun",
+    "feelingFine": "Fine",
+    "feelingFrustrated": "Frustrated",
+    "feelingTired": "Tired",
+    "feelingExhausted": "Exhausted",
     "submit": "Submit",
     "submitting": "Submitting...",
     "startError": "Error starting the workout",
@@ -202,12 +213,7 @@
       "difficulty": "Reported difficulty",
       "feeling": "Feeling",
       "points": "Points earned",
-      "close": "Close",
-      "feelingValues": {
-        "great": "Great",
-        "ok": "OK",
-        "hard": "Hard"
-      }
+      "close": "Close"
     }
   }
 }
