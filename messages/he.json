@@ -126,6 +126,7 @@
     "questionnaireTitle": "איך היה האימון?",
     "actualDurationLabel": "זמן אימון בפועל: {duration}",
     "trainedLongerPraise": "התאמנת {minutes} דקות יותר מהמומלץ, כל הכבוד! 💪",
+    "exercisesHeading": "תרגילים באימון",
     "currentExerciseLabel": "התרגיל הנוכחי",
     "difficultyTipLabel": "טיפ לפי רמת קושי",
     "difficultyLabel": "רמת קושי בפועל",

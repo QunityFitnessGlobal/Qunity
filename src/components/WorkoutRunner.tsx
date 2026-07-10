@@ -331,7 +331,28 @@ export function WorkoutRunner({
       </p>
       <h1 className="text-2xl font-bold">{resolveLocalizedText(workout.title, locale)}</h1>
 
-      {currentExercise && (
+      {stage === "idle" && exercises.length > 0 && (
+        <div className="w-full space-y-2 text-right">
+          <h2 className="text-sm font-semibold text-text-muted">{t("exercisesHeading")}</h2>
+          {exercises.map(({ slotNumber, exercise }) => (
+            <div key={exercise.id} className="rounded-md border border-zinc-200 bg-zinc-50 p-3">
+              <p className="font-semibold">
+                {slotNumber}. {locale === "en" ? exercise.name_en : exercise.name_he}
+              </p>
+              {exercise.description_he && (
+                <p className="mt-1 text-sm text-zinc-600">{exercise.description_he}</p>
+              )}
+              {exercise.difficulty_tip_he && (
+                <p className="mt-1 text-xs text-brand-purple">
+                  {t("difficultyTipLabel")}: {exercise.difficulty_tip_he}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {stage === "running" && currentExercise && (
         <div className="w-full rounded-md border border-zinc-200 bg-zinc-50 p-3 text-right">
           <p className="text-xs font-semibold text-text-muted">{t("currentExerciseLabel")}</p>
           <p className="mt-0.5 font-semibold">
