@@ -29,7 +29,7 @@ const GROUP_TITLE_KEYS: Record<(typeof GROUP_ORDER)[number], string> = {
   5: "group5",
 };
 
-const FADE_DURATION_MS = 300;
+const FADE_DURATION_MS = 600;
 
 // The ChildSelector switch does a full Next.js navigation (childId lives in
 // the URL), which remounts this component and would otherwise silently wipe
@@ -132,7 +132,7 @@ export function WhatsHappeningNowMenu({
 
       {selectedTip && (
         <div
-          className={`relative mt-3 rounded-md border border-brand-purple/20 bg-brand-purple/5 p-3 pt-8 transition-opacity duration-300 ${
+          className={`relative mt-3 rounded-md border border-brand-purple/20 bg-brand-purple/5 p-3 pt-8 transition-opacity duration-[600ms] ${
             fading ? "opacity-0" : "opacity-100"
           }`}
         >

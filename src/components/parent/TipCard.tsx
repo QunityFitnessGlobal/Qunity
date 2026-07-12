@@ -12,7 +12,7 @@ interface TipCardProps {
   gender: Gender | null;
 }
 
-const FADE_DURATION_MS = 300;
+const FADE_DURATION_MS = 600;
 
 export function TipCard({ tip, locale, gender }: TipCardProps) {
   const [dismissed, setDismissed] = useState(false);
@@ -29,7 +29,7 @@ export function TipCard({ tip, locale, gender }: TipCardProps) {
 
   return (
     <div
-      className={`relative rounded-md border border-brand-purple/20 bg-brand-purple/5 p-3 pt-8 transition-opacity duration-300 ${
+      className={`relative rounded-md border border-brand-purple/20 bg-brand-purple/5 p-3 pt-8 transition-opacity duration-[600ms] ${
         fading ? "opacity-0" : "opacity-100"
       }`}
     >
