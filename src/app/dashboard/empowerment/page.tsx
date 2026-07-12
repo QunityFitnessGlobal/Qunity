@@ -65,6 +65,13 @@ export default async function EmpowermentPage({ searchParams }: EmpowermentPageP
 
       {selectedChildId && (
         <WhatsHappeningNowMenu
+          // Forces a full remount (fresh expandedGroup/selectedTip state)
+          // whenever the selected child changes. Without this, Next.js's
+          // client-side navigation for a searchParams-only change can reuse
+          // the existing WhatsHappeningNowMenu instance instead of
+          // remounting it, since it stays in the same position in the tree
+          // — leaving stale accordion/tip state on screen.
+          key={selectedChildId}
           tips={manualMenuTips}
           parentId={user.id}
           childId={selectedChildId}
