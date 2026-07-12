@@ -1,6 +1,8 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { awardPoints } from "@/services/points.service";
-import { CHALLENGES, type ChallengeDefinition } from "@/data/challenges.data";
+import type { ChallengeDefinition, ChallengeConditionType } from "@/data/challenges.data";
+import type { LocalizedText } from "@/lib/i18n-content";
 
 export interface ChallengeSessionContext {
   sessionId: string;
@@ -12,6 +14,29 @@ export interface ChallengeSessionContext {
 interface CompletedSessionRow {
   start_time: string;
   actual_duration_seconds: number | null;
+}
+
+interface ChallengeRow {
+  id: string;
+  title: LocalizedText;
+  bonus_points: number;
+  condition_type: string;
+}
+
+// The `challenges` table is the source of truth for content/points (title,
+// description, bonus_points — see the "MULTI-LANGUAGE CONTENT" migration in
+// schema.sql); condition-checking logic still lives in code (isConditionMet
+// below), the same split as parent_tip_rules/tip-conditions. Accepts either
+// the browser or server Supabase client.
+export async function getChallengeDefinitions(supabase: SupabaseClient): Promise<ChallengeDefinition[]> {
+  const { data } = await supabase.from("challenges").select("id, title, bonus_points, condition_type");
+
+  return ((data ?? []) as ChallengeRow[]).map((row) => ({
+    id: row.id,
+    title: row.title,
+    bonusPoints: row.bonus_points,
+    conditionType: row.condition_type as ChallengeConditionType,
+  }));
 }
 
 // Length of the current run of consecutive calendar days (most recent day
@@ -74,13 +99,14 @@ export async function checkAndAwardChallenges(
 ): Promise<ChallengeDefinition[]> {
   const supabase = createClient();
 
-  const [{ data: unlockedRows }, { data: sessionRows }] = await Promise.all([
+  const [{ data: unlockedRows }, { data: sessionRows }, challenges] = await Promise.all([
     supabase.from("child_challenges").select("challenge_id").eq("child_id", childId),
     supabase
       .from("workout_sessions")
       .select("start_time, actual_duration_seconds")
       .eq("child_id", childId)
       .eq("status", "completed"),
+    getChallengeDefinitions(supabase),
   ]);
 
   const unlockedIds = new Set((unlockedRows ?? []).map((row) => row.challenge_id as string));
@@ -93,7 +119,7 @@ export async function checkAndAwardChallenges(
 
   const newlyUnlocked: ChallengeDefinition[] = [];
 
-  for (const challenge of CHALLENGES) {
+  for (const challenge of challenges) {
     if (unlockedIds.has(challenge.id)) {
       continue;
     }

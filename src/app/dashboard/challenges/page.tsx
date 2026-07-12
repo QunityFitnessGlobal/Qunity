@@ -5,7 +5,7 @@ import { getLinkedChildren } from "@/services/linking.service";
 import { getChildStatsForParent } from "@/services/parent-stats.service";
 import { ChallengeList } from "@/components/child/ChallengeList";
 import { ChildSelector } from "@/components/parent/ChildSelector";
-import { CHALLENGES } from "@/data/challenges.data";
+import { getChallengeDefinitions } from "@/services/challenge.service";
 import type { Role } from "@/lib/types";
 
 interface ChallengesPageProps {
@@ -33,17 +33,20 @@ export default async function ChallengesPage({ searchParams }: ChallengesPagePro
   const tDashboard = await getTranslations("dashboard");
 
   if (profile?.role === "child") {
-    const { data: unlockedRows } = await supabase
-      .from("child_challenges")
-      .select("challenge_id, completed_at")
-      .eq("child_id", user.id)
-      .order("completed_at", { ascending: false });
+    const [{ data: unlockedRows }, challengeDefs] = await Promise.all([
+      supabase
+        .from("child_challenges")
+        .select("challenge_id, completed_at")
+        .eq("child_id", user.id)
+        .order("completed_at", { ascending: false }),
+      getChallengeDefinitions(supabase),
+    ]);
 
     const challenges = (unlockedRows ?? []).map((row) => {
       const challengeId = row.challenge_id as string;
       return {
         id: challengeId,
-        title: CHALLENGES.find((c) => c.id === challengeId)?.title ?? {
+        title: challengeDefs.find((c) => c.id === challengeId)?.title ?? {
           he: challengeId,
           en: challengeId,
         },

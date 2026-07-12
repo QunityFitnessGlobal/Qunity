@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { calculateProgressPercent } from "@/services/progression.service";
-import { CHALLENGES } from "@/data/challenges.data";
+import { getChallengeDefinitions } from "@/services/challenge.service";
 import type { LocalizedText } from "@/lib/i18n-content";
 import type { BraceletColor } from "@/lib/types";
 
@@ -154,17 +154,20 @@ export async function getChildStatsForParent(
     }),
   );
 
-  const { data: unlockedRows } = await supabase
-    .from("child_challenges")
-    .select("challenge_id, completed_at")
-    .eq("child_id", childId)
-    .order("completed_at", { ascending: false });
+  const [{ data: unlockedRows }, challenges] = await Promise.all([
+    supabase
+      .from("child_challenges")
+      .select("challenge_id, completed_at")
+      .eq("child_id", childId)
+      .order("completed_at", { ascending: false }),
+    getChallengeDefinitions(supabase),
+  ]);
 
   const completedChallenges: CompletedChallengeEntry[] = (unlockedRows ?? []).map((row) => {
     const challengeId = row.challenge_id as string;
     return {
       id: challengeId,
-      title: CHALLENGES.find((c) => c.id === challengeId)?.title ?? { he: challengeId, en: challengeId },
+      title: challenges.find((c) => c.id === challengeId)?.title ?? { he: challengeId, en: challengeId },
       completedAt: row.completed_at as string | null,
     };
   });

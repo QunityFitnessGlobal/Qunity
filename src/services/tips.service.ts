@@ -1,6 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { CHALLENGES } from "@/data/challenges.data";
-import { calculateStreakDays } from "@/services/challenge.service";
+import { calculateStreakDays, getChallengeDefinitions } from "@/services/challenge.service";
 import { TIP_CONDITION_REGISTRY, type ChildTipSnapshot } from "@/services/tip-conditions";
 import type { LocalizedText } from "@/lib/i18n-content";
 
@@ -69,7 +68,7 @@ export async function buildChildTipSnapshot(
   supabase: SupabaseClient,
   childId: string,
 ): Promise<ChildTipSnapshot> {
-  const [{ data: child }, { data: sessions }, { data: inProgressSessions }, { data: unlocked }] =
+  const [{ data: child }, { data: sessions }, { data: inProgressSessions }, { data: unlocked }, challenges] =
     await Promise.all([
       supabase
         .from("children")
@@ -88,6 +87,7 @@ export async function buildChildTipSnapshot(
         .eq("child_id", childId)
         .eq("status", "in_progress"),
       supabase.from("child_challenges").select("challenge_id").eq("child_id", childId),
+      getChallengeDefinitions(supabase),
     ]);
 
   const sessionRows = (sessions ?? []) as CompletedSessionRow[];
@@ -145,7 +145,7 @@ export async function buildChildTipSnapshot(
       .filter((d): d is number => d !== null),
     feelingHistory: resultRows.map((r) => r.feeling_after).filter((f): f is string => f !== null),
     unlockedChallengeCount: unlocked?.length ?? 0,
-    totalChallengesAvailable: CHALLENGES.length,
+    totalChallengesAvailable: challenges.length,
     totalWorkoutsCompleted: child?.total_workouts_completed ?? 0,
     workoutsThisMonth,
     durationHistory: sessionRows

@@ -1,9 +1,13 @@
 import type { LocalizedText } from "@/lib/i18n-content";
 
-// Mirrors the `challenges` table (supabase/seed.sql). The database is the
-// source of truth; this file exists so services/tests can reference challenge
-// ids and condition types without a round trip to the DB. title/description
-// are {"he": "...", "en": "..."} to match the JSONB columns.
+// Mirrors the `challenges` table (supabase/seed.sql) for reference — like
+// tips.data.ts, this is NOT used at runtime. The challenges table is the
+// source of truth for title/description/bonus_points (see
+// challenge.service.ts's getChallengeDefinitions); only the condition-check
+// logic (isConditionMet in challenge.service.ts) lives in code, keyed by
+// condition_type. This file exists so the id <-> condition_type mapping is
+// easy to read without opening the SQL seed file, and so ChallengeDefinition/
+// ChallengeConditionType have somewhere to live as shared types.
 
 export type ChallengeConditionType =
   | "first_workout"
