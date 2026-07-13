@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { calculateWorkoutPoints, awardPoints } from "@/services/points.service";
 import { checkColorProgression } from "@/services/progression.service";
-import { checkAndAwardChallenges } from "@/services/challenge.service";
+import { checkAndAwardChallenges, unlockColorChallenge } from "@/services/challenge.service";
 import type { ChallengeDefinition } from "@/data/challenges.data";
 import type { BraceletColor, Exercise, Workout } from "@/lib/types";
 
@@ -163,6 +163,7 @@ export interface CompleteWorkoutResult {
   didLevelUp: boolean;
   newColor?: BraceletColor;
   newChallenges: ChallengeDefinition[];
+  unlockedChallenge: ChallengeDefinition | null;
 }
 
 export async function completeWorkout(params: {
@@ -245,10 +246,17 @@ export async function completeWorkout(params: {
     didLevelUpThisSession: progression.didLevelUp,
   });
 
+  // Repeatable ("type B") challenge tied to the color just finished — separate
+  // from checkAndAwardChallenges above since it unlocks rather than completes.
+  const unlockedChallenge = progression.completedColor
+    ? await unlockColorChallenge(supabase, childId, progression.completedColor)
+    : null;
+
   return {
     pointsAwarded,
     didLevelUp: progression.didLevelUp,
     newColor: progression.newColor,
     newChallenges,
+    unlockedChallenge,
   };
 }

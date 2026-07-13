@@ -1187,3 +1187,97 @@ update public.bracelet_levels set required_points = 780 where color = 'purple';
 -- ============================================================================
 
 alter table public.exercises add column image_url text;
+
+-- ============================================================================
+-- ADDED FOR REPEATABLE ("TYPE B") CHALLENGES
+--
+-- Two kinds of challenges now exist, distinguished by challenge_type:
+--   'condition'          — the original 7 challenges: auto-detected from
+--                           cumulative activity (first workout, streaks,
+--                           etc — see challenge.service.ts's isConditionMet),
+--                           unlock and complete in the same moment, one-time.
+--   'repeatable_workout' — a challenging "workout" of its own (e.g. a
+--                           stairs climb) that unlocks when a child FINISHES
+--                           a given belt color (unlock_color) and can then be
+--                           performed any number of times, each time
+--                           awarding bonus_points again. Does not appear on
+--                           the journey map — only in the Challenges tab.
+--
+-- child_challenges keeps tracking one-time UNLOCK state for both kinds (for
+-- 'condition' rows, unlocking IS completing, so completed_at already means
+-- that; for 'repeatable_workout' rows it just marks "became available" —
+-- the actual per-attempt history lives in challenge_sessions below).
+-- ============================================================================
+
+alter table public.challenges
+  add column challenge_type text not null default 'condition'
+    check (challenge_type in ('condition', 'repeatable_workout'));
+alter table public.challenges
+  add column unlock_color text references public.bracelet_levels (color);
+
+create table public.challenge_sessions (
+  id uuid primary key default gen_random_uuid(),
+  child_id uuid not null references public.children (id) on delete cascade,
+  challenge_id text not null references public.challenges (id) on delete cascade,
+  status text not null default 'completed' check (status in ('in_progress', 'completed')),
+  start_time timestamptz not null default now(),
+  end_time timestamptz,
+  actual_duration_seconds integer,
+  difficulty_reported integer,
+  feeling_after text,
+  parent_trained_together boolean not null default false,
+  points_awarded integer,
+  created_at timestamptz not null default now()
+);
+
+alter table public.challenge_sessions enable row level security;
+
+create policy "challenge_sessions_select_own" on public.challenge_sessions
+  for select using (child_id = auth.uid() or public.is_parent_of(child_id));
+create policy "challenge_sessions_insert_own" on public.challenge_sessions
+  for insert with check (child_id = auth.uid());
+create policy "challenge_sessions_update_own" on public.challenge_sessions
+  for update using (child_id = auth.uid());
+
+-- 5 sample repeatable challenges, one per color, for testing the flow end
+-- to end. Content/points are placeholders — easy to edit later since this is
+-- all DB-driven (see the challenges DB-unification change).
+insert into public.challenges (id, title, description, bonus_points, condition_type, challenge_type, unlock_color) values
+  ('stairs_white', jsonb_build_object('he', '100 מדרגות', 'en', '100 stairs'),
+   jsonb_build_object('he', 'עלה 100 מדרגות ברצף, בקצב שנוח לך.', 'en', 'Climb 100 stairs in a row, at your own pace.'),
+   15, null, 'repeatable_workout', 'white'),
+  ('stairs_orange', jsonb_build_object('he', '200 מדרגות', 'en', '200 stairs'),
+   jsonb_build_object('he', 'עלה 200 מדרגות ברצף, בקצב שנוח לך.', 'en', 'Climb 200 stairs in a row, at your own pace.'),
+   20, null, 'repeatable_workout', 'orange'),
+  ('stairs_green', jsonb_build_object('he', '300 מדרגות', 'en', '300 stairs'),
+   jsonb_build_object('he', 'עלה 300 מדרגות ברצף, בקצב שנוח לך.', 'en', 'Climb 300 stairs in a row, at your own pace.'),
+   25, null, 'repeatable_workout', 'green'),
+  ('stairs_blue', jsonb_build_object('he', '400 מדרגות', 'en', '400 stairs'),
+   jsonb_build_object('he', 'עלה 400 מדרגות ברצף, בקצב שנוח לך.', 'en', 'Climb 400 stairs in a row, at your own pace.'),
+   30, null, 'repeatable_workout', 'blue'),
+  ('stairs_purple', jsonb_build_object('he', '500 מדרגות', 'en', '500 stairs'),
+   jsonb_build_object('he', 'עלה 500 מדרגות ברצף, בקצב שנוח לך.', 'en', 'Climb 500 stairs in a row, at your own pace.'),
+   35, null, 'repeatable_workout', 'purple');
+
+-- ============================================================================
+-- ADDED FOR CHALLENGE POINTS ISOLATION
+--
+-- Repeatable ("type B") challenges can be done any number of times, so
+-- their points must NOT feed points_in_color (the belt-progression gate —
+-- see progression.service.ts's calculateProgressPercent) or they'd inflate
+-- the displayed progress bar without any matching real workout progress.
+-- They still count toward total_points (lifetime score / leaderboard).
+-- ============================================================================
+
+create or replace function public.increment_child_total_points_only(p_child_id uuid, p_points integer)
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  update public.children
+  set total_points = total_points + p_points
+  where id = p_child_id;
+$$;
+
+grant execute on function public.increment_child_total_points_only(uuid, integer) to authenticated;

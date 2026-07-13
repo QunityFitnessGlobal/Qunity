@@ -52,13 +52,25 @@ export function totalPoints(breakdown: PointsBreakdownItem[]): number {
   return breakdown.reduce((sum, item) => sum + item.points, 0);
 }
 
+export interface AwardPointsOptions {
+  // false for repeatable ("type B") challenges — they can be done any
+  // number of times, so their points must count toward total_points
+  // (lifetime score / leaderboard) but not points_in_color (the belt-
+  // progression gate), or they'd inflate the progress bar without any
+  // matching real workout progress. Defaults to true for regular workouts
+  // and one-time ("type A") challenges.
+  countTowardColor?: boolean;
+}
+
 export async function awardPoints(
   childId: string,
   sessionId: string | null,
   breakdown: PointsBreakdownItem[],
+  options?: AwardPointsOptions,
 ): Promise<number> {
   const supabase = createClient();
   const total = totalPoints(breakdown);
+  const countTowardColor = options?.countTowardColor ?? true;
 
   const rows = breakdown.map((item) => ({
     child_id: childId,
@@ -75,10 +87,10 @@ export async function awardPoints(
   // Atomic increment via RPC (SET total_points = total_points + $1 in one SQL
   // statement) rather than reading the current value in JS and writing it
   // back — that two-step pattern loses updates under concurrent calls.
-  const { error: incrementError } = await supabase.rpc("increment_child_points", {
-    p_child_id: childId,
-    p_points: total,
-  });
+  const { error: incrementError } = await supabase.rpc(
+    countTowardColor ? "increment_child_points" : "increment_child_total_points_only",
+    { p_child_id: childId, p_points: total },
+  );
 
   if (incrementError) {
     throw new Error(incrementError.message);

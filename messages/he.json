@@ -74,9 +74,6 @@
     "label": "האימון הבא - שווי {points} נקודות",
     "start": "התחל"
   },
-  "challengeList": {
-    "empty": "עדיין לא פתחת אתגרים."
-  },
   "colors": {
     "badge": "צמיד {color}",
     "white": "לבן",
@@ -119,6 +116,7 @@
     "resultTitle": "כל הכבוד!",
     "pointsAwarded": "קיבלת {points} נקודות על האימון הזה.",
     "leveledUp": "כל הכבוד! עברת לשלב ה{color}! 🎉",
+    "advanceToChallenge": "התקדם לשלב ה{color}",
     "challengeUnlocked": "פתחת אתגר: {title} +{points}",
     "nextWorkout": "אימון הבא",
     "finishSession": "סיום",
@@ -184,7 +182,31 @@
   },
   "challengesPage": {
     "myTitle": "האתגרים שלי",
-    "completedTitle": "אתגרים שהושלמו"
+    "completedTitle": "אתגרים שהושלמו",
+    "doneTab": "אתגרים שבוצעו",
+    "todoTab": "אתגרים לביצוע",
+    "emptyDone": "עדיין אין אתגרים שהושלמו.",
+    "emptyTodo": "אין אתגרים זמינים כרגע.",
+    "doItNow": "בצע עכשיו",
+    "completedTimes": "בוצע {count} פעמים",
+    "lockedHint": "עדיין לא הושג",
+    "perCompletion": "+{points} לכל ביצוע",
+    "testTriggerLabel": "בדיקה בלבד — מדמה סיום שלב",
+    "testTriggerPlaceholder": "1-5",
+    "testTriggerButton": "פתח אתגר"
+  },
+  "challengeRunner": {
+    "badge": "אתגר",
+    "bonusPoints": "בונוס: {points} נקודות",
+    "resultTitle": "כל הכבוד!",
+    "pointsAwarded": "קיבלת {points} נקודות על האתגר הזה.",
+    "backToJourney": "חזרה למסלול"
+  },
+  "challengeUnlockedModal": {
+    "title": "אתגר חדש נפתח!",
+    "body": "סיימת את השלב ה{color}. מוכן לנסות?",
+    "doNow": "בצע עכשיו",
+    "postpone": "דחה לפעם אחרת"
   },
   "recentWorkoutsPage": {
     "title": "אימונים אחרונים"

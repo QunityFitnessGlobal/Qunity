@@ -13,6 +13,7 @@ import {
   type WorkoutExerciseEntry,
 } from "@/services/workout.service";
 import { Button } from "@/components/ui/Button";
+import { ChallengeUnlockedModal } from "@/components/child/ChallengeUnlockedModal";
 import { formatDurationClock } from "@/lib/format";
 import { resolveLocalizedText } from "@/lib/i18n-content";
 import {
@@ -76,6 +77,7 @@ export function WorkoutRunner({
   const [parentTrainedTogether, setParentTrainedTogether] = useState("no");
   const [feelingAfter, setFeelingAfter] = useState<FeelingCode>(FEELING_CODES[0]);
   const [nextWorkoutLoading, setNextWorkoutLoading] = useState(false);
+  const [showChallengeModal, setShowChallengeModal] = useState(false);
 
   const recommendedDurationMinutes = workout.recommended_duration_minutes ?? 0;
   const extraMinutes = Math.round(actualDurationSeconds / 60) - recommendedDurationMinutes;
@@ -243,6 +245,11 @@ export function WorkoutRunner({
           <Button className="w-full" disabled={nextWorkoutLoading} onClick={handleNextWorkout}>
             {nextWorkoutLoading ? t("loading") : t("nextWorkout")}
           </Button>
+          {result.unlockedChallenge && result.newColor && (
+            <Button className="w-full" onClick={() => setShowChallengeModal(true)}>
+              {t("advanceToChallenge", { color: tColors(result.newColor) })}
+            </Button>
+          )}
           <Button
             className="w-full bg-zinc-700 hover:bg-zinc-800"
             onClick={() => router.push("/dashboard/journey")}
@@ -250,6 +257,15 @@ export function WorkoutRunner({
             {t("finishSession")}
           </Button>
         </div>
+
+        {showChallengeModal && result.unlockedChallenge && result.newColor && (
+          <ChallengeUnlockedModal
+            title={result.unlockedChallenge.title}
+            colorLabel={tColors(result.newColor)}
+            onDoNow={() => router.push(`/challenge/${result.unlockedChallenge!.id}`)}
+            onPostpone={() => router.push("/dashboard/journey")}
+          />
+        )}
       </div>
     );
   }

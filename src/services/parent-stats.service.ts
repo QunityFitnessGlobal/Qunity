@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { calculateProgressPercent } from "@/services/progression.service";
-import { getChallengeDefinitions } from "@/services/challenge.service";
+import { getCompletedChallengeHistory, type CompletedChallengeEntry } from "@/services/challenge.service";
 import type { LocalizedText } from "@/lib/i18n-content";
 import type { BraceletColor } from "@/lib/types";
 
@@ -12,11 +12,7 @@ export interface RecentWorkoutEntry {
   difficultyReported: number | null;
 }
 
-export interface CompletedChallengeEntry {
-  id: string;
-  title: LocalizedText;
-  completedAt: string | null;
-}
+export type { CompletedChallengeEntry };
 
 export interface ParentChildStats {
   nickname: string;
@@ -154,23 +150,7 @@ export async function getChildStatsForParent(
     }),
   );
 
-  const [{ data: unlockedRows }, challenges] = await Promise.all([
-    supabase
-      .from("child_challenges")
-      .select("challenge_id, completed_at")
-      .eq("child_id", childId)
-      .order("completed_at", { ascending: false }),
-    getChallengeDefinitions(supabase),
-  ]);
-
-  const completedChallenges: CompletedChallengeEntry[] = (unlockedRows ?? []).map((row) => {
-    const challengeId = row.challenge_id as string;
-    return {
-      id: challengeId,
-      title: challenges.find((c) => c.id === challengeId)?.title ?? { he: challengeId, en: challengeId },
-      completedAt: row.completed_at as string | null,
-    };
-  });
+  const completedChallenges = await getCompletedChallengeHistory(supabase, childId);
 
   const requiredPoints = level?.required_points ?? 0;
   const requiredWorkouts = level?.required_workouts ?? 0;

@@ -3,9 +3,10 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getLinkedChildren } from "@/services/linking.service";
 import { getChildStatsForParent } from "@/services/parent-stats.service";
-import { ChallengeList } from "@/components/child/ChallengeList";
+import { getCompletedChallengeHistory, getPendingChallenges } from "@/services/challenge.service";
+import { ChallengesTabs } from "@/components/child/ChallengesTabs";
+import { ChallengeTestTrigger } from "@/components/child/ChallengeTestTrigger";
 import { ChildSelector } from "@/components/parent/ChildSelector";
-import { getChallengeDefinitions } from "@/services/challenge.service";
 import type { Role } from "@/lib/types";
 
 interface ChallengesPageProps {
@@ -33,31 +34,19 @@ export default async function ChallengesPage({ searchParams }: ChallengesPagePro
   const tDashboard = await getTranslations("dashboard");
 
   if (profile?.role === "child") {
-    const [{ data: unlockedRows }, challengeDefs] = await Promise.all([
-      supabase
-        .from("child_challenges")
-        .select("challenge_id, completed_at")
-        .eq("child_id", user.id)
-        .order("completed_at", { ascending: false }),
-      getChallengeDefinitions(supabase),
+    const [completed, pending] = await Promise.all([
+      getCompletedChallengeHistory(supabase, user.id),
+      getPendingChallenges(supabase, user.id),
     ]);
-
-    const challenges = (unlockedRows ?? []).map((row) => {
-      const challengeId = row.challenge_id as string;
-      return {
-        id: challengeId,
-        title: challengeDefs.find((c) => c.id === challengeId)?.title ?? {
-          he: challengeId,
-          en: challengeId,
-        },
-        completedAt: row.completed_at as string | null,
-      };
-    });
 
     return (
       <div className="flex flex-1 flex-col items-center gap-4 px-4 py-16">
         <h1 className="text-2xl font-bold">{t("myTitle")}</h1>
-        <ChallengeList challenges={challenges} />
+        <ChallengesTabs
+          completed={completed}
+          pending={pending}
+          testTrigger={<ChallengeTestTrigger childId={user.id} />}
+        />
       </div>
     );
   }
@@ -65,7 +54,11 @@ export default async function ChallengesPage({ searchParams }: ChallengesPagePro
   const linkedChildren = await getLinkedChildren(supabase, user.id);
   const { childId } = await searchParams;
   const selectedChildId = childId ?? linkedChildren[0]?.id ?? null;
-  const stats = selectedChildId ? await getChildStatsForParent(supabase, selectedChildId) : null;
+
+  const [stats, pending] = await Promise.all([
+    selectedChildId ? getChildStatsForParent(supabase, selectedChildId) : Promise.resolve(null),
+    selectedChildId ? getPendingChallenges(supabase, selectedChildId) : Promise.resolve([]),
+  ]);
 
   return (
     <div className="flex flex-1 flex-col items-center gap-4 px-4 py-16">
@@ -79,7 +72,7 @@ export default async function ChallengesPage({ searchParams }: ChallengesPagePro
         <ChildSelector items={linkedChildren} selectedId={selectedChildId} />
       )}
 
-      {stats && <ChallengeList challenges={stats.completedChallenges} />}
+      {stats && <ChallengesTabs completed={stats.completedChallenges} pending={pending} />}
     </div>
   );
 }

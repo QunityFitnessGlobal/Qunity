@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/client";
 import type { BraceletColor } from "@/lib/types";
 
-const COLOR_ORDER: BraceletColor[] = ["white", "orange", "green", "blue", "purple"];
+export const COLOR_ORDER: BraceletColor[] = ["white", "orange", "green", "blue", "purple"];
 
 export interface ChildProgressionState {
   currentColor: BraceletColor;
@@ -71,7 +71,7 @@ interface BraceletLevelRow {
 // for the MVP, see the Prompt 3/7 summary for the rationale.
 export async function checkColorProgression(
   childId: string,
-): Promise<{ didLevelUp: boolean; newColor?: BraceletColor }> {
+): Promise<{ didLevelUp: boolean; newColor?: BraceletColor; completedColor?: BraceletColor }> {
   const supabase = createClient();
 
   const { data: child } = await supabase
@@ -127,5 +127,9 @@ export async function checkColorProgression(
     }
   }
 
-  return { didLevelUp: result.didLevelUp, newColor: result.nextColor ?? undefined };
+  return {
+    didLevelUp: result.didLevelUp,
+    newColor: result.nextColor ?? undefined,
+    completedColor: result.didLevelUp ? child.current_color : undefined,
+  };
 }

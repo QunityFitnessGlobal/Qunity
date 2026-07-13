@@ -74,9 +74,6 @@
     "label": "Next workout - worth {points} points",
     "start": "Start"
   },
-  "challengeList": {
-    "empty": "You haven't unlocked any challenges yet."
-  },
   "colors": {
     "badge": "{color} bracelet",
     "white": "White",
@@ -119,6 +116,7 @@
     "resultTitle": "Well done!",
     "pointsAwarded": "You earned {points} points for this workout.",
     "leveledUp": "Well done! You moved up to the {color} level! 🎉",
+    "advanceToChallenge": "Advance to the {color} level",
     "challengeUnlocked": "Challenge unlocked: {title} +{points}",
     "nextWorkout": "Next workout",
     "finishSession": "Done",
@@ -184,7 +182,31 @@
   },
   "challengesPage": {
     "myTitle": "My challenges",
-    "completedTitle": "Completed challenges"
+    "completedTitle": "Completed challenges",
+    "doneTab": "Completed",
+    "todoTab": "To do",
+    "emptyDone": "No challenges completed yet.",
+    "emptyTodo": "No challenges available right now.",
+    "doItNow": "Do it now",
+    "completedTimes": "Completed {count} times",
+    "lockedHint": "Not yet achieved",
+    "perCompletion": "+{points} per completion",
+    "testTriggerLabel": "Testing only — simulates finishing a level",
+    "testTriggerPlaceholder": "1-5",
+    "testTriggerButton": "Open challenge"
+  },
+  "challengeRunner": {
+    "badge": "Challenge",
+    "bonusPoints": "Bonus: {points} points",
+    "resultTitle": "Well done!",
+    "pointsAwarded": "You earned {points} points for this challenge.",
+    "backToJourney": "Back to journey"
+  },
+  "challengeUnlockedModal": {
+    "title": "New challenge unlocked!",
+    "body": "You finished the {color} level. Ready to try it?",
+    "doNow": "Do it now",
+    "postpone": "Do it later"
   },
   "recentWorkoutsPage": {
     "title": "Recent workouts"
