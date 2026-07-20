@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { logShownTips, type ManualMenuTip } from "@/services/tips.service";
-import { resolveGenderedText } from "@/lib/i18n-content";
+import { resolveGenderedText, resolveLocalizedText } from "@/lib/i18n-content";
 import { TipLikeDismissButtons } from "@/components/parent/TipLikeDismissButtons";
 import type { Gender } from "@/lib/types";
 
@@ -113,7 +113,9 @@ export function WhatsHappeningNowMenu({
             onDismiss={dismissSelectedTip}
           />
           {selectedTip.principle && (
-            <p className="mb-1 text-xs font-semibold text-brand-purple">{selectedTip.principle}</p>
+            <p className="mb-1 text-xs font-semibold text-brand-purple">
+              {resolveLocalizedText(selectedTip.principle, locale)}
+            </p>
           )}
           <p className="whitespace-pre-line text-sm text-zinc-700">
             {resolveGenderedText(selectedTip.tipText, locale, childGender)}

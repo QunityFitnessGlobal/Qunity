@@ -10,12 +10,14 @@ import type { CompletedChallengeEntry, PendingChallengeEntry } from "@/services/
 interface ChallengesTabsProps {
   completed: CompletedChallengeEntry[];
   pending: PendingChallengeEntry[];
-  testTrigger?: React.ReactNode;
+  // Only the child's own view can actually start a challenge — a parent
+  // viewing a linked child's challenges sees the same lists read-only.
+  canPerform?: boolean;
 }
 
 type Tab = "done" | "todo";
 
-export function ChallengesTabs({ completed, pending, testTrigger }: ChallengesTabsProps) {
+export function ChallengesTabs({ completed, pending, canPerform = false }: ChallengesTabsProps) {
   const t = useTranslations("challengesPage");
   const locale = useLocale();
   const [tab, setTab] = useState<Tab>("done");
@@ -27,7 +29,7 @@ export function ChallengesTabs({ completed, pending, testTrigger }: ChallengesTa
           type="button"
           onClick={() => setTab("done")}
           className={`flex-1 py-2 text-sm font-medium ${
-            tab === "done" ? "bg-brand-purple/10 text-brand-purple" : "text-text-muted"
+            tab === "done" ? "bg-blue-50 text-blue-700" : "text-blue-700/70"
           }`}
         >
           {t("doneTab")}
@@ -36,7 +38,7 @@ export function ChallengesTabs({ completed, pending, testTrigger }: ChallengesTa
           type="button"
           onClick={() => setTab("todo")}
           className={`flex-1 py-2 text-sm font-medium ${
-            tab === "todo" ? "bg-brand-purple/10 text-brand-purple" : "text-text-muted"
+            tab === "todo" ? "bg-orange-50 text-orange-700" : "text-orange-700/70"
           }`}
         >
           {t("todoTab")}
@@ -70,9 +72,7 @@ export function ChallengesTabs({ completed, pending, testTrigger }: ChallengesTa
 
       {tab === "todo" && (
         <div className="space-y-2">
-          {pending.length === 0 && !testTrigger && (
-            <p className="text-sm text-text-muted">{t("emptyTodo")}</p>
-          )}
+          {pending.length === 0 && <p className="text-sm text-text-muted">{t("emptyTodo")}</p>}
           {pending.map((entry) =>
             entry.challengeType === "repeatable_workout" ? (
               <div key={entry.challengeId} className="rounded-md border border-zinc-200 bg-white p-3">
@@ -87,12 +87,14 @@ export function ChallengesTabs({ completed, pending, testTrigger }: ChallengesTa
                     {t("perCompletion", { points: entry.bonusPoints })}
                   </span>
                 </div>
-                <Link
-                  href={`/challenge/${entry.challengeId}`}
-                  className="mt-3 block w-full rounded-md border border-zinc-300 py-2 text-center text-sm font-medium hover:bg-zinc-50"
-                >
-                  {t("doItNow")}
-                </Link>
+                {canPerform && (
+                  <Link
+                    href={`/challenge/${entry.challengeId}`}
+                    className="mt-3 block w-full rounded-md bg-green-600 py-2 text-center text-sm font-medium text-white hover:bg-green-700"
+                  >
+                    {entry.completionCount > 0 ? t("doItAgain") : t("doItNow")}
+                  </Link>
+                )}
               </div>
             ) : (
               <div
@@ -104,7 +106,6 @@ export function ChallengesTabs({ completed, pending, testTrigger }: ChallengesTa
               </div>
             ),
           )}
-          {testTrigger}
         </div>
       )}
     </div>

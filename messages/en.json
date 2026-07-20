@@ -191,9 +191,7 @@
     "completedTimes": "Completed {count} times",
     "lockedHint": "Not yet achieved",
     "perCompletion": "+{points} per completion",
-    "testTriggerLabel": "Testing only — simulates finishing a level",
-    "testTriggerPlaceholder": "1-5",
-    "testTriggerButton": "Open challenge"
+    "doItAgain": "Do it again"
   },
   "challengeRunner": {
     "badge": "Challenge",

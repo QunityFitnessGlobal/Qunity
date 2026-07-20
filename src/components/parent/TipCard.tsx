@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { resolveGenderedText } from "@/lib/i18n-content";
+import { resolveGenderedText, resolveLocalizedText } from "@/lib/i18n-content";
 import { TipLikeDismissButtons } from "@/components/parent/TipLikeDismissButtons";
 import type { RelevantTip } from "@/services/tips.service";
 import type { Gender } from "@/lib/types";
@@ -35,7 +35,9 @@ export function TipCard({ tip, locale, gender }: TipCardProps) {
     >
       <TipLikeDismissButtons ruleId={tip.ruleId} onLike={handleLike} onDismiss={() => setDismissed(true)} />
       {tip.principle && (
-        <p className="mb-1 text-xs font-semibold text-brand-purple">{tip.principle}</p>
+        <p className="mb-1 text-xs font-semibold text-brand-purple">
+          {resolveLocalizedText(tip.principle, locale)}
+        </p>
       )}
       <p className="text-sm text-zinc-700">{resolveGenderedText(tip.tipText, locale, gender)}</p>
     </div>

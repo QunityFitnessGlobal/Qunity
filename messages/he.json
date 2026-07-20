@@ -191,9 +191,7 @@
     "completedTimes": "בוצע {count} פעמים",
     "lockedHint": "עדיין לא הושג",
     "perCompletion": "+{points} לכל ביצוע",
-    "testTriggerLabel": "בדיקה בלבד — מדמה סיום שלב",
-    "testTriggerPlaceholder": "1-5",
-    "testTriggerButton": "פתח אתגר"
+    "doItAgain": "בצע שוב"
   },
   "challengeRunner": {
     "badge": "אתגר",

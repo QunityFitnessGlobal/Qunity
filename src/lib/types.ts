@@ -145,7 +145,7 @@ export interface ChildChallenge {
 
 export interface ParentTipRule {
   id: string;
-  principle: string | null;
+  principle: LocalizedText | null;
   condition_type: string | null;
   condition_params: Record<string, unknown>;
   tip_text: LocalizedText;

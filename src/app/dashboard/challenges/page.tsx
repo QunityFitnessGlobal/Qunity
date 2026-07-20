@@ -5,7 +5,6 @@ import { getLinkedChildren } from "@/services/linking.service";
 import { getChildStatsForParent } from "@/services/parent-stats.service";
 import { getCompletedChallengeHistory, getPendingChallenges } from "@/services/challenge.service";
 import { ChallengesTabs } from "@/components/child/ChallengesTabs";
-import { ChallengeTestTrigger } from "@/components/child/ChallengeTestTrigger";
 import { ChildSelector } from "@/components/parent/ChildSelector";
 import type { Role } from "@/lib/types";
 
@@ -42,11 +41,7 @@ export default async function ChallengesPage({ searchParams }: ChallengesPagePro
     return (
       <div className="flex flex-1 flex-col items-center gap-4 px-4 py-16">
         <h1 className="text-2xl font-bold">{t("myTitle")}</h1>
-        <ChallengesTabs
-          completed={completed}
-          pending={pending}
-          testTrigger={<ChallengeTestTrigger childId={user.id} />}
-        />
+        <ChallengesTabs completed={completed} pending={pending} canPerform />
       </div>
     );
   }

@@ -1281,3 +1281,42 @@ as $$
 $$;
 
 grant execute on function public.increment_child_total_points_only(uuid, integer) to authenticated;
+
+-- ============================================================================
+-- ADDED FOR TIP PRINCIPLE I18N
+--
+-- parent_tip_rules.principle was still plain English text (e.g. "Empowering
+-- Framework") even after tip_text itself became {"he", "en"} JSONB — it was
+-- rendered as-is in a Hebrew-only UI. Same migration pattern as
+-- workouts/challenges/parent_tip_rules.tip_text: add the _i18n column,
+-- backfill by matching the current text, drop + rename. "Personal Example"
+-- (used by the two original low/zero_parent_participation rows) and
+-- "Personal Example & Praise" (used by every Prompt 8 row) are the same
+-- principle under two names that drifted apart — both map to the same
+-- Hebrew text here. English is kept for whenever the UI supports it.
+-- ============================================================================
+
+alter table public.parent_tip_rules add column principle_i18n jsonb;
+
+update public.parent_tip_rules
+set principle_i18n = jsonb_build_object('he', 'מסגרת מעצימה', 'en', 'Empowering Framework')
+where principle = 'Empowering Framework';
+
+update public.parent_tip_rules
+set principle_i18n = jsonb_build_object('he', 'פוקוס על הדרך', 'en', 'Focus On The Journey')
+where principle = 'Focus On The Journey';
+
+update public.parent_tip_rules
+set principle_i18n = jsonb_build_object('he', 'אמונה משחררת', 'en', 'Liberating Belief')
+where principle = 'Liberating Belief';
+
+update public.parent_tip_rules
+set principle_i18n = jsonb_build_object('he', 'דוגמא אישית והכוונה', 'en', 'Personal Example & Praise')
+where principle in ('Personal Example & Praise', 'Personal Example');
+
+update public.parent_tip_rules
+set principle_i18n = jsonb_build_object('he', 'מותר להרגיש הכל', 'en', 'All Feelings Are Allowed')
+where principle = 'All Feelings Are Allowed';
+
+alter table public.parent_tip_rules drop column principle;
+alter table public.parent_tip_rules rename column principle_i18n to principle;

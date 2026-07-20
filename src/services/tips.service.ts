@@ -5,7 +5,7 @@ import type { LocalizedText } from "@/lib/i18n-content";
 
 export interface RelevantTip {
   ruleId: string;
-  principle: string | null;
+  principle: LocalizedText | null;
   tipText: LocalizedText;
   priority: number;
 }
@@ -17,7 +17,7 @@ export interface RelevantTip {
 // tip_text/principle.
 export interface ManualMenuTip {
   ruleId: string;
-  principle: string | null;
+  principle: LocalizedText | null;
   tipText: LocalizedText;
   menuGroup: number;
   labelHe: string;
@@ -48,7 +48,7 @@ interface InProgressSessionRow {
 
 interface TipRuleRow {
   id: string;
-  principle: string | null;
+  principle: LocalizedText | null;
   condition_type: string;
   condition_params: Record<string, unknown> | null;
   tip_text: LocalizedText;
@@ -208,7 +208,7 @@ export async function getManualMenuTips(supabase: SupabaseClient): Promise<Manua
 
   const rows = (rules ?? []) as {
     id: string;
-    principle: string | null;
+    principle: LocalizedText | null;
     condition_params: Record<string, unknown> | null;
     tip_text: LocalizedText;
   }[];
