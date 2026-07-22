@@ -191,7 +191,8 @@
     "completedTimes": "Completed {count} times",
     "lockedHint": "Not yet achieved",
     "perCompletion": "+{points} per completion",
-    "doItAgain": "Do it again"
+    "doItAgain": "Do it again",
+    "unlockedByPower": "Unlocked by {power}"
   },
   "challengeRunner": {
     "badge": "Challenge",
@@ -212,7 +213,12 @@
   "settings": {
     "title": "Settings",
     "myCode": "My code",
-    "addChild": "Add a child by code"
+    "addChild": "Add a child by code",
+    "powerPreview": {
+      "label": "Power screen preview (TEMP)",
+      "placeholder": "1-5",
+      "button": "Show"
+    }
   },
   "nav": {
     "home": "Home",
@@ -239,5 +245,15 @@
       "points": "Points earned",
       "close": "Close"
     }
+  },
+  "powers": {
+    "discoveredLabel": "You discovered a new power",
+    "unlockedAt": "Unlocked at the end of the {color} stage",
+    "continue": "Continue",
+    "white": { "name": "The power of starting", "code": "GO NOW", "quote": "I start even when I'm not sure" },
+    "orange": { "name": "The power of persistence", "code": "PUSH IT", "quote": "I keep going even when it's hard" },
+    "green": { "name": "The power of self-belief", "code": "YOU WIN", "quote": "I can see how much I've already achieved" },
+    "blue": { "name": "The power of growth", "code": "LEVEL UP", "quote": "I keep getting better" },
+    "purple": { "name": "The power of appreciation", "code": "CELEBRATE", "quote": "I know how to stop and enjoy the journey" }
   }
 }

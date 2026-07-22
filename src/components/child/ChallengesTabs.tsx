@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { resolveLocalizedText } from "@/lib/i18n-content";
 import { formatDurationClock } from "@/lib/format";
+import { POWER_ICON } from "@/lib/powers";
 import type { CompletedChallengeEntry, PendingChallengeEntry } from "@/services/challenge.service";
 
 interface ChallengesTabsProps {
@@ -19,6 +20,7 @@ type Tab = "done" | "todo";
 
 export function ChallengesTabs({ completed, pending, canPerform = false }: ChallengesTabsProps) {
   const t = useTranslations("challengesPage");
+  const tPowers = useTranslations("powers");
   const locale = useLocale();
   const [tab, setTab] = useState<Tab>("done");
 
@@ -87,6 +89,17 @@ export function ChallengesTabs({ completed, pending, canPerform = false }: Chall
                     {t("perCompletion", { points: entry.bonusPoints })}
                   </span>
                 </div>
+                {entry.unlockColor && (
+                  <div className="mt-2 flex items-center gap-1 text-xs text-text-muted">
+                    {(() => {
+                      const PowerIcon = POWER_ICON[entry.unlockColor];
+                      return <PowerIcon className="h-3.5 w-3.5" />;
+                    })()}
+                    <span>
+                      {t("unlockedByPower", { power: tPowers(`${entry.unlockColor}.name`) })}
+                    </span>
+                  </div>
+                )}
                 {canPerform && (
                   <Link
                     href={`/challenge/${entry.challengeId}`}

@@ -278,6 +278,7 @@ export interface PendingChallengeEntry {
   bonusPoints: number;
   challengeType: ChallengeType;
   completionCount: number;
+  unlockColor: BraceletColor | null;
 }
 
 // Challenges "to do" tab: unlocked 'repeatable_workout' challenges (can be
@@ -314,6 +315,7 @@ export async function getPendingChallenges(
     bonusPoints: c.bonusPoints,
     challengeType: c.challengeType,
     completionCount: completionCounts.get(c.id) ?? 0,
+    unlockColor: c.unlockColor,
   }));
 }
 

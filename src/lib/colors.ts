@@ -34,3 +34,79 @@ export const BRACELET_ROAD_COLOR: Record<BraceletColor, string> = {
   blue: "var(--color-bracelet-blue)",
   purple: "var(--color-bracelet-purple)",
 };
+
+// Full-screen "power discovered" reveal (PowerRevealScreen) — one set of
+// raw hex values per belt, since the screen needs a two-stop gradient plus
+// several text/badge colors tuned for contrast against it, not just the
+// single flat brand color BRACELET_CSS_VAR gives. White is special-cased
+// (dark badge/text on a light neutral background) for the same contrast
+// reason BRACELET_ROAD_COLOR is.
+export interface PowerRevealTheme {
+  gradientFrom: string;
+  gradientTo: string;
+  badgeBg: string;
+  badgeIcon: string;
+  badgeBorder: string | null;
+  heading: string;
+  muted: string;
+  buttonBg: string;
+  buttonText: string;
+}
+
+export const POWER_REVEAL_THEME: Record<BraceletColor, PowerRevealTheme> = {
+  white: {
+    gradientFrom: "#ECECEF",
+    gradientTo: "#D6D6DB",
+    badgeBg: "#ffffff",
+    badgeIcon: "#2C2C30",
+    badgeBorder: "#2C2C30",
+    heading: "#2C2C30",
+    muted: "#6A6A72",
+    buttonBg: "#2C2C30",
+    buttonText: "#ffffff",
+  },
+  orange: {
+    gradientFrom: "#FF8A3D",
+    gradientTo: "#E85D1F",
+    badgeBg: "#ffffff",
+    badgeIcon: "#E85D1F",
+    badgeBorder: null,
+    heading: "#ffffff",
+    muted: "#FFE8D6",
+    buttonBg: "#ffffff",
+    buttonText: "#E85D1F",
+  },
+  green: {
+    gradientFrom: "#22C55E",
+    gradientTo: "#178F45",
+    badgeBg: "#ffffff",
+    badgeIcon: "#178F45",
+    badgeBorder: null,
+    heading: "#ffffff",
+    muted: "#DCFCE7",
+    buttonBg: "#ffffff",
+    buttonText: "#178F45",
+  },
+  blue: {
+    gradientFrom: "#3B82F6",
+    gradientTo: "#1D5FD1",
+    badgeBg: "#ffffff",
+    badgeIcon: "#1D5FD1",
+    badgeBorder: null,
+    heading: "#ffffff",
+    muted: "#DCE9FE",
+    buttonBg: "#ffffff",
+    buttonText: "#1D5FD1",
+  },
+  purple: {
+    gradientFrom: "#A32894",
+    gradientTo: "#7A1D6E",
+    badgeBg: "#ffffff",
+    badgeIcon: "#7A1D6E",
+    badgeBorder: null,
+    heading: "#ffffff",
+    muted: "#F3DCF0",
+    buttonBg: "#ffffff",
+    buttonText: "#7A1D6E",
+  },
+};

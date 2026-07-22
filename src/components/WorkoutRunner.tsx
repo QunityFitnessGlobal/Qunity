@@ -14,6 +14,7 @@ import {
 } from "@/services/workout.service";
 import { Button } from "@/components/ui/Button";
 import { ChallengeUnlockedModal } from "@/components/child/ChallengeUnlockedModal";
+import { PowerRevealScreen } from "@/components/child/PowerRevealScreen";
 import { formatDurationClock } from "@/lib/format";
 import { resolveLocalizedText } from "@/lib/i18n-content";
 import {
@@ -39,7 +40,7 @@ interface WorkoutRunnerProps {
   exercises: WorkoutExerciseEntry[];
 }
 
-type Stage = "idle" | "running" | "questionnaire" | "result";
+type Stage = "idle" | "running" | "questionnaire" | "power-reveal" | "result";
 
 interface IntervalTimerState {
   phase: "work" | "rest";
@@ -197,7 +198,7 @@ export function WorkoutRunner({
         },
       });
       setResult(outcome);
-      setStage("result");
+      setStage(outcome.didLevelUp && outcome.newColor ? "power-reveal" : "result");
     } catch {
       setError(t("submitError"));
     } finally {
@@ -214,6 +215,12 @@ export function WorkoutRunner({
     } finally {
       setNextWorkoutLoading(false);
     }
+  }
+
+  if (stage === "power-reveal" && result?.newColor) {
+    return (
+      <PowerRevealScreen color={result.newColor} onContinue={() => setStage("result")} />
+    );
   }
 
   if (stage === "result" && result) {

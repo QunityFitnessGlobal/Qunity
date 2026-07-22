@@ -191,7 +191,8 @@
     "completedTimes": "בוצע {count} פעמים",
     "lockedHint": "עדיין לא הושג",
     "perCompletion": "+{points} לכל ביצוע",
-    "doItAgain": "בצע שוב"
+    "doItAgain": "בצע שוב",
+    "unlockedByPower": "נפתח בזכות {power}"
   },
   "challengeRunner": {
     "badge": "אתגר",
@@ -212,7 +213,12 @@
   "settings": {
     "title": "הגדרות",
     "myCode": "הקוד שלי",
-    "addChild": "הוספת ילד לפי קוד"
+    "addChild": "הוספת ילד לפי קוד",
+    "powerPreview": {
+      "label": "תצוגה מקדימה של מסך כוח (TEMP)",
+      "placeholder": "1-5",
+      "button": "הצג"
+    }
   },
   "nav": {
     "home": "בית",
@@ -239,5 +245,15 @@
       "points": "נקודות שנצברו",
       "close": "סגירה"
     }
+  },
+  "powers": {
+    "discoveredLabel": "גילית כוח חדש",
+    "unlockedAt": "התגלה בסיום השלב ה{color}",
+    "continue": "המשך",
+    "white": { "name": "כוח ההתחלה", "code": "GO NOW", "quote": "אני מתחיל גם כשאני לא בטוח" },
+    "orange": { "name": "כוח ההתמדה", "code": "PUSH IT", "quote": "אני ממשיך גם כשקשה" },
+    "green": { "name": "כוח האמונה בעצמי", "code": "YOU WIN", "quote": "אני רואה כמה כבר הצלחתי" },
+    "blue": { "name": "כוח הצמיחה", "code": "LEVEL UP", "quote": "אני משתפר בכל פעם" },
+    "purple": { "name": "כוח ההוקרה", "code": "CELEBRATE", "quote": "אני יודע לעצור ולשמוח בדרך שעשיתי" }
   }
 }

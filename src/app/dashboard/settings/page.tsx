@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { LogoutButton } from "@/components/LogoutButton";
+import { PowerPreviewTester } from "@/components/child/PowerPreviewTester";
 import type { Role } from "@/lib/types";
 
 export default async function SettingsPage() {
@@ -46,6 +47,8 @@ export default async function SettingsPage() {
           </Link>
         )}
       </div>
+
+      {isChild && <PowerPreviewTester />}
 
       <LogoutButton />
     </div>
