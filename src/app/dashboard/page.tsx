@@ -11,8 +11,8 @@ import { getRelevantTips, logShownTips } from "@/services/tips.service";
 import { formatDurationClock } from "@/lib/format";
 import { averageDifficultyLabelKey } from "@/lib/workout-labels";
 import { ChildCodeCard } from "@/components/ChildCodeCard";
-import { ColorBadge } from "@/components/child/ColorBadge";
-import { ProgressBar } from "@/components/child/ProgressBar";
+import { MinimalAvatar } from "@/components/child/MinimalAvatar";
+import { EnergyMeter } from "@/components/child/EnergyMeter";
 import { NextWorkoutCard } from "@/components/child/NextWorkoutCard";
 import { EncouragementBanner } from "@/components/child/EncouragementBanner";
 import { ChildSelector } from "@/components/parent/ChildSelector";
@@ -96,7 +96,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
           {stats && (
             <>
-              <ColorBadge color={stats.currentColor} />
+              <MinimalAvatar color={stats.currentColor} />
 
               <div className="w-full max-w-md space-y-2 text-center">
                 <p className="text-sm text-text-muted">
@@ -105,7 +105,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                     total: stats.requiredWorkouts,
                   })}
                 </p>
-                <ProgressBar percent={stats.progressPercent} color={stats.currentColor} />
+                <EnergyMeter percent={stats.progressPercent} color={stats.currentColor} />
               </div>
 
               <StatsGrid
@@ -212,7 +212,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <p className="text-zinc-600">{t("helloExclaim", { name: profile.full_name })}</p>
         )}
 
-        <ColorBadge color={currentColor} />
+        <MinimalAvatar color={currentColor} />
 
         <div className="w-full max-w-sm space-y-2 text-center">
           <p className="text-sm text-text-muted">
@@ -222,7 +222,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               points: pointsToNextColor,
             })}
           </p>
-          <ProgressBar percent={progressPercent} color={currentColor} />
+          <EnergyMeter percent={progressPercent} color={currentColor} />
         </div>
 
         <p className="text-lg font-bold">
