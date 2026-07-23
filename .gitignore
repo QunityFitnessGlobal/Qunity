@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# generated content-export workbooks (scripts/export-*.mjs) — working files, not source
+tips-export.xlsx
