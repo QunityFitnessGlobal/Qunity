@@ -31,7 +31,7 @@ export async function MinimalAvatar({ color }: MinimalAvatarProps) {
           style={{ borderColor: braceletVar }}
         />
         <div className="animate-power-badge-pop absolute -end-1 -top-1 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md ring-2 ring-white">
-          <Icon className="h-4 w-4" style={{ color: braceletVar }} />
+          <Icon className="h-5 w-5" style={{ color: braceletVar }} />
         </div>
       </div>
       <span className="text-sm font-semibold text-zinc-700">
