@@ -25,13 +25,14 @@ import {
   FEELING_ICONS,
   type FeelingCode,
 } from "@/lib/workout-labels";
-import type { Gender, Workout } from "@/lib/types";
+import type { BraceletColor, Gender, Workout } from "@/lib/types";
 
 interface WorkoutRunnerProps {
   childId: string;
   workout: Workout;
   workoutIndex: number;
   requiredWorkouts: number;
+  color: BraceletColor;
   colorLabel: string;
   intervalRounds: number | null;
   intervalWorkSeconds: number | null;
@@ -54,6 +55,7 @@ export function WorkoutRunner({
   workout,
   workoutIndex,
   requiredWorkouts,
+  color,
   colorLabel,
   intervalRounds,
   intervalWorkSeconds,
@@ -143,7 +145,7 @@ export function WorkoutRunner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timer?.totalRemaining]);
 
-  async function handleStart() {
+  async function beginWorkoutSession() {
     setError(null);
     try {
       const id = await startWorkoutSession(childId, workout.id);
@@ -158,6 +160,19 @@ export function WorkoutRunner({
     } catch {
       setError(t("startError"));
     }
+  }
+
+  // The power for a color is discovered at the START of that color's first
+  // workout (including white's very first workout ever, since workoutIndex
+  // is 1-based within the current color) — not at the end of the previous
+  // one. So starting workout #1 shows the reveal first; only continuing
+  // from there actually begins the session.
+  function handleStart() {
+    if (workoutIndex === 1) {
+      setStage("power-reveal");
+      return;
+    }
+    beginWorkoutSession();
   }
 
   async function finishSession(actualSeconds: number) {
@@ -198,7 +213,7 @@ export function WorkoutRunner({
         },
       });
       setResult(outcome);
-      setStage(outcome.didLevelUp && outcome.newColor ? "power-reveal" : "result");
+      setStage("result");
     } catch {
       setError(t("submitError"));
     } finally {
@@ -217,10 +232,8 @@ export function WorkoutRunner({
     }
   }
 
-  if (stage === "power-reveal" && result?.newColor) {
-    return (
-      <PowerRevealScreen color={result.newColor} onContinue={() => setStage("result")} />
-    );
+  if (stage === "power-reveal") {
+    return <PowerRevealScreen color={color} onContinue={beginWorkoutSession} />;
   }
 
   if (stage === "result" && result) {

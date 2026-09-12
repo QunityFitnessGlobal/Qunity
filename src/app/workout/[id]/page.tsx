@@ -76,6 +76,7 @@ export default async function WorkoutPage({ params }: WorkoutPageProps) {
         workout={workout}
         workoutIndex={(child?.workouts_completed_in_color ?? 0) + 1}
         requiredWorkouts={level?.required_workouts ?? 0}
+        color={workout.color ?? child?.current_color ?? "white"}
         colorLabel={tColors(workout.color ?? child?.current_color ?? "white")}
         intervalRounds={interval?.interval_rounds ?? null}
         intervalWorkSeconds={interval?.interval_work_seconds ?? null}
