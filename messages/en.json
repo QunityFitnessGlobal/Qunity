@@ -214,11 +214,42 @@
     "title": "Settings",
     "myCode": "My code",
     "addChild": "Add a child by code",
+    "addChildDirect": "Create a child profile",
     "powerPreview": {
       "label": "Power screen preview (TEMP)",
       "placeholder": "1-5",
       "button": "Show"
     }
+  },
+  "addChildDirect": {
+    "title": "Add a child",
+    "description": "Fill in the child's name and gender — no email, no password.",
+    "nicknameLabel": "Child's name",
+    "genderLabel": "Gender",
+    "genderFemale": "Female",
+    "genderMale": "Male",
+    "submit": "Create profile",
+    "submitting": "Creating...",
+    "genericError": "Error creating the profile, please try again",
+    "backToSettings": "Back to settings"
+  },
+  "familyMode": {
+    "switchToChild": "Child Mode ⚡",
+    "switching": "Switching...",
+    "pickChild": "Which child?",
+    "switchError": "Error switching to child mode",
+    "pinLabelSet": "Set a 4-digit PIN to return to parent mode",
+    "pinLabelChange": "Change your PIN",
+    "savePin": "Save PIN",
+    "saving": "Saving...",
+    "pinSaved": "Saved!",
+    "pinError": "Error saving the PIN",
+    "exitToParentMode": "🔒 Exit to parent mode",
+    "enterPin": "Enter PIN",
+    "wrongPin": "Wrong PIN, try again",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "checking": "Checking..."
   },
   "nav": {
     "home": "Home",

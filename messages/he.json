@@ -214,11 +214,42 @@
     "title": "הגדרות",
     "myCode": "הקוד שלי",
     "addChild": "הוספת ילד לפי קוד",
+    "addChildDirect": "יצירת פרופיל ילד",
     "powerPreview": {
       "label": "תצוגה מקדימה של מסך כוח (TEMP)",
       "placeholder": "1-5",
       "button": "הצג"
     }
+  },
+  "addChildDirect": {
+    "title": "הוספת ילד",
+    "description": "מלא/י את השם והמין של הילד/ה — בלי מייל ובלי סיסמה.",
+    "nicknameLabel": "שם הילד/ה",
+    "genderLabel": "מין",
+    "genderFemale": "נקבה",
+    "genderMale": "זכר",
+    "submit": "צור פרופיל",
+    "submitting": "יוצר...",
+    "genericError": "שגיאה ביצירת הפרופיל, נסה שוב",
+    "backToSettings": "חזרה להגדרות"
+  },
+  "familyMode": {
+    "switchToChild": "מצב ילד ⚡",
+    "switching": "עובר...",
+    "pickChild": "איזה ילד?",
+    "switchError": "שגיאה במעבר למצב ילד",
+    "pinLabelSet": "הגדר קוד PIN בן 4 ספרות לחזרה למצב הורה",
+    "pinLabelChange": "שינוי קוד ה-PIN",
+    "savePin": "שמור PIN",
+    "saving": "שומר...",
+    "pinSaved": "נשמר!",
+    "pinError": "שגיאה בשמירת ה-PIN",
+    "exitToParentMode": "🔒 יציאה למצב הורה",
+    "enterPin": "הזן קוד PIN",
+    "wrongPin": "קוד שגוי, נסה שוב",
+    "cancel": "ביטול",
+    "confirm": "אישור",
+    "checking": "בודק..."
   },
   "nav": {
     "home": "בית",

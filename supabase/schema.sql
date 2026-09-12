@@ -1320,3 +1320,43 @@ where principle = 'All Feelings Are Allowed';
 
 alter table public.parent_tip_rules drop column principle;
 alter table public.parent_tip_rules rename column principle_i18n to principle;
+
+-- ============================================================================
+-- ADDED FOR PARENT/CHILD MODE SWITCHING
+--
+-- Lets a parent create a child profile directly (no separate email/signup
+-- for the child) and switch this device between "Parent Mode" and "Child
+-- Mode" without a real login each time. The child still gets a completely
+-- normal auth.users account under the hood (via public.handle_new_user(),
+-- same trigger as always) — it's just created and held by the app instead
+-- of the child registering it themselves, and its login is never shown to
+-- anyone.
+--
+-- parents.pin_hash: a parent-chosen 4-digit PIN (salted+hashed in app code,
+-- see src/lib/pin.ts — never stored in plaintext) that gates returning from
+-- Child Mode back to Parent Mode on the SAME device. It is not a Supabase
+-- Auth credential and cannot log in as the parent from anywhere else — the
+-- app restores the parent's session from tokens it cached client-side at
+-- switch time, using the PIN only as a local unlock gate.
+--
+-- child_credentials: the child's hidden auto-generated login. Deliberately
+-- has NO RLS policies at all (RLS is enabled with zero grants = default
+-- deny for every role) so it is reachable only via the service-role key
+-- from server-side code (src/lib/supabase/admin.ts) — never through the
+-- normal client, by a parent, or by the child themselves.
+-- ============================================================================
+
+alter table public.parents add column pin_hash text;
+
+create policy "parents_update_self" on public.parents
+  for update using (id = auth.uid());
+
+create table public.child_credentials (
+  child_id uuid primary key references public.children (id) on delete cascade,
+  hidden_email text not null unique,
+  hidden_password text not null,
+  created_at timestamptz not null default now()
+);
+
+alter table public.child_credentials enable row level security;
+-- No policies added on purpose — see comment above.
