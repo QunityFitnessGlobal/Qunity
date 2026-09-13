@@ -244,7 +244,7 @@
     "pickChild": "איזה ילד?",
     "switchError": "שגיאה במעבר למצב ילד",
     "pinLabelSet": "הגדר קוד PIN בן 4 ספרות לחזרה למצב הורה",
-    "pinLabelChange": "שינוי קוד ה-PIN",
+    "pinLabelChange": "שינוי קוד מצב הורה",
     "savePin": "שמור PIN",
     "saving": "שומר...",
     "pinSaved": "נשמר!",
