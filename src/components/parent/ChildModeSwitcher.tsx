@@ -12,6 +12,7 @@ import type { LinkedChild } from "@/services/linking.service";
 interface ChildModeSwitcherProps {
   parentId: string;
   linkedChildren: LinkedChild[];
+  label?: string;
 }
 
 // "מצב ילד" — hands the phone to a linked child without a real login: auto
@@ -19,7 +20,7 @@ interface ChildModeSwitcherProps {
 // parent's own tokens are cached (see family-session.ts) before swapping the
 // browser's active session to the child's hidden account, so ReturnToParentButton
 // can restore this exact session later via a PIN, on this same device.
-export function ChildModeSwitcher({ parentId, linkedChildren }: ChildModeSwitcherProps) {
+export function ChildModeSwitcher({ parentId, linkedChildren, label }: ChildModeSwitcherProps) {
   const t = useTranslations("familyMode");
   const router = useRouter();
   const [showPicker, setShowPicker] = useState(false);
@@ -83,7 +84,7 @@ export function ChildModeSwitcher({ parentId, linkedChildren }: ChildModeSwitche
           disabled={loading}
           onClick={handleStart}
         >
-          {loading ? t("switching") : t("switchToChild")}
+          {loading ? t("switching") : (label ?? t("switchToChild"))}
         </Button>
       )}
 

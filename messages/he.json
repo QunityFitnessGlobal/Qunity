@@ -215,7 +215,9 @@
     "title": "הגדרות",
     "myCode": "הקוד שלי",
     "addChild": "הוספת ילד לפי קוד",
-    "addChildDirect": "יצירת פרופיל ילד",
+    "addChildDirect": "יצירת פרופיל ילד חדש",
+    "pairViaQr": "חבר את המכשיר של הילד עם QR",
+    "pairViaCode": "הוספת מכשיר ילד לפי קוד",
     "sectionChildren": "הילדים שלי",
     "sectionSecurity": "אבטחה",
     "powerPreview": {
@@ -238,6 +240,7 @@
   },
   "familyMode": {
     "switchToChild": "מצב ילד ⚡",
+    "goToChildMode": "עבור למצב ילד",
     "switching": "עובר...",
     "pickChild": "איזה ילד?",
     "switchError": "שגיאה במעבר למצב ילד",
@@ -253,9 +256,9 @@
     "cancel": "ביטול",
     "confirm": "אישור",
     "checking": "בודק...",
-    "pairDevice": "חבר מכשיר של הילד",
     "pairingError": "שגיאה ביצירת קוד החיבור",
-    "scanOrType": "סרוק את הקוד עם המצלמה של הילד, או הקלד את המספר",
+    "scanQr": "סרוק את הקוד עם המצלמה של הילד",
+    "typeCode": "הקלד/י את הקוד הזה במכשיר של הילד",
     "expiresIn10": "בתוקף ל-10 דקות",
     "close": "סגירה"
   },

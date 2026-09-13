@@ -27,10 +27,7 @@ export function ParentPinForm({ hasPinSet }: ParentPinFormProps) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="w-full max-w-sm space-y-2 rounded-lg border border-zinc-200 p-3"
-    >
+    <form onSubmit={handleSubmit} className="w-full space-y-2">
       <label className="block text-sm font-medium text-zinc-700">
         {hasPinSet ? t("pinLabelChange") : t("pinLabelSet")}
       </label>

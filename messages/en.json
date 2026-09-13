@@ -215,7 +215,9 @@
     "title": "Settings",
     "myCode": "My code",
     "addChild": "Add a child by code",
-    "addChildDirect": "Create a child profile",
+    "addChildDirect": "Create a new child profile",
+    "pairViaQr": "Connect the child's device with QR",
+    "pairViaCode": "Add a child's device by code",
     "sectionChildren": "My children",
     "sectionSecurity": "Security",
     "powerPreview": {
@@ -238,6 +240,7 @@
   },
   "familyMode": {
     "switchToChild": "Child Mode ⚡",
+    "goToChildMode": "Go to Child Mode",
     "switching": "Switching...",
     "pickChild": "Which child?",
     "switchError": "Error switching to child mode",
@@ -253,9 +256,9 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "checking": "Checking...",
-    "pairDevice": "Connect the child's device",
     "pairingError": "Error creating the pairing code",
-    "scanOrType": "Scan this with the child's camera, or type the number",
+    "scanQr": "Scan this with the child's camera",
+    "typeCode": "Type this code on the child's device",
     "expiresIn10": "Valid for 10 minutes",
     "close": "Close"
   },

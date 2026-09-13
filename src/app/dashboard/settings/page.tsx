@@ -6,8 +6,10 @@ import { getLinkedChildren } from "@/services/linking.service";
 import { LogoutButton } from "@/components/LogoutButton";
 import { PowerPreviewTester } from "@/components/child/PowerPreviewTester";
 import { ReturnToParentButton } from "@/components/child/ReturnToParentButton";
-import { ParentPinForm } from "@/components/parent/ParentPinForm";
-import { PairChildDeviceButton } from "@/components/parent/PairChildDeviceButton";
+import { ParentPinMenuItem } from "@/components/parent/ParentPinMenuItem";
+import { ChildModeSwitcher } from "@/components/parent/ChildModeSwitcher";
+import { PairChildDeviceMenuItem } from "@/components/parent/PairChildDeviceMenuItem";
+import { AccordionSection } from "@/components/ui/AccordionSection";
 import type { Role } from "@/lib/types";
 
 export default async function SettingsPage() {
@@ -29,6 +31,7 @@ export default async function SettingsPage() {
 
   const isChild = profile?.role === "child";
   const t = await getTranslations("settings");
+  const tFamily = await getTranslations("familyMode");
 
   const { data: parentRow } = !isChild
     ? await supabase.from("parents").select("pin_hash").eq("id", user.id).single<{ pin_hash: string | null }>()
@@ -54,29 +57,30 @@ export default async function SettingsPage() {
       {isChild && <ReturnToParentButton />}
 
       {!isChild && (
-        <div className="w-full max-w-sm space-y-2">
-          <h2 className="text-sm font-semibold text-text-muted">{t("sectionChildren")}</h2>
+        <AccordionSection title={t("sectionChildren")}>
           <Link
             href="/add-child-direct"
-            className="block rounded-lg border border-zinc-200 bg-white px-4 py-3 text-right shadow-sm transition-colors hover:bg-zinc-50"
+            className="block px-4 py-3 text-right text-sm text-zinc-700 hover:bg-zinc-50"
           >
             {t("addChildDirect")}
           </Link>
-          <PairChildDeviceButton linkedChildren={linkedChildren} />
-          <Link
-            href="/add-child"
-            className="block px-1 text-right text-xs text-text-muted underline"
-          >
-            {t("addChild")}
-          </Link>
-        </div>
+          <PairChildDeviceMenuItem mode="qr" label={t("pairViaQr")} linkedChildren={linkedChildren} />
+          <PairChildDeviceMenuItem mode="code" label={t("pairViaCode")} linkedChildren={linkedChildren} />
+        </AccordionSection>
       )}
 
       {!isChild && (
-        <div className="w-full max-w-sm space-y-2">
-          <h2 className="text-sm font-semibold text-text-muted">{t("sectionSecurity")}</h2>
-          <ParentPinForm hasPinSet={Boolean(parentRow?.pin_hash)} />
-        </div>
+        <AccordionSection title={t("sectionSecurity")}>
+          <ParentPinMenuItem hasPinSet={Boolean(parentRow?.pin_hash)} />
+        </AccordionSection>
+      )}
+
+      {!isChild && (
+        <ChildModeSwitcher
+          parentId={user.id}
+          linkedChildren={linkedChildren}
+          label={tFamily("goToChildMode")}
+        />
       )}
 
       <LogoutButton />
