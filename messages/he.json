@@ -216,8 +216,7 @@
     "myCode": "הקוד שלי",
     "addChild": "הוספת ילד לפי קוד",
     "addChildDirect": "יצירת פרופיל ילד חדש",
-    "pairViaQr": "חבר את המכשיר של הילד עם QR",
-    "pairViaCode": "הוספת מכשיר ילד לפי קוד",
+    "pairDevice": "חבר את מכשיר הילד",
     "sectionChildren": "הילדים שלי",
     "sectionSecurity": "אבטחה",
     "powerPreview": {
@@ -257,8 +256,7 @@
     "confirm": "אישור",
     "checking": "בודק...",
     "pairingError": "שגיאה ביצירת קוד החיבור",
-    "scanQr": "סרוק את הקוד עם המצלמה של הילד",
-    "typeCode": "הקלד/י את הקוד הזה במכשיר של הילד",
+    "or": "או",
     "expiresIn10": "בתוקף ל-10 דקות",
     "close": "סגירה"
   },

@@ -216,8 +216,7 @@
     "myCode": "My code",
     "addChild": "Add a child by code",
     "addChildDirect": "Create a new child profile",
-    "pairViaQr": "Connect the child's device with QR",
-    "pairViaCode": "Add a child's device by code",
+    "pairDevice": "Connect the child's device",
     "sectionChildren": "My children",
     "sectionSecurity": "Security",
     "powerPreview": {
@@ -257,8 +256,7 @@
     "confirm": "Confirm",
     "checking": "Checking...",
     "pairingError": "Error creating the pairing code",
-    "scanQr": "Scan this with the child's camera",
-    "typeCode": "Type this code on the child's device",
+    "or": "or",
     "expiresIn10": "Valid for 10 minutes",
     "close": "Close"
   },

@@ -64,8 +64,7 @@ export default async function SettingsPage() {
           >
             {t("addChildDirect")}
           </Link>
-          <PairChildDeviceMenuItem mode="qr" label={t("pairViaQr")} linkedChildren={linkedChildren} />
-          <PairChildDeviceMenuItem mode="code" label={t("pairViaCode")} linkedChildren={linkedChildren} />
+          <PairChildDeviceMenuItem label={t("pairDevice")} linkedChildren={linkedChildren} />
         </AccordionSection>
       )}
 

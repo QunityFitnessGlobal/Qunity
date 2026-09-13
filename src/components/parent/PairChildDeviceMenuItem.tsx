@@ -7,7 +7,6 @@ import { createPairingCode } from "@/services/family-mode.service";
 import type { LinkedChild } from "@/services/linking.service";
 
 interface PairChildDeviceMenuItemProps {
-  mode: "qr" | "code";
   label: string;
   linkedChildren: LinkedChild[];
 }
@@ -17,11 +16,11 @@ interface ActivePairing {
   code: string;
 }
 
-// One settings menu row per pairing method (QR vs manual code) — both call
-// the exact same createPairingCode action, just focused on the piece of
-// the result that method actually needs, per the child's own device flow
-// (see src/app/pair/page.tsx and src/app/pair/[token]/route.ts).
-export function PairChildDeviceMenuItem({ mode, label, linkedChildren }: PairChildDeviceMenuItemProps) {
+// "חבר את מכשיר הילד" — one menu item, one generated code, shown as QR and
+// 6-digit code together (QR, an "או" divider, then the code) — the same
+// layout Netflix/Disney+-style device pairing screens use, so it reads as
+// "pick whichever is easier" rather than two separate features.
+export function PairChildDeviceMenuItem({ label, linkedChildren }: PairChildDeviceMenuItemProps) {
   const t = useTranslations("familyMode");
   const [open, setOpen] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
@@ -38,13 +37,10 @@ export function PairChildDeviceMenuItem({ mode, label, linkedChildren }: PairChi
         setError(t("pairingError"));
         return;
       }
-      const qrDataUrl =
-        mode === "qr"
-          ? await QRCode.toDataURL(`${window.location.origin}/pair/${result.token}`, {
-              width: 220,
-              margin: 1,
-            })
-          : "";
+      const qrDataUrl = await QRCode.toDataURL(`${window.location.origin}/pair/${result.token}`, {
+        width: 200,
+        margin: 1,
+      });
       setPairing({ qrDataUrl, code: result.code });
       setShowPicker(false);
     } finally {
@@ -105,22 +101,22 @@ export function PairChildDeviceMenuItem({ mode, label, linkedChildren }: PairChi
 
             {loading && !pairing && <p className="text-sm text-zinc-500">{t("switching")}</p>}
 
-            {pairing && mode === "qr" && (
+            {pairing && (
               <>
-                <p className="text-sm font-medium text-zinc-700">{t("scanQr")}</p>
                 {/* eslint-disable-next-line @next/next/no-img-element -- generated data: URL, not a Storage asset */}
-                <img src={pairing.qrDataUrl} alt="QR" className="mx-auto h-[220px] w-[220px]" />
-              </>
-            )}
+                <img src={pairing.qrDataUrl} alt="QR" className="mx-auto h-[200px] w-[200px]" />
 
-            {pairing && mode === "code" && (
-              <>
-                <p className="text-sm font-medium text-zinc-700">{t("typeCode")}</p>
+                <div className="flex items-center gap-2">
+                  <div className="h-px flex-1 bg-zinc-200" />
+                  <span className="text-xs text-zinc-400">{t("or")}</span>
+                  <div className="h-px flex-1 bg-zinc-200" />
+                </div>
+
                 <p className="text-3xl font-bold tracking-[0.3em]">{pairing.code}</p>
+                <p className="text-xs text-text-muted">{t("expiresIn10")}</p>
               </>
             )}
 
-            {pairing && <p className="text-xs text-text-muted">{t("expiresIn10")}</p>}
             {error && <p className="text-sm text-red-600">{error}</p>}
 
             <button
