@@ -45,10 +45,21 @@
   }
 }
 
+/* Guards against any element that ends up even a pixel wider than the
+ * viewport (a stray long word, an unbroken number, future content we
+ * haven't seen yet) turning into a visible sideways wobble on mobile —
+ * without this, Android Chrome lets the page rubber-band sideways and
+ * snap back, which can look like a repeating jitter when something else
+ * on the page is animating continuously (e.g. the power glow-pulse). */
+html {
+  overflow-x: hidden;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }
 
 /* Locked journey-map station tap feedback (see JourneyStation.tsx). */
