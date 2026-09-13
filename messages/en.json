@@ -217,6 +217,7 @@
     "addChild": "Add a child by code",
     "addChildDirect": "Create a new child profile",
     "pairDevice": "Connect the child's device",
+    "alreadyRegisteredLink": "Did your child already sign up on their own? Link them here",
     "sectionChildren": "My children",
     "sectionSecurity": "Security",
     "powerPreview": {

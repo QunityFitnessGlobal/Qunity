@@ -65,6 +65,12 @@ export default async function SettingsPage() {
             {t("addChildDirect")}
           </Link>
           <PairChildDeviceMenuItem label={t("pairDevice")} linkedChildren={linkedChildren} />
+          <Link
+            href="/add-child"
+            className="block px-4 py-3 text-right text-xs text-zinc-400 hover:bg-zinc-50"
+          >
+            {t("alreadyRegisteredLink")}
+          </Link>
         </AccordionSection>
       )}
 

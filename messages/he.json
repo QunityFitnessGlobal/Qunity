@@ -217,6 +217,7 @@
     "addChild": "הוספת ילד לפי קוד",
     "addChildDirect": "יצירת פרופיל ילד חדש",
     "pairDevice": "חבר את מכשיר הילד",
+    "alreadyRegisteredLink": "הילד כבר נרשם בעצמו? קשר אותו כאן",
     "sectionChildren": "הילדים שלי",
     "sectionSecurity": "אבטחה",
     "powerPreview": {
