@@ -54,11 +54,11 @@
   },
   "addChild": {
     "title": "הוספת ילד לפי קוד",
-    "description": "הזן/י את הקוד שהילד/ה קיבל/ה במסך שלו/ה (בפורמט QNTY-XXXXX).",
+    "description": "הזן את הקוד שהילד קיבל במסך שלו (בפורמט QNTY-XXXXX).",
     "codeLabel": "קוד הילד",
     "submit": "קישור ילד",
-    "submitting": "מקשר/ת...",
-    "success": "{nickname} נוסף/ה בהצלחה!",
+    "submitting": "מקשר...",
+    "success": "{nickname} נוסף בהצלחה!",
     "backToSettings": "חזרה להגדרות"
   },
   "logout": {
