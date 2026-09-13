@@ -9,10 +9,19 @@ import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
 import type { Gender } from "@/lib/types";
 
-export function CreateChildProfileForm() {
+interface CreateChildProfileFormProps {
+  // The parent's own gender, for grammatically correct phrasing addressed
+  // to THEM ("fill in..."), distinct from the child's own gender selected
+  // below. Defaults to masculine when unset, per how every other gendered
+  // string in this app already falls back (see resolveGenderedText).
+  parentGender: Gender | null;
+}
+
+export function CreateChildProfileForm({ parentGender }: CreateChildProfileFormProps) {
   const t = useTranslations("addChildDirect");
   const router = useRouter();
   const [nickname, setNickname] = useState("");
+  const [age, setAge] = useState("");
   const [gender, setGender] = useState<Gender>("female");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -22,7 +31,8 @@ export function CreateChildProfileForm() {
     setError(null);
     setLoading(true);
     try {
-      const result = await createChildProfile(nickname, gender);
+      const parsedAge = age.trim() ? Number(age) : null;
+      const result = await createChildProfile(nickname, gender, parsedAge);
       if (result.success) {
         router.push("/dashboard/settings");
         router.refresh();
@@ -37,7 +47,9 @@ export function CreateChildProfileForm() {
   return (
     <div className="w-full max-w-sm space-y-6">
       <h1 className="text-center text-2xl font-bold">{t("title")}</h1>
-      <p className="text-center text-sm text-zinc-600">{t("description")}</p>
+      <p className="text-center text-sm text-zinc-600">
+        {t("description", { gender: parentGender ?? "male" })}
+      </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <TextField
@@ -45,6 +57,18 @@ export function CreateChildProfileForm() {
           name="nickname"
           value={nickname}
           onChange={setNickname}
+          required
+        />
+
+        <TextField
+          label={t("ageLabel")}
+          name="age"
+          type="number"
+          inputMode="numeric"
+          min={1}
+          max={18}
+          value={age}
+          onChange={setAge}
           required
         />
 

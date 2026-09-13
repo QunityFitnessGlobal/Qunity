@@ -227,9 +227,10 @@
     }
   },
   "addChildDirect": {
-    "title": "Add a child",
-    "description": "Fill in the child's name and gender — no email, no password.",
+    "title": "Create a new child profile",
+    "description": "Fill in the child's name, age, and gender — no email, no password.",
     "nicknameLabel": "Child's name",
+    "ageLabel": "Age",
     "genderLabel": "Gender",
     "genderFemale": "Female",
     "genderMale": "Male",

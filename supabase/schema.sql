@@ -1392,3 +1392,12 @@ create table public.pairing_codes (
 
 alter table public.pairing_codes enable row level security;
 -- No policies added on purpose — see comment above.
+
+-- ============================================================================
+-- ADDED FOR CHILD AGE
+-- Collected on the "יצירת פרופיל ילד חדש" screen (createChildProfile) — not
+-- used by any progression/workout logic yet, purely informational for now.
+-- Nullable since every child created before this exists without one.
+-- ============================================================================
+
+alter table public.children add column age integer;

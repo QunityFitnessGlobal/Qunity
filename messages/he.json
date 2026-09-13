@@ -227,9 +227,10 @@
     }
   },
   "addChildDirect": {
-    "title": "הוספת ילד",
-    "description": "מלא/י את השם והמין של הילד/ה — בלי מייל ובלי סיסמה.",
+    "title": "יצירת פרופיל ילד חדש",
+    "description": "{gender, select, female {מלאי את השם, הגיל והמין של הילד/ה — בלי מייל ובלי סיסמה.} other {מלא את השם, הגיל והמין של הילד/ה — בלי מייל ובלי סיסמה.}}",
     "nicknameLabel": "שם הילד/ה",
+    "ageLabel": "גיל",
     "genderLabel": "מין",
     "genderFemale": "נקבה",
     "genderMale": "זכר",

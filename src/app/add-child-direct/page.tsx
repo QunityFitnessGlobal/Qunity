@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { CreateChildProfileForm } from "@/components/parent/CreateChildProfileForm";
-import type { Role } from "@/lib/types";
+import type { Gender, Role } from "@/lib/types";
 
 export default async function AddChildDirectPage() {
   const supabase = await createClient();
@@ -16,9 +16,9 @@ export default async function AddChildDirectPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("role")
+    .select("role, gender")
     .eq("id", user.id)
-    .single<{ role: Role }>();
+    .single<{ role: Role; gender: Gender | null }>();
 
   if (profile?.role !== "parent") {
     redirect("/dashboard");
@@ -26,7 +26,7 @@ export default async function AddChildDirectPage() {
 
   return (
     <div className="flex flex-1 items-center justify-center px-4 py-16">
-      <CreateChildProfileForm />
+      <CreateChildProfileForm parentGender={profile?.gender ?? null} />
     </div>
   );
 }

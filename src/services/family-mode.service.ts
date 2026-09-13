@@ -26,6 +26,7 @@ export interface CreateChildProfileResult {
 export async function createChildProfile(
   nickname: string,
   gender: Gender,
+  age: number | null,
 ): Promise<CreateChildProfileResult> {
   const trimmedNickname = nickname.trim();
   if (!trimmedNickname) {
@@ -80,6 +81,10 @@ export async function createChildProfile(
   if (linkError) {
     await admin.auth.admin.deleteUser(childId);
     return { success: false, error: "CREATE_FAILED" };
+  }
+
+  if (age != null && Number.isInteger(age) && age > 0) {
+    await admin.from("children").update({ age }).eq("id", childId);
   }
 
   return { success: true, childId, nickname: trimmedNickname };
