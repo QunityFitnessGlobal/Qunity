@@ -237,7 +237,9 @@
     "submit": "Create profile",
     "submitting": "Creating...",
     "genericError": "Error creating the profile, please try again",
-    "backToSettings": "Back to settings"
+    "backToSettings": "Back to settings",
+    "createSuccess": "The child's profile was created successfully",
+    "continue": "Continue"
   },
   "familyMode": {
     "switchToChild": "Child Mode ⚡",
@@ -260,7 +262,9 @@
     "pairingError": "Error creating the pairing code",
     "or": "or",
     "expiresIn10": "Valid for 10 minutes",
-    "close": "Close"
+    "close": "Close",
+    "continue": "Continue",
+    "pairSuccess": "The child's device was connected successfully"
   },
   "pair": {
     "title": "Connect device",

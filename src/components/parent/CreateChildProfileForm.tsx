@@ -25,6 +25,7 @@ export function CreateChildProfileForm({ parentGender }: CreateChildProfileFormP
   const [gender, setGender] = useState<Gender>("female");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -34,14 +35,31 @@ export function CreateChildProfileForm({ parentGender }: CreateChildProfileFormP
       const parsedAge = age.trim() ? Number(age) : null;
       const result = await createChildProfile(nickname, gender, parsedAge);
       if (result.success) {
-        router.push("/dashboard/settings");
-        router.refresh();
+        setShowSuccess(true);
       } else {
         setError(t("genericError"));
       }
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleContinue() {
+    router.push("/dashboard/settings?openChildren=1");
+    router.refresh();
+  }
+
+  if (showSuccess) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+        <div className="w-full max-w-xs space-y-3 rounded-lg bg-white p-5 text-center">
+          <p className="text-sm font-medium text-green-700">{t("createSuccess")}</p>
+          <Button className="w-full" onClick={handleContinue}>
+            {t("continue")}
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (

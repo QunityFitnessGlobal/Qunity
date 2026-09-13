@@ -237,7 +237,9 @@
     "submit": "צור פרופיל",
     "submitting": "יוצר...",
     "genericError": "שגיאה ביצירת הפרופיל, נסה שוב",
-    "backToSettings": "חזרה להגדרות"
+    "backToSettings": "חזרה להגדרות",
+    "createSuccess": "יצירת פרופיל הילד עברה בהצלחה",
+    "continue": "המשך"
   },
   "familyMode": {
     "switchToChild": "מצב ילד ⚡",
@@ -260,7 +262,9 @@
     "pairingError": "שגיאה ביצירת קוד החיבור",
     "or": "או",
     "expiresIn10": "בתוקף ל-10 דקות",
-    "close": "סגירה"
+    "close": "סגירה",
+    "continue": "המשך",
+    "pairSuccess": "חיבור מכשיר הילד עבר בהצלחה"
   },
   "pair": {
     "title": "חיבור מכשיר",

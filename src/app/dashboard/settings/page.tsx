@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getLinkedChildren } from "@/services/linking.service";
@@ -8,7 +9,7 @@ import { PowerPreviewTester } from "@/components/child/PowerPreviewTester";
 import { ReturnToParentButton } from "@/components/child/ReturnToParentButton";
 import { ParentPinMenuItem } from "@/components/parent/ParentPinMenuItem";
 import { ChildModeSwitcher } from "@/components/parent/ChildModeSwitcher";
-import { PairChildDeviceMenuItem } from "@/components/parent/PairChildDeviceMenuItem";
+import { ChildrenAccordion } from "@/components/parent/ChildrenAccordion";
 import { AccordionSection } from "@/components/ui/AccordionSection";
 import type { Role } from "@/lib/types";
 
@@ -57,21 +58,9 @@ export default async function SettingsPage() {
       {isChild && <ReturnToParentButton />}
 
       {!isChild && (
-        <AccordionSection title={t("sectionChildren")}>
-          <Link
-            href="/add-child-direct"
-            className="block px-4 py-3 text-right text-sm text-zinc-700 hover:bg-zinc-50"
-          >
-            {t("addChildDirect")}
-          </Link>
-          <PairChildDeviceMenuItem label={t("pairDevice")} linkedChildren={linkedChildren} />
-          <Link
-            href="/add-child"
-            className="block px-4 py-3 text-right text-xs text-zinc-400 hover:bg-zinc-50"
-          >
-            {t("alreadyRegisteredLink")}
-          </Link>
-        </AccordionSection>
+        <Suspense fallback={null}>
+          <ChildrenAccordion linkedChildren={linkedChildren} />
+        </Suspense>
       )}
 
       {!isChild && (

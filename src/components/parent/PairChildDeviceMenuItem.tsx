@@ -4,11 +4,16 @@ import { useState } from "react";
 import QRCode from "qrcode";
 import { useTranslations } from "next-intl";
 import { createPairingCode } from "@/services/family-mode.service";
+import { Button } from "@/components/ui/Button";
 import type { LinkedChild } from "@/services/linking.service";
 
 interface PairChildDeviceMenuItemProps {
   label: string;
   linkedChildren: LinkedChild[];
+  // Called once the success popup is dismissed — lets a parent (the
+  // settings menu) close itself back up, per the parent/child hand-off
+  // being "done" from the settings screen's point of view.
+  onDone?: () => void;
 }
 
 interface ActivePairing {
@@ -19,14 +24,18 @@ interface ActivePairing {
 // "חבר את מכשיר הילד" — one menu item, one generated code, shown as QR and
 // 6-digit code together (QR, an "או" divider, then the code) — the same
 // layout Netflix/Disney+-style device pairing screens use, so it reads as
-// "pick whichever is easier" rather than two separate features.
-export function PairChildDeviceMenuItem({ label, linkedChildren }: PairChildDeviceMenuItemProps) {
+// "pick whichever is easier" rather than two separate features. Ends with
+// its own success confirmation, separate from the QR/code screen itself,
+// since that's the actual useful content and shouldn't just vanish once
+// generated.
+export function PairChildDeviceMenuItem({ label, linkedChildren, onDone }: PairChildDeviceMenuItemProps) {
   const t = useTranslations("familyMode");
   const [open, setOpen] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pairing, setPairing] = useState<ActivePairing | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   async function handleGenerate(childId: string) {
     setLoading(true);
@@ -62,7 +71,13 @@ export function PairChildDeviceMenuItem({ label, linkedChildren }: PairChildDevi
     setOpen(false);
     setShowPicker(false);
     setPairing(null);
+    setShowSuccess(false);
     setError(null);
+  }
+
+  function handleFinish() {
+    handleClose();
+    onDone?.();
   }
 
   if (linkedChildren.length === 0) {
@@ -101,7 +116,7 @@ export function PairChildDeviceMenuItem({ label, linkedChildren }: PairChildDevi
 
             {loading && !pairing && <p className="text-sm text-zinc-500">{t("switching")}</p>}
 
-            {pairing && (
+            {pairing && !showSuccess && (
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element -- generated data: URL, not a Storage asset */}
                 <img src={pairing.qrDataUrl} alt="QR" className="mx-auto h-[200px] w-[200px]" />
@@ -114,18 +129,33 @@ export function PairChildDeviceMenuItem({ label, linkedChildren }: PairChildDevi
 
                 <p className="text-3xl font-bold tracking-[0.3em]">{pairing.code}</p>
                 <p className="text-xs text-text-muted">{t("expiresIn10")}</p>
+
+                <Button className="w-full" onClick={() => setShowSuccess(true)}>
+                  {t("continue")}
+                </Button>
+              </>
+            )}
+
+            {showSuccess && (
+              <>
+                <p className="text-sm font-medium text-green-700">{t("pairSuccess")}</p>
+                <Button className="w-full" onClick={handleFinish}>
+                  {t("continue")}
+                </Button>
               </>
             )}
 
             {error && <p className="text-sm text-red-600">{error}</p>}
 
-            <button
-              type="button"
-              onClick={handleClose}
-              className="block w-full text-center text-sm text-zinc-500 underline"
-            >
-              {t("close")}
-            </button>
+            {!pairing && (
+              <button
+                type="button"
+                onClick={handleClose}
+                className="block w-full text-center text-sm text-zinc-500 underline"
+              >
+                {t("close")}
+              </button>
+            )}
           </div>
         </div>
       )}
