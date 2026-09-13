@@ -16,6 +16,7 @@ import { EnergyMeter } from "@/components/child/EnergyMeter";
 import { NextWorkoutCard } from "@/components/child/NextWorkoutCard";
 import { EncouragementBanner } from "@/components/child/EncouragementBanner";
 import { ChildSelector } from "@/components/parent/ChildSelector";
+import { ChildModeSwitcher } from "@/components/parent/ChildModeSwitcher";
 import { StatsGrid } from "@/components/parent/StatsGrid";
 import { TipsPanel } from "@/components/parent/TipsPanel";
 import type { BraceletColor, Gender, Role } from "@/lib/types";
@@ -85,6 +86,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <div className="flex w-full flex-col items-center gap-6 px-4">
           <h1 className="text-2xl font-bold">{t("parentTitle")}</h1>
           {profile?.full_name && <p className="text-zinc-600">{t("hello", { name: profile.full_name })}</p>}
+
+          <ChildModeSwitcher parentId={user.id} linkedChildren={linkedChildren} />
 
           {linkedChildren.length === 0 && (
             <p className="text-zinc-600">{t("noChildDefined")}</p>

@@ -216,6 +216,8 @@
     "myCode": "My code",
     "addChild": "Add a child by code",
     "addChildDirect": "Create a child profile",
+    "sectionChildren": "My children",
+    "sectionSecurity": "Security",
     "powerPreview": {
       "label": "Power screen preview (TEMP)",
       "placeholder": "1-5",

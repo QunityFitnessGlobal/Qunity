@@ -216,6 +216,8 @@
     "myCode": "הקוד שלי",
     "addChild": "הוספת ילד לפי קוד",
     "addChildDirect": "יצירת פרופיל ילד",
+    "sectionChildren": "הילדים שלי",
+    "sectionSecurity": "אבטחה",
     "powerPreview": {
       "label": "תצוגה מקדימה של מסך כוח (TEMP)",
       "placeholder": "1-5",
