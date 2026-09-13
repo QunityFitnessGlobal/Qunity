@@ -1360,3 +1360,35 @@ create table public.child_credentials (
 
 alter table public.child_credentials enable row level security;
 -- No policies added on purpose — see comment above.
+
+-- ============================================================================
+-- ADDED FOR QR/CODE DEVICE PAIRING
+--
+-- Lets a child's OWN phone get a session for their existing hidden account
+-- (see child_credentials above) without ever seeing an email or password:
+-- the parent generates a short-lived, single-use code from their device;
+-- the child's device redeems it (by scanning a QR that encodes a /pair/<token>
+-- link, or by typing the 6-digit `code` at /pair) and gets signed in.
+--
+-- token: long random string, embedded in the QR's URL — effectively
+-- impossible to guess, so it alone is enough proof of possessing the QR.
+-- code: short 6-digit string for manual entry — NOT guaranteed globally
+-- unique (only checked among currently-active codes at creation time), so
+-- redeeming it always filters on used_at is null and expires_at > now().
+--
+-- Same no-RLS-policies pattern as child_credentials: reachable only via the
+-- service-role key from server-side code, never through the normal client.
+-- ============================================================================
+
+create table public.pairing_codes (
+  id uuid primary key default gen_random_uuid(),
+  child_id uuid not null references public.children (id) on delete cascade,
+  token text not null unique,
+  code text not null,
+  created_at timestamptz not null default now(),
+  expires_at timestamptz not null,
+  used_at timestamptz
+);
+
+alter table public.pairing_codes enable row level security;
+-- No policies added on purpose — see comment above.

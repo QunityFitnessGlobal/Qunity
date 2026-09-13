@@ -19,7 +19,8 @@
       "genericError": "Login error, please try again",
       "invalidCredentials": "Incorrect email or password",
       "emailNotConfirmed": "Please confirm your email before logging in",
-      "rateLimited": "Too many attempts, please try again shortly"
+      "rateLimited": "Too many attempts, please try again shortly",
+      "havePairingCode": "Have a code from your parent?"
     },
     "signup": {
       "title": "Sign up for Qunity",
@@ -249,7 +250,19 @@
     "wrongPin": "Wrong PIN, try again",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "checking": "Checking..."
+    "checking": "Checking...",
+    "pairDevice": "Connect the child's device",
+    "pairingError": "Error creating the pairing code",
+    "scanOrType": "Scan this with the child's camera, or type the number",
+    "expiresIn10": "Valid for 10 minutes",
+    "close": "Close"
+  },
+  "pair": {
+    "title": "Connect device",
+    "description": "Enter the 6-digit code you got from your parent",
+    "checking": "Checking...",
+    "submit": "Connect",
+    "invalidOrExpired": "That code is wrong or has expired"
   },
   "nav": {
     "home": "Home",

@@ -79,6 +79,12 @@ export default function LoginPage() {
             {t("signupLink")}
           </Link>
         </p>
+
+        <p className="text-center text-sm text-zinc-600">
+          <Link href="/pair" className="font-medium text-blue-600">
+            {t("havePairingCode")}
+          </Link>
+        </p>
       </div>
     </div>
   );

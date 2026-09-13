@@ -19,7 +19,8 @@
       "genericError": "שגיאה בהתחברות, נסה שוב",
       "invalidCredentials": "אימייל או סיסמה שגויים",
       "emailNotConfirmed": "יש לאשר את כתובת האימייל לפני ההתחברות",
-      "rateLimited": "יותר מדי ניסיונות, נסה שוב בעוד רגע"
+      "rateLimited": "יותר מדי ניסיונות, נסה שוב בעוד רגע",
+      "havePairingCode": "יש לך קוד מהורה?"
     },
     "signup": {
       "title": "הרשמה ל-Qunity",
@@ -249,7 +250,19 @@
     "wrongPin": "קוד שגוי, נסה שוב",
     "cancel": "ביטול",
     "confirm": "אישור",
-    "checking": "בודק..."
+    "checking": "בודק...",
+    "pairDevice": "חבר מכשיר של הילד",
+    "pairingError": "שגיאה ביצירת קוד החיבור",
+    "scanOrType": "סרוק את הקוד עם המצלמה של הילד, או הקלד את המספר",
+    "expiresIn10": "בתוקף ל-10 דקות",
+    "close": "סגירה"
+  },
+  "pair": {
+    "title": "חיבור מכשיר",
+    "description": "הזן/י את הקוד בן 6 הספרות שקיבלת מההורה",
+    "checking": "בודק...",
+    "submit": "התחבר",
+    "invalidOrExpired": "הקוד שגוי או שפג תוקפו"
   },
   "nav": {
     "home": "בית",

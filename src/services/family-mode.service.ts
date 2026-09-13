@@ -150,41 +150,20 @@ export async function verifyParentPin(parentId: string, pin: string): Promise<{ 
 }
 
 // ---------------------------------------------------------------------------
-// Switch Mode — issues a real session for a linked child's hidden account.
-// This is the same primitive a future QR-pairing flow on a second device
-// will call too: given an authorized request for child X, hand back a
-// session for child X. Switch Mode is just "authorized because it's the
-// linking parent, on this device, right now"; QR pairing will be "authorized
-// because it presented a valid short-lived pairing code" — same function,
-// different authorization check in front of it.
+// Shared core: issue a real session for a child's hidden account. Both
+// Switch Mode and QR/code device pairing end here — they only differ in how
+// they decide the request is authorized (linking parent vs. a valid pairing
+// code), see each caller below.
 // ---------------------------------------------------------------------------
 
-export interface SwitchToChildResult {
+interface IssueSessionResult {
   success: boolean;
   accessToken?: string;
   refreshToken?: string;
-  error?: "NOT_AUTHENTICATED" | "NOT_LINKED" | "NO_HIDDEN_ACCOUNT" | "SIGN_IN_FAILED";
+  error?: "NO_HIDDEN_ACCOUNT" | "SIGN_IN_FAILED";
 }
 
-export async function switchToChild(childId: string): Promise<SwitchToChildResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return { success: false, error: "NOT_AUTHENTICATED" };
-  }
-
-  const { data: link } = await supabase
-    .from("parent_child_links")
-    .select("child_id")
-    .eq("parent_id", user.id)
-    .eq("child_id", childId)
-    .maybeSingle();
-  if (!link) {
-    return { success: false, error: "NOT_LINKED" };
-  }
-
+async function issueSessionForChild(childId: string): Promise<IssueSessionResult> {
   const admin = createAdminClient();
   const { data: creds } = await admin
     .from("child_credentials")
@@ -214,4 +193,130 @@ export async function switchToChild(childId: string): Promise<SwitchToChildResul
     accessToken: signIn.session.access_token,
     refreshToken: signIn.session.refresh_token,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Switch Mode — authorized because the caller is the linking parent, on
+// this device, right now.
+// ---------------------------------------------------------------------------
+
+export type SwitchToChildResult = Omit<IssueSessionResult, "error"> & {
+  error?: IssueSessionResult["error"] | "NOT_AUTHENTICATED" | "NOT_LINKED";
+};
+
+export async function switchToChild(childId: string): Promise<SwitchToChildResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: "NOT_AUTHENTICATED" };
+  }
+
+  const { data: link } = await supabase
+    .from("parent_child_links")
+    .select("child_id")
+    .eq("parent_id", user.id)
+    .eq("child_id", childId)
+    .maybeSingle();
+  if (!link) {
+    return { success: false, error: "NOT_LINKED" };
+  }
+
+  return issueSessionForChild(childId);
+}
+
+// ---------------------------------------------------------------------------
+// QR / code device pairing — authorized because the caller presented a
+// valid, unexpired, not-yet-used pairing code. No parent session required
+// here: this is exactly what runs when the CHILD's own (unauthenticated)
+// device redeems a code — see src/app/pair/page.tsx and
+// src/app/pair/[token]/route.ts.
+// ---------------------------------------------------------------------------
+
+const PAIRING_CODE_TTL_MINUTES = 10;
+
+export interface CreatePairingCodeResult {
+  success: boolean;
+  token?: string;
+  code?: string;
+  expiresAt?: string;
+  error?: "NOT_AUTHENTICATED" | "NOT_LINKED";
+}
+
+export async function createPairingCode(childId: string): Promise<CreatePairingCodeResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: "NOT_AUTHENTICATED" };
+  }
+
+  const { data: link } = await supabase
+    .from("parent_child_links")
+    .select("child_id")
+    .eq("parent_id", user.id)
+    .eq("child_id", childId)
+    .maybeSingle();
+  if (!link) {
+    return { success: false, error: "NOT_LINKED" };
+  }
+
+  const admin = createAdminClient();
+  // Clear any still-active codes for this child first, so there's never more
+  // than one valid code floating around for the same child at once.
+  await admin.from("pairing_codes").delete().eq("child_id", childId).is("used_at", null);
+
+  const token = randomBytes(24).toString("base64url");
+  const code = String(Math.floor(100000 + Math.random() * 900000)); // 6 digits, no leading zero
+  const expiresAt = new Date(Date.now() + PAIRING_CODE_TTL_MINUTES * 60 * 1000).toISOString();
+
+  const { error } = await admin
+    .from("pairing_codes")
+    .insert({ child_id: childId, token, code, expires_at: expiresAt });
+  if (error) {
+    return { success: false };
+  }
+
+  return { success: true, token, code, expiresAt };
+}
+
+type RedeemPairingResult = Omit<IssueSessionResult, "error"> & {
+  error?: IssueSessionResult["error"] | "NOT_FOUND_OR_EXPIRED";
+};
+
+async function redeemPairingRow(
+  column: "code" | "token",
+  value: string,
+): Promise<RedeemPairingResult> {
+  const admin = createAdminClient();
+  const { data: row } = await admin
+    .from("pairing_codes")
+    .select("id, child_id, expires_at, used_at")
+    .eq(column, value)
+    .maybeSingle<{ id: string; child_id: string; expires_at: string; used_at: string | null }>();
+
+  if (!row || row.used_at || new Date(row.expires_at).getTime() < Date.now()) {
+    return { success: false, error: "NOT_FOUND_OR_EXPIRED" };
+  }
+
+  const { error: markUsedError } = await admin
+    .from("pairing_codes")
+    .update({ used_at: new Date().toISOString() })
+    .eq("id", row.id)
+    .is("used_at", null); // guards against redeeming the same row twice concurrently
+  if (markUsedError) {
+    return { success: false, error: "NOT_FOUND_OR_EXPIRED" };
+  }
+
+  return issueSessionForChild(row.child_id);
+}
+
+export async function redeemPairingCode(code: string): Promise<RedeemPairingResult> {
+  return redeemPairingRow("code", code.trim());
+}
+
+export async function redeemPairingToken(token: string): Promise<RedeemPairingResult> {
+  return redeemPairingRow("token", token);
 }

@@ -8,6 +8,7 @@ import { PowerPreviewTester } from "@/components/child/PowerPreviewTester";
 import { ReturnToParentButton } from "@/components/child/ReturnToParentButton";
 import { ParentPinForm } from "@/components/parent/ParentPinForm";
 import { ChildModeSwitcher } from "@/components/parent/ChildModeSwitcher";
+import { PairChildDeviceButton } from "@/components/parent/PairChildDeviceButton";
 import type { Role } from "@/lib/types";
 
 export default async function SettingsPage() {
@@ -70,6 +71,7 @@ export default async function SettingsPage() {
 
       {!isChild && <ParentPinForm hasPinSet={Boolean(parentRow?.pin_hash)} />}
       {!isChild && <ChildModeSwitcher parentId={user.id} linkedChildren={linkedChildren} />}
+      {!isChild && <PairChildDeviceButton linkedChildren={linkedChildren} />}
 
       <LogoutButton />
     </div>

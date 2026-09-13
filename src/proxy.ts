@@ -30,7 +30,10 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
   const publicRoutes = ["/", "/login", "/signup"];
-  const isPublicRoute = publicRoutes.includes(pathname);
+  // /pair (manual code entry) and /pair/<token> (QR link target) both need
+  // to work for a child who has no session at all yet — that's the whole
+  // point of device pairing (see family-mode.service.ts's redeemPairingCode).
+  const isPublicRoute = publicRoutes.includes(pathname) || pathname.startsWith("/pair");
 
   if (!user && !isPublicRoute) {
     return NextResponse.redirect(new URL("/login", request.url));
