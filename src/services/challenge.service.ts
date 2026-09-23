@@ -344,7 +344,7 @@ export async function completeChallenge(
   const pointsAwarded = challenge?.bonus_points ?? 0;
   const now = new Date();
 
-  const { data: session, error: insertError } = await supabase
+  const { error: insertError } = await supabase
     .from("challenge_sessions")
     .insert({
       child_id: childId,
