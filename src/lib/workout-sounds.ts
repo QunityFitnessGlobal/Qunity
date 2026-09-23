@@ -7,10 +7,17 @@
 // user gesture before it can play — unlockWorkoutAudio() is called from the
 // workout's Start tap so the timer's later, gesture-less transitions work.
 
-export type WorkoutSoundKind = "bell" | "beeps" | "arp" | "voice" | "none";
+export type WorkoutSoundKind = "bell" | "beeps" | "arp" | "voiceFemale" | "voiceMale" | "none";
 export type WorkoutPhase = "work" | "rest";
 
-export const WORKOUT_SOUND_KINDS: readonly WorkoutSoundKind[] = ["bell", "beeps", "arp", "voice", "none"];
+export const WORKOUT_SOUND_KINDS: readonly WorkoutSoundKind[] = [
+  "bell",
+  "beeps",
+  "arp",
+  "voiceFemale",
+  "voiceMale",
+  "none",
+];
 export const DEFAULT_WORKOUT_SOUND: WorkoutSoundKind = "bell";
 
 const STORAGE_KEY = "qunity_workout_sound";
@@ -20,9 +27,29 @@ const STORAGE_KEY = "qunity_workout_sound";
 const VOICE_LANG = "he-IL";
 const VOICE_TEXT: Record<WorkoutPhase, string> = { work: "קדימה!", rest: "מנוחה" };
 
+type SpokenKind = "voiceFemale" | "voiceMale";
+
+function isSpokenKind(kind: WorkoutSoundKind): kind is SpokenKind {
+  return kind === "voiceFemale" || kind === "voiceMale";
+}
+
+// Which Hebrew voices a device has depends on its OS/browser, and voices don't
+// report their gender — so match by known names (Windows: Asaf = male, Hila =
+// female; Android/Chrome's "Google עברית" and Apple's Carmit are female). When
+// no voice of the requested gender is found, the default Hebrew voice is used
+// with its pitch shifted, which most engines honor.
+const VOICE_NAME_HINTS: Record<SpokenKind, RegExp> = {
+  voiceMale: /asaf|\bmale\b|גבר/i,
+  voiceFemale: /hila|carmit|female|אישה|google.*(עברית|hebrew)/i,
+};
+const VOICE_FALLBACK_PITCH: Record<SpokenKind, number> = { voiceMale: 0.6, voiceFemale: 1.15 };
+
 export function getWorkoutSoundPreference(): WorkoutSoundKind {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
+    // "voice" was the single spoken option before it split into female/male;
+    // the one voice devices had been using was the default (female) one.
+    if (stored === "voice") return "voiceFemale";
     if (stored && (WORKOUT_SOUND_KINDS as readonly string[]).includes(stored)) {
       return stored as WorkoutSoundKind;
     }
@@ -68,7 +95,7 @@ function getAudio(): { ctx: AudioContext; out: AudioNode } | null {
 // sounds are allowed to play.
 export function unlockWorkoutAudio() {
   getAudio();
-  if (getWorkoutSoundPreference() === "voice" && "speechSynthesis" in window) {
+  if (isSpokenKind(getWorkoutSoundPreference()) && "speechSynthesis" in window) {
     const primer = new SpeechSynthesisUtterance("");
     primer.volume = 0;
     speechSynthesis.speak(primer);
@@ -153,16 +180,21 @@ export function stopWorkoutSound() {
   }
 }
 
-function speak(phase: WorkoutPhase) {
+function speak(kind: SpokenKind, phase: WorkoutPhase) {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
   speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(VOICE_TEXT[phase]);
   utterance.lang = VOICE_LANG;
-  const hebrewVoice = speechSynthesis
+  const hebrewVoices = speechSynthesis
     .getVoices()
-    .find((voice) => voice.lang.toLowerCase().startsWith("he"));
-  if (hebrewVoice) {
-    utterance.voice = hebrewVoice;
+    .filter((voice) => voice.lang.toLowerCase().startsWith("he"));
+  const matched = hebrewVoices.find((voice) => VOICE_NAME_HINTS[kind].test(voice.name));
+  const voice = matched ?? hebrewVoices[0];
+  if (voice) {
+    utterance.voice = voice;
+  }
+  if (!matched) {
+    utterance.pitch = VOICE_FALLBACK_PITCH[kind];
   }
   utterance.rate = 1.05;
   utterance.volume = 1;
@@ -171,12 +203,12 @@ function speak(phase: WorkoutPhase) {
 
 // Plays the cue for entering `phase`: bell = double ring for work / single
 // lower ring for rest; beeps = two high beeps / one soft low tone; arp =
-// rising / falling three-note run; voice = "קדימה!" / "מנוחה".
+// rising / falling three-note run; spoken = "קדימה!" / "מנוחה" (female / male voice).
 export function playWorkoutSound(kind: WorkoutSoundKind, phase: WorkoutPhase) {
   if (kind === "none") return;
 
-  if (kind === "voice") {
-    speak(phase);
+  if (isSpokenKind(kind)) {
+    speak(kind, phase);
     return;
   }
 
@@ -217,7 +249,8 @@ const PREVIEW_GAP_SECONDS: Record<WorkoutSoundKind, number> = {
   bell: 1.7,
   beeps: 1.0,
   arp: 1.1,
-  voice: 1.6,
+  voiceFemale: 1.6,
+  voiceMale: 1.6,
   none: 0,
 };
 

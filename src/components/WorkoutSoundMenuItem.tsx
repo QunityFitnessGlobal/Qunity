@@ -92,11 +92,11 @@ export function WorkoutSoundMenuItem() {
             </div>
 
             <div className="flex gap-2">
-              <Button className="flex-1 bg-zinc-700 hover:bg-zinc-800" onClick={handleClose}>
-                {t("cancel")}
-              </Button>
               <Button className="flex-1" onClick={handleSave}>
                 {t("save")}
+              </Button>
+              <Button className="flex-1 bg-zinc-700 hover:bg-zinc-800" onClick={handleClose}>
+                {t("cancel")}
               </Button>
             </div>
           </div>
