@@ -159,9 +159,9 @@
     "setProgress": "{current} מתוך {total}",
     "resultPartial": "השלמת {percent}% מהאימון, ולכן קיבלת {percent}% מהנקודות.",
     "resultBelowThreshold": "השלמת רק {percent}% מהאימון. מתחת ל-60% לא מקבלים נקודות.",
-    "resultReplayPoints": "זה אימון חוזר: קיבלת נקודות רק על מה שהוספת על הפעם הקודמת.",
-    "resultReplayNoPoints": "זה אימון חוזר, אז אין נקודות נוספות. כל הכבוד על ההתמדה!",
-    "replayBadge": "אימון חוזר · לא מקדם את הצבע",
+    "resultReplayPoints": "כל הכבוד על אימון נוסף! הנקודות נוספו לנקודות שכבר יש לך.",
+    "resultReplayNoPoints": "כל הכבוד על אימון נוסף! ההתמדה שלך מחזקת אותך.",
+    "replayBadge": "אימון חוזר",
     "stopConfirmMessage": "האימון קצר מדי לקבלת נקודות, לעצור בכל זאת?",
     "stopConfirmContinue": "להמשיך",
     "stopConfirmStop": "לעצור"
@@ -310,7 +310,8 @@
       "close": "סגירה",
       "completion": "השלמה",
       "replay": "לעשות שוב את האימון",
-      "replayHint": "אימון חוזר לא מקדם את הצבע. נקודות מקבלים רק על מה שנוסף על הפעם הקודמת."
+      "replayHint": "אימון חוזר מעניק נקודות עד להשלמה של האימון.",
+      "replayHintDone": "כל הכבוד על ההתמדה! אימון חוזר שומר אותך בכושר."
     }
   },
   "powers": {

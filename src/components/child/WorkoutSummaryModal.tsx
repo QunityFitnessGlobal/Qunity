@@ -117,7 +117,11 @@ export function WorkoutSummaryModal({
             <Button className="w-full" onClick={onReplay}>
               {t("replay")}
             </Button>
-            <p className="text-center text-xs text-text-muted">{t("replayHint")}</p>
+            <p className="text-center text-xs text-text-muted">
+              {summary.bestCompletionPercent !== null && summary.bestCompletionPercent < 100
+                ? t("replayHint")
+                : t("replayHintDone")}
+            </p>
           </div>
         )}
 
