@@ -32,16 +32,22 @@ export function ChildModeSwitcher({ parentId, linkedChildren, label }: ChildMode
     setError(null);
     try {
       const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) {
+
+      const result = await switchToChild(childId);
+      if (!result.success || !result.accessToken || !result.refreshToken) {
         setError(t("switchError"));
         return;
       }
 
-      const result = await switchToChild(childId);
-      if (!result.success || !result.accessToken || !result.refreshToken) {
+      // Read the parent session only AFTER the server action: if the access
+      // token had expired, that action refreshed the session (rotating the
+      // refresh token and updating the cookie). Reading it beforehand would
+      // cache a refresh token that was already used up, and the way back to
+      // parent mode would silently fail later.
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
         setError(t("switchError"));
         return;
       }

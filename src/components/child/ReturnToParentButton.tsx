@@ -44,11 +44,23 @@ export function ReturnToParentButton() {
       }
 
       const supabase = createClient();
-      await supabase.auth.setSession({
+      const { error: restoreError } = await supabase.auth.setSession({
         access_token: cached.accessToken,
         refresh_token: cached.refreshToken,
       });
       clearCachedParentSession();
+
+      if (restoreError) {
+        // The cached parent session is no longer valid (e.g. it was refreshed
+        // elsewhere or expired). The PIN was right, so rather than dropping the
+        // parent back on the child screen, end the child session and send them
+        // to a normal login.
+        await supabase.auth.signOut();
+        router.push("/login");
+        router.refresh();
+        return;
+      }
+
       router.push("/dashboard");
       router.refresh();
     } finally {
