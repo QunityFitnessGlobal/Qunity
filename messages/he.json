@@ -303,10 +303,42 @@
     "discoveredLabel": "גילית כוח חדש",
     "unlockedAt": "התגלה בסיום השלב ה{color}",
     "continue": "המשך",
-    "white": { "name": "כוח ההתחלה", "code": "GO NOW", "quote": "אני מתחיל גם כשאני לא בטוח" },
-    "orange": { "name": "כוח ההתמדה", "code": "PUSH IT", "quote": "אני ממשיך גם כשקשה" },
-    "green": { "name": "כוח האמונה בעצמי", "code": "YOU WIN", "quote": "אני רואה כמה כבר הצלחתי" },
-    "blue": { "name": "כוח הצמיחה", "code": "LEVEL UP", "quote": "אני משתפר בכל פעם" },
-    "purple": { "name": "כוח ההוקרה", "code": "CELEBRATE", "quote": "אני יודע לעצור ולשמוח בדרך שעשיתי" }
+    "white": {
+      "name": "כוח ההתחלה",
+      "code": "GO NOW",
+      "quote": "אני מתחיל גם כשאני לא בטוח"
+    },
+    "orange": {
+      "name": "כוח ההתמדה",
+      "code": "PUSH IT",
+      "quote": "אני ממשיך גם כשקשה"
+    },
+    "green": {
+      "name": "כוח האמונה בעצמי",
+      "code": "YOU WIN",
+      "quote": "אני רואה כמה כבר הצלחתי"
+    },
+    "blue": {
+      "name": "כוח הצמיחה",
+      "code": "LEVEL UP",
+      "quote": "אני משתפר בכל פעם"
+    },
+    "purple": {
+      "name": "כוח ההוקרה",
+      "code": "CELEBRATE",
+      "quote": "אני יודע לעצור ולשמוח בדרך שעשיתי"
+    }
+  },
+  "workoutSound": {
+    "menuLabel": "סוג צלצול לאימון",
+    "title": "סוג צלצול לאימון",
+    "bell": "פעמון אגרוף",
+    "beeps": "ביפים",
+    "arp": "עולה יורד",
+    "voice": "קול בעברית",
+    "none": "ללא צליל",
+    "save": "שמירה",
+    "cancel": "ביטול",
+    "preview": "השמע: {name}"
   }
 }

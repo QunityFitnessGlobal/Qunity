@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
@@ -16,6 +16,12 @@ import { Button } from "@/components/ui/Button";
 import { ChallengeUnlockedModal } from "@/components/child/ChallengeUnlockedModal";
 import { PowerRevealScreen } from "@/components/child/PowerRevealScreen";
 import { formatDurationClock } from "@/lib/format";
+import {
+  getWorkoutSoundPreference,
+  playWorkoutSound,
+  stopWorkoutSound,
+  unlockWorkoutAudio,
+} from "@/lib/workout-sounds";
 import { resolveLocalizedText } from "@/lib/i18n-content";
 import {
   DIFFICULTY_VALUES,
@@ -136,6 +142,22 @@ export function WorkoutRunner({
     return () => clearInterval(interval);
   }, [stage, hasIntervalStructure, intervalWorkSeconds, intervalRestSeconds]);
 
+  // Cue sound when the timer starts and on each work<->rest switch (chosen in
+  // Settings -> "סוג צלצול לאימון"). Driven off the phase changing rather than
+  // played inside the timer's state updater, which must stay free of side
+  // effects. The start counts as a change (null -> "work"), so it rings too.
+  const currentPhase = stage === "running" && timer ? timer.phase : null;
+  const previousPhaseRef = useRef<typeof currentPhase>(null);
+  useEffect(() => {
+    const previous = previousPhaseRef.current;
+    previousPhaseRef.current = currentPhase;
+    if (currentPhase && previous !== currentPhase) {
+      playWorkoutSound(getWorkoutSoundPreference(), currentPhase);
+    }
+  }, [currentPhase]);
+
+  useEffect(() => () => stopWorkoutSound(), []);
+
   // Time ran out on its own — finish automatically using the full duration,
   // as opposed to a manual mid-workout "Finish" tap (see handleManualFinish).
   useEffect(() => {
@@ -146,6 +168,9 @@ export function WorkoutRunner({
   }, [timer?.totalRemaining]);
 
   async function beginWorkoutSession() {
+    // Still inside the Start / Continue tap here, which is what lets the
+    // browser play the timer's later, gesture-less transition sounds.
+    unlockWorkoutAudio();
     setError(null);
     try {
       const id = await startWorkoutSession(childId, workout.id);

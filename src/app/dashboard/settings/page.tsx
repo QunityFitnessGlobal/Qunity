@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getLinkedChildren } from "@/services/linking.service";
 import { LogoutButton } from "@/components/LogoutButton";
+import { WorkoutSoundMenuItem } from "@/components/WorkoutSoundMenuItem";
 import { PowerPreviewTester } from "@/components/child/PowerPreviewTester";
 import { ReturnToParentButton } from "@/components/child/ReturnToParentButton";
 import { ParentPinMenuItem } from "@/components/parent/ParentPinMenuItem";
@@ -53,6 +54,8 @@ export default async function SettingsPage() {
           </Link>
         </div>
       )}
+
+      {isChild && <WorkoutSoundMenuItem />}
 
       {isChild && <PowerPreviewTester />}
       {isChild && <ReturnToParentButton />}
