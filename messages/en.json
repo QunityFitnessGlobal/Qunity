@@ -95,7 +95,9 @@
     "workout": "Workout",
     "duration": "Duration",
     "difficulty": "Difficulty",
-    "unknownWorkout": "Workout"
+    "unknownWorkout": "Workout",
+    "completion": "Completed",
+    "replay": "repeat"
   },
   "tips": {
     "heading": "Tips for parents",
@@ -154,7 +156,15 @@
     "phaseWork": "Work",
     "phaseRest": "Rest",
     "setLabel": "Set",
-    "setProgress": "{current} of {total}"
+    "setProgress": "{current} of {total}",
+    "resultPartial": "You completed {percent}% of the workout, so you earned {percent}% of the points.",
+    "resultBelowThreshold": "You completed only {percent}% of the workout. Below 60% there are no points.",
+    "resultReplayPoints": "This was a repeat: you earned points only for what you added over last time.",
+    "resultReplayNoPoints": "This was a repeat, so there are no extra points. Great persistence!",
+    "replayBadge": "Repeat workout · does not advance your color",
+    "stopConfirmMessage": "The workout is too short to earn points. Stop anyway?",
+    "stopConfirmContinue": "Keep going",
+    "stopConfirmStop": "Stop"
   },
   "dashboard": {
     "parentTitle": "Parent Dashboard",
@@ -171,7 +181,8 @@
       "totalWorkouts": "Total workouts",
       "totalActiveTime": "Total active time",
       "averageDifficulty": "Average reported difficulty",
-      "parentTogetherCount": "Workouts together with parent"
+      "parentTogetherCount": "Workouts together with parent",
+      "cancelledWorkouts": "Cancelled workouts"
     }
   },
   "leaderboard": {
@@ -296,7 +307,10 @@
       "difficulty": "Reported difficulty",
       "feeling": "Feeling",
       "points": "Points earned",
-      "close": "Close"
+      "close": "Close",
+      "completion": "Completed",
+      "replay": "Do this workout again",
+      "replayHint": "A repeat does not advance your color. You only earn points for what you add over the previous time."
     }
   },
   "powers": {

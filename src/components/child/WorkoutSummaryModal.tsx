@@ -15,6 +15,7 @@ interface WorkoutSummaryModalProps {
   beltColor: BraceletColor;
   localNumber: number;
   gender: Gender | null;
+  onReplay: () => void;
   onClose: () => void;
 }
 
@@ -27,6 +28,7 @@ export function WorkoutSummaryModal({
   beltColor,
   localNumber,
   gender,
+  onReplay,
   onClose,
 }: WorkoutSummaryModalProps) {
   const t = useTranslations("journey.summary");
@@ -96,6 +98,12 @@ export function WorkoutSummaryModal({
                   })()}
                 </dd>
               </div>
+              {summary.bestCompletionPercent !== null && (
+                <div className="flex justify-between">
+                  <dt className="text-text-muted">{t("completion")}</dt>
+                  <dd>{summary.bestCompletionPercent}%</dd>
+                </div>
+              )}
               <div className="flex justify-between font-semibold">
                 <dt>{t("points")}</dt>
                 <dd>{summary.pointsAwarded}</dd>
@@ -104,7 +112,16 @@ export function WorkoutSummaryModal({
           </>
         )}
 
-        <Button className="w-full" onClick={onClose}>
+        {!loading && summary && (
+          <div className="space-y-1">
+            <Button className="w-full" onClick={onReplay}>
+              {t("replay")}
+            </Button>
+            <p className="text-center text-xs text-text-muted">{t("replayHint")}</p>
+          </div>
+        )}
+
+        <Button className="w-full bg-zinc-700 hover:bg-zinc-800" onClick={onClose}>
           {t("close")}
         </Button>
       </div>

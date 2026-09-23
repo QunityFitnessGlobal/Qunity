@@ -95,7 +95,9 @@
     "workout": "אימון",
     "duration": "משך",
     "difficulty": "קושי",
-    "unknownWorkout": "אימון"
+    "unknownWorkout": "אימון",
+    "completion": "השלמה",
+    "replay": "חוזר"
   },
   "tips": {
     "heading": "טיפים להורה",
@@ -154,7 +156,15 @@
     "phaseWork": "אימון",
     "phaseRest": "מנוחה",
     "setLabel": "סט",
-    "setProgress": "{current} מתוך {total}"
+    "setProgress": "{current} מתוך {total}",
+    "resultPartial": "השלמת {percent}% מהאימון, ולכן קיבלת {percent}% מהנקודות.",
+    "resultBelowThreshold": "השלמת רק {percent}% מהאימון. מתחת ל-60% לא מקבלים נקודות.",
+    "resultReplayPoints": "זה אימון חוזר: קיבלת נקודות רק על מה שהוספת על הפעם הקודמת.",
+    "resultReplayNoPoints": "זה אימון חוזר, אז אין נקודות נוספות. כל הכבוד על ההתמדה!",
+    "replayBadge": "אימון חוזר · לא מקדם את הצבע",
+    "stopConfirmMessage": "האימון קצר מדי לקבלת נקודות, לעצור בכל זאת?",
+    "stopConfirmContinue": "להמשיך",
+    "stopConfirmStop": "לעצור"
   },
   "dashboard": {
     "parentTitle": "לוח הורה",
@@ -171,7 +181,8 @@
       "totalWorkouts": "אימונים בסה\"כ",
       "totalActiveTime": "זמן פעילות כולל",
       "averageDifficulty": "קושי ממוצע מדווח",
-      "parentTogetherCount": "אימונים משותפים עם הורה"
+      "parentTogetherCount": "אימונים משותפים עם הורה",
+      "cancelledWorkouts": "אימונים שבוטלו"
     }
   },
   "leaderboard": {
@@ -296,7 +307,10 @@
       "difficulty": "קושי מדווח",
       "feeling": "הרגשה",
       "points": "נקודות שנצברו",
-      "close": "סגירה"
+      "close": "סגירה",
+      "completion": "השלמה",
+      "replay": "לעשות שוב את האימון",
+      "replayHint": "אימון חוזר לא מקדם את הצבע. נקודות מקבלים רק על מה שנוסף על הפעם הקודמת."
     }
   },
   "powers": {

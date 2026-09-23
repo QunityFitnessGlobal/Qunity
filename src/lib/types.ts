@@ -93,6 +93,9 @@ export interface JourneyStation {
   localNumber: number;
   globalNumber: number;
   state: JourneyStationState;
+  // A done station whose every attempt stopped below the points threshold:
+  // shown as a half star (it can still be replayed to earn the full one).
+  partial: boolean;
 }
 
 export interface WorkoutSession {

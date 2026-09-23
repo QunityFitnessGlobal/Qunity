@@ -3,7 +3,7 @@
 import { useState, type CSSProperties } from "react";
 import { useTranslations } from "next-intl";
 import { BRACELET_BADGE_CLASSES, BRACELET_CSS_VAR } from "@/lib/colors";
-import { LockIcon, PlayIcon, StarIcon } from "@/components/child/journeyIcons";
+import { HalfStarIcon, LockIcon, PlayIcon, StarIcon } from "@/components/child/journeyIcons";
 import type { BraceletColor, JourneyStationState } from "@/lib/types";
 
 interface JourneyStationProps {
@@ -11,6 +11,8 @@ interface JourneyStationProps {
   title: string;
   beltColor: BraceletColor;
   localNumber: number;
+  // Done but never reached the points threshold: half star instead of full.
+  partial?: boolean;
   // Called for "current" (start the workout) and "done" (open its summary).
   // Never called for "locked" — the component handles that tap itself.
   onOpen?: () => void;
@@ -26,6 +28,7 @@ export function JourneyStation({
   title,
   beltColor,
   localNumber,
+  partial = false,
   onOpen,
   style,
   id,
@@ -69,7 +72,11 @@ export function JourneyStation({
         }`}
       >
         {isDone ? (
-          <StarIcon className="h-6 w-6 text-yellow-400" />
+          partial ? (
+            <HalfStarIcon className="h-6 w-6 text-yellow-400" />
+          ) : (
+            <StarIcon className="h-6 w-6 text-yellow-400" />
+          )
         ) : (
           <span>{localNumber}</span>
         )}

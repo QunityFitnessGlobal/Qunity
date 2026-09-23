@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { calculateProgressPercent } from "@/services/progression.service";
+import { meetsCompletionThreshold } from "@/services/points.service";
 import { getCompletedChallengeHistory, type CompletedChallengeEntry } from "@/services/challenge.service";
 import type { LocalizedText } from "@/lib/i18n-content";
 import type { BraceletColor } from "@/lib/types";
@@ -10,6 +11,9 @@ export interface RecentWorkoutEntry {
   date: string;
   durationSeconds: number | null;
   difficultyReported: number | null;
+  // Share of the planned time done; null for sessions from before it was tracked.
+  completionPercent: number | null;
+  isReplay: boolean;
 }
 
 export type { CompletedChallengeEntry };
@@ -23,6 +27,8 @@ export interface ParentChildStats {
   workoutsCompletedInColor: number;
   requiredWorkouts: number;
   totalWorkoutsCompleted: number;
+  // Workouts stopped below the points threshold (repeats included).
+  cancelledWorkoutsCount: number;
   totalActiveSeconds: number;
   averageDifficultyReported: number | null;
   parentTogetherCount: number;
@@ -47,12 +53,15 @@ interface SessionAggregateRow {
   start_time: string;
   actual_duration_seconds: number | null;
   status: string;
+  completion_percent: number | null;
 }
 
 interface RecentSessionRow {
   id: string;
   start_time: string;
   actual_duration_seconds: number | null;
+  completion_percent: number | null;
+  is_replay: boolean;
   workouts: { title: LocalizedText } | { title: LocalizedText }[] | null;
 }
 
@@ -97,7 +106,7 @@ export async function getChildStatsForParent(
   // totals across the child's entire history.
   const { data: allSessions } = await supabase
     .from("workout_sessions")
-    .select("id, start_time, actual_duration_seconds, status")
+    .select("id, start_time, actual_duration_seconds, status, completion_percent")
     .eq("child_id", childId);
 
   const allSessionRows = (allSessions ?? []) as SessionAggregateRow[];
@@ -130,11 +139,18 @@ export async function getChildStatsForParent(
 
   const parentTogetherCount = resultRows.filter((r) => r.parent_trained_together).length;
 
+  const cancelledWorkoutsCount = allSessionRows.filter(
+    (s) =>
+      s.status === "completed" &&
+      s.completion_percent !== null &&
+      !meetsCompletionThreshold(s.completion_percent),
+  ).length;
+
   // Bounded query for the "recent workouts" list — the DB applies the limit,
   // rather than fetching everything and slicing it in JS.
   const { data: recentSessions } = await supabase
     .from("workout_sessions")
-    .select("id, start_time, actual_duration_seconds, workouts(title)")
+    .select("id, start_time, actual_duration_seconds, completion_percent, is_replay, workouts(title)")
     .eq("child_id", childId)
     .eq("status", "completed")
     .order("start_time", { ascending: false })
@@ -147,6 +163,8 @@ export async function getChildStatsForParent(
       date: s.start_time,
       durationSeconds: s.actual_duration_seconds,
       difficultyReported: resultsBySession.get(s.id)?.difficulty_reported ?? null,
+      completionPercent: s.completion_percent,
+      isReplay: s.is_replay,
     }),
   );
 
@@ -164,6 +182,7 @@ export async function getChildStatsForParent(
     workoutsCompletedInColor: child.workouts_completed_in_color,
     requiredWorkouts,
     totalWorkoutsCompleted: child.total_workouts_completed,
+    cancelledWorkoutsCount,
     totalActiveSeconds,
     averageDifficultyReported,
     parentTogetherCount,

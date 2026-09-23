@@ -14,6 +14,9 @@ import {
 } from "@/services/workout.service";
 import { Button } from "@/components/ui/Button";
 import { ChallengeUnlockedModal } from "@/components/child/ChallengeUnlockedModal";
+import { unlockPowerChallenge } from "@/services/challenge.service";
+import { calculateCompletionPercent, meetsCompletionThreshold } from "@/services/points.service";
+import type { ChallengeDefinition } from "@/data/challenges.data";
 import { PowerRevealScreen } from "@/components/child/PowerRevealScreen";
 import { formatDurationClock } from "@/lib/format";
 import {
@@ -37,6 +40,11 @@ interface WorkoutRunnerProps {
   childId: string;
   workout: Workout;
   workoutIndex: number;
+  // Set when repeating an already-passed station from the journey map; such a
+  // run never advances the color progress (see completeWorkout).
+  replayStation: number | null;
+  // First workout of a color whose power has not been revealed yet.
+  showPowerReveal: boolean;
   requiredWorkouts: number;
   color: BraceletColor;
   colorLabel: string;
@@ -60,6 +68,8 @@ export function WorkoutRunner({
   childId,
   workout,
   workoutIndex,
+  replayStation,
+  showPowerReveal,
   requiredWorkouts,
   color,
   colorLabel,
@@ -87,6 +97,10 @@ export function WorkoutRunner({
   const [feelingAfter, setFeelingAfter] = useState<FeelingCode>(FEELING_CODES[0]);
   const [nextWorkoutLoading, setNextWorkoutLoading] = useState(false);
   const [showChallengeModal, setShowChallengeModal] = useState(false);
+  // Finishing below the points threshold asks for confirmation first; the
+  // timer stays paused while that question is open.
+  const [stopConfirmOpen, setStopConfirmOpen] = useState(false);
+  const [powerChallenge, setPowerChallenge] = useState<ChallengeDefinition | null>(null);
 
   const recommendedDurationMinutes = workout.recommended_duration_minutes ?? 0;
   const extraMinutes = Math.round(actualDurationSeconds / 60) - recommendedDurationMinutes;
@@ -110,17 +124,22 @@ export function WorkoutRunner({
   const totalDurationSeconds = hasIntervalStructure
     ? intervalRounds * (intervalWorkSeconds + intervalRestSeconds)
     : 0;
+  // What 100% of the workout means: the whole interval timer, or the
+  // recommended time for workouts without one.
+  const plannedDurationSeconds = hasIntervalStructure
+    ? totalDurationSeconds
+    : recommendedDurationMinutes * 60;
 
   useEffect(() => {
-    if (stage !== "running" || hasIntervalStructure) {
+    if (stage !== "running" || hasIntervalStructure || stopConfirmOpen) {
       return;
     }
     const interval = setInterval(() => setElapsedSeconds((s) => s + 1), 1000);
     return () => clearInterval(interval);
-  }, [stage, hasIntervalStructure]);
+  }, [stage, hasIntervalStructure, stopConfirmOpen]);
 
   useEffect(() => {
-    if (stage !== "running" || !hasIntervalStructure) {
+    if (stage !== "running" || !hasIntervalStructure || stopConfirmOpen) {
       return;
     }
     const interval = setInterval(() => {
@@ -140,7 +159,7 @@ export function WorkoutRunner({
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [stage, hasIntervalStructure, intervalWorkSeconds, intervalRestSeconds]);
+  }, [stage, hasIntervalStructure, stopConfirmOpen, intervalWorkSeconds, intervalRestSeconds]);
 
   // Cue sound when the timer starts and on each work<->rest switch (chosen in
   // Settings -> "סוג צלצול לאימון"). Driven off the phase changing rather than
@@ -173,7 +192,10 @@ export function WorkoutRunner({
     unlockWorkoutAudio();
     setError(null);
     try {
-      const id = await startWorkoutSession(childId, workout.id);
+      const id = await startWorkoutSession(childId, workout.id, {
+        stationNumber: replayStation ?? workoutIndex,
+        isReplay: replayStation !== null,
+      });
       setSessionId(id);
       setElapsedSeconds(0);
       setTimer(
@@ -187,17 +209,25 @@ export function WorkoutRunner({
     }
   }
 
-  // The power for a color is discovered at the START of that color's first
-  // workout (including white's very first workout ever, since workoutIndex
-  // is 1-based within the current color) — not at the end of the previous
-  // one. So starting workout #1 shows the reveal first; only continuing
-  // from there actually begins the session.
+  // The power for a color is discovered at the START of that color first
+  // workout (including white first workout ever) - not at the end of the
+  // previous one - and only once: continuing from the reveal unlocks the
+  // "received power" challenge, which is what marks it as seen.
   function handleStart() {
-    if (workoutIndex === 1) {
+    if (showPowerReveal) {
       setStage("power-reveal");
       return;
     }
     beginWorkoutSession();
+  }
+
+  async function handlePowerContinue() {
+    try {
+      setPowerChallenge(await unlockPowerChallenge(createClient(), childId, color));
+    } catch {
+      // Not worth blocking the workout over; the reveal just shows again next time.
+    }
+    await beginWorkoutSession();
   }
 
   async function finishSession(actualSeconds: number) {
@@ -212,11 +242,24 @@ export function WorkoutRunner({
     }
   }
 
-  function handleManualFinish() {
-    const actualSeconds = hasIntervalStructure
+  function manualFinishSeconds() {
+    return hasIntervalStructure
       ? totalDurationSeconds - (timer?.totalRemaining ?? 0)
       : elapsedSeconds;
-    finishSession(actualSeconds);
+  }
+
+  function handleManualFinish() {
+    const percent = calculateCompletionPercent(manualFinishSeconds(), plannedDurationSeconds);
+    if (!meetsCompletionThreshold(percent)) {
+      setStopConfirmOpen(true);
+      return;
+    }
+    finishSession(manualFinishSeconds());
+  }
+
+  function handleConfirmStop() {
+    setStopConfirmOpen(false);
+    finishSession(manualFinishSeconds());
   }
 
   async function handleSubmitQuestionnaire() {
@@ -227,8 +270,12 @@ export function WorkoutRunner({
       const outcome = await completeWorkout({
         childId,
         sessionId,
+        beltColor: color,
+        stationNumber: replayStation ?? workoutIndex,
+        isReplay: replayStation !== null,
         recommendedDifficulty: workout.recommended_difficulty ?? 1,
         recommendedDurationMinutes,
+        plannedDurationSeconds,
         actualDurationSeconds,
         answers: {
           activityReported: "",
@@ -258,14 +305,30 @@ export function WorkoutRunner({
   }
 
   if (stage === "power-reveal") {
-    return <PowerRevealScreen color={color} onContinue={beginWorkoutSession} />;
+    return <PowerRevealScreen color={color} onContinue={handlePowerContinue} />;
   }
 
   if (stage === "result" && result) {
+    // The power challenge was unlocked back at the reveal; list it with the
+    // ones from this workout so the child sees everything they earned.
+    const announcedChallenges = powerChallenge
+      ? [powerChallenge, ...result.newChallenges]
+      : result.newChallenges;
     return (
       <div className="w-full max-w-sm space-y-4 text-center">
         <h1 className="text-2xl font-bold">{t("resultTitle")}</h1>
         <p className="text-zinc-600">{t("pointsAwarded", { points: result.pointsAwarded })}</p>
+        <p className="text-sm text-zinc-500">
+          {result.isReplay
+            ? result.pointsAwarded > 0
+              ? t("resultReplayPoints", { percent: result.completionPercent })
+              : t("resultReplayNoPoints", { percent: result.completionPercent })
+            : result.completionPercent >= 100
+              ? null
+              : meetsCompletionThreshold(result.completionPercent)
+                ? t("resultPartial", { percent: result.completionPercent })
+                : t("resultBelowThreshold", { percent: result.completionPercent })}
+        </p>
 
         {result.didLevelUp && result.newColor && (
           <div className="rounded-lg bg-yellow-50 p-4 text-lg font-bold text-yellow-800">
@@ -273,9 +336,9 @@ export function WorkoutRunner({
           </div>
         )}
 
-        {result.newChallenges.length > 0 && (
+        {announcedChallenges.length > 0 && (
           <div className="space-y-2 rounded-lg bg-blue-50 p-4 text-right">
-            {result.newChallenges.map((challenge) => (
+            {announcedChallenges.map((challenge) => (
               <p key={challenge.id} className="text-sm font-medium text-blue-800">
                 {t("challengeUnlocked", {
                   title: resolveLocalizedText(challenge.title, locale),
@@ -391,6 +454,9 @@ export function WorkoutRunner({
       <p className="text-sm font-medium text-zinc-500">
         {t("colorProgress", { color: colorLabel, index: workoutIndex, total: requiredWorkouts })}
       </p>
+      {replayStation !== null && (
+        <p className="text-sm font-semibold text-brand-purple">{t("replayBadge")}</p>
+      )}
       <h1 className="text-2xl font-bold">{resolveLocalizedText(workout.title, locale)}</h1>
       <p className="text-sm text-zinc-500">
         {t("recommended", {
@@ -499,6 +565,22 @@ export function WorkoutRunner({
           <Button className="w-full" onClick={handleManualFinish}>
             {t("finish")}
           </Button>
+        </div>
+      )}
+
+      {stopConfirmOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-xs space-y-4 rounded-lg bg-white p-5 text-center">
+            <p className="text-base font-semibold">{t("stopConfirmMessage")}</p>
+            <div className="flex gap-2">
+              <Button className="flex-1" onClick={() => setStopConfirmOpen(false)}>
+                {t("stopConfirmContinue")}
+              </Button>
+              <Button className="flex-1 bg-zinc-700 hover:bg-zinc-800" onClick={handleConfirmStop}>
+                {t("stopConfirmStop")}
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -113,6 +113,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                   { label: t("stats.totalPoints"), value: String(stats.totalPoints) },
                   { label: t("stats.pointsInColor"), value: String(stats.pointsInColor) },
                   { label: t("stats.totalWorkouts"), value: String(stats.totalWorkoutsCompleted) },
+                  { label: t("stats.cancelledWorkouts"), value: String(stats.cancelledWorkoutsCount) },
                   {
                     label: t("stats.totalActiveTime"),
                     value: formatDurationClock(stats.totalActiveSeconds),

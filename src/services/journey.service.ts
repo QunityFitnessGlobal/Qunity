@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { BraceletColor, JourneyStation } from "@/lib/types";
 import type { LocalizedText } from "@/lib/i18n-content";
+import { meetsCompletionThreshold } from "@/services/points.service";
 
 interface BraceletLevelRow {
   color: BraceletColor;
@@ -17,6 +18,12 @@ interface WorkoutRow {
 interface ChildProgressRow {
   current_color: BraceletColor;
   workouts_completed_in_color: number;
+}
+
+interface AttemptRow {
+  station_number: number | null;
+  completion_percent: number | null;
+  workouts: { color: BraceletColor | null } | { color: BraceletColor | null }[] | null;
 }
 
 export interface JourneyOverview {
@@ -44,7 +51,7 @@ export async function getJourneyStations(
   supabase: SupabaseClient,
   childId: string,
 ): Promise<JourneyOverview> {
-  const [{ data: levels }, { data: workouts }, { data: child }] = await Promise.all([
+  const [{ data: levels }, { data: workouts }, { data: child }, { data: attempts }] = await Promise.all([
     supabase.from("bracelet_levels").select("color, order_index").order("order_index", { ascending: true }),
     supabase.from("workouts").select("id, title, color, order_in_color"),
     supabase
@@ -52,7 +59,24 @@ export async function getJourneyStations(
       .select("current_color, workouts_completed_in_color")
       .eq("id", childId)
       .single<ChildProgressRow>(),
+    supabase
+      .from("workout_sessions")
+      .select("station_number, completion_percent, workouts!inner(color)")
+      .eq("child_id", childId)
+      .eq("status", "completed")
+      .not("station_number", "is", null),
   ]);
+
+  // Per station (color + number): did any attempt reach the points threshold?
+  // Sessions from before completion_percent existed count as full.
+  const passedByStation = new Map<string, boolean>();
+  for (const row of (attempts ?? []) as unknown as AttemptRow[]) {
+    const color = Array.isArray(row.workouts) ? row.workouts[0]?.color : row.workouts?.color;
+    if (!color || row.station_number == null) continue;
+    const key = `${color}:${row.station_number}`;
+    const passed = row.completion_percent == null || meetsCompletionThreshold(row.completion_percent);
+    passedByStation.set(key, (passedByStation.get(key) ?? false) || passed);
+  }
 
   const levelRows = (levels ?? []) as BraceletLevelRow[];
   const workoutRows = (workouts ?? []) as WorkoutRow[];
@@ -94,6 +118,7 @@ export async function getJourneyStations(
       localNumber,
       globalNumber: index + 1,
       state,
+      partial: state === "done" && passedByStation.get(`${beltColor}:${localNumber}`) === false,
     };
   });
 
@@ -111,12 +136,17 @@ export interface StationWorkoutSummary {
   difficultyReported: number | null;
   feelingAfter: string | null;
   pointsAwarded: number;
+  // Best completion across the attempts at this station; null when the
+  // station only has sessions from before completion was tracked.
+  bestCompletionPercent: number | null;
 }
 
 interface StationSessionRow {
   id: string;
   start_time: string;
   actual_duration_seconds: number | null;
+  is_replay: boolean;
+  completion_percent: number | null;
   workouts: { title: LocalizedText } | { title: LocalizedText }[] | null;
 }
 
@@ -127,12 +157,12 @@ function workoutTitle(workouts: StationSessionRow["workouts"]): LocalizedText | 
 
 // Reuses the same (title, date, duration, difficulty) shape as
 // RecentWorkoutEntry (parent-stats.service.ts) rather than inventing a new
-// one, since this is the same underlying concept from the child's own view.
+// one, since this is the same underlying concept from the child own view.
 //
-// A "done" station identifies a specific past session the same way its
-// state was derived: by ordinal position (the Nth completed session whose
-// workout belongs to this belt color), not by workout_id — see the note on
-// getJourneyStations above.
+// A station is identified by (belt color, station number), recorded on each
+// session when it starts. The date/duration/difficulty shown are from the
+// first, regular attempt; points add up every attempt at the station
+// (replays included), and the completion is the best of them.
 export async function getStationWorkoutSummary(
   supabase: SupabaseClient,
   childId: string,
@@ -141,14 +171,15 @@ export async function getStationWorkoutSummary(
 ): Promise<StationWorkoutSummary | null> {
   const { data: sessions } = await supabase
     .from("workout_sessions")
-    .select("id, start_time, actual_duration_seconds, workouts!inner(title, color)")
+    .select("id, start_time, actual_duration_seconds, is_replay, completion_percent, workouts!inner(title, color)")
     .eq("child_id", childId)
     .eq("status", "completed")
+    .eq("station_number", localNumber)
     .eq("workouts.color", beltColor)
     .order("start_time", { ascending: true });
 
   const sessionRows = (sessions ?? []) as StationSessionRow[];
-  const target = sessionRows[localNumber - 1];
+  const target = sessionRows.find((row) => !row.is_replay) ?? sessionRows[0];
   if (!target) {
     return null;
   }
@@ -159,13 +190,20 @@ export async function getStationWorkoutSummary(
       .select("difficulty_reported, feeling_after")
       .eq("session_id", target.id)
       .maybeSingle<{ difficulty_reported: number | null; feeling_after: string | null }>(),
-    supabase.from("points_transactions").select("points").eq("session_id", target.id),
+    supabase
+      .from("points_transactions")
+      .select("points")
+      .in("session_id", sessionRows.map((row) => row.id)),
   ]);
 
   const pointsAwarded = ((pointsRows ?? []) as { points: number }[]).reduce(
     (sum, row) => sum + row.points,
     0,
   );
+
+  const percents = sessionRows
+    .map((row) => row.completion_percent)
+    .filter((percent): percent is number => percent !== null);
 
   return {
     workoutTitle: workoutTitle(target.workouts),
@@ -174,5 +212,6 @@ export async function getStationWorkoutSummary(
     difficultyReported: result?.difficulty_reported ?? null,
     feelingAfter: result?.feeling_after ?? null,
     pointsAwarded,
+    bestCompletionPercent: percents.length > 0 ? Math.max(...percents) : null,
   };
 }

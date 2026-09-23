@@ -25,6 +25,7 @@ export async function RecentWorkoutsList({ workouts }: RecentWorkoutsListProps) 
             <th className="px-3 py-2 text-right font-medium text-text-muted">{t("date")}</th>
             <th className="px-3 py-2 text-right font-medium text-text-muted">{t("workout")}</th>
             <th className="px-3 py-2 text-right font-medium text-text-muted">{t("duration")}</th>
+            <th className="px-3 py-2 text-right font-medium text-text-muted">{t("completion")}</th>
             <th className="px-3 py-2 text-right font-medium text-text-muted">{t("difficulty")}</th>
           </tr>
         </thead>
@@ -34,9 +35,13 @@ export async function RecentWorkoutsList({ workouts }: RecentWorkoutsListProps) 
               <td className="px-3 py-2">{new Date(workout.date).toLocaleDateString(locale)}</td>
               <td className="px-3 py-2">
                 {workout.workoutTitle ? resolveLocalizedText(workout.workoutTitle, locale) : t("unknownWorkout")}
+                {workout.isReplay && <span className="mr-1 text-xs text-text-muted"> ({t("replay")})</span>}
               </td>
               <td className="px-3 py-2">
                 {workout.durationSeconds !== null ? formatDurationClock(workout.durationSeconds) : "-"}
+              </td>
+              <td className="px-3 py-2">
+                {workout.completionPercent !== null ? `${workout.completionPercent}%` : "-"}
               </td>
               <td className="px-3 py-2">
                 {(() => {

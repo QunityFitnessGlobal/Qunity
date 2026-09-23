@@ -1401,3 +1401,92 @@ alter table public.pairing_codes enable row level security;
 -- ============================================================================
 
 alter table public.children add column age integer;
+
+-- ============================================================================
+-- ADDED FOR PARTIAL-COMPLETION POINTS, STATION REPLAY AND PER-POWER CHALLENGES
+--
+-- completion_percent: how much of the planned time the child actually did
+--   (0-100), set when the questionnaire is submitted. NULL on sessions from
+--   before this existed — treated as 100 (full) everywhere.
+-- station_number: the child's 1-based position within the workout's color
+--   (same numbering as the journey map's local_number). Lets the map/summary
+--   find "the session(s) for station N" directly instead of guessing by
+--   order of completion.
+-- is_replay: a repeat of a station that was already passed. Replays never
+--   advance workouts_completed_in_color or points_in_color, but still count
+--   as real workouts for total_workouts_completed and for the parent.
+-- ============================================================================
+
+alter table public.workout_sessions
+  add column completion_percent integer check (completion_percent between 0 and 100),
+  add column station_number integer,
+  add column is_replay boolean not null default false;
+
+-- Every session before this change was a regular (non-replay) one, so the
+-- station number is simply the order in which the child completed workouts
+-- of that color — the same ordinal rule the journey map used until now.
+update public.workout_sessions s
+set station_number = ranked.rn
+from (
+  select ws.id,
+         row_number() over (partition by ws.child_id, w.color order by ws.start_time) as rn
+  from public.workout_sessions ws
+  join public.workouts w on w.id = ws.workout_id
+  where ws.status = 'completed'
+) ranked
+where s.id = ranked.id;
+
+-- Replays count toward the lifetime workout total (what the parent sees) but
+-- not toward the color's progress counter.
+create or replace function public.increment_child_total_workouts_only(p_child_id uuid)
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  update public.children
+  set total_workouts_completed = total_workouts_completed + 1
+  where id = p_child_id;
+$$;
+
+grant execute on function public.increment_child_total_workouts_only(uuid) to authenticated;
+
+-- One challenge per power ("קבלת כוח X"), unlocked the moment the power is
+-- revealed at the start of that color's first workout. Replaces the single
+-- "color_starter" challenge.
+insert into public.challenges (id, title, description, bonus_points, condition_type, challenge_type) values
+  ('power_white',
+   jsonb_build_object('he', 'קבלת כוח ההתחלה', 'en', 'Received the power of starting'),
+   jsonb_build_object('he', 'גילית את כוח ההתחלה.', 'en', 'You discovered the power of starting.'),
+   10, 'power_white', 'condition'),
+  ('power_orange',
+   jsonb_build_object('he', 'קבלת כוח ההתמדה', 'en', 'Received the power of persistence'),
+   jsonb_build_object('he', 'גילית את כוח ההתמדה.', 'en', 'You discovered the power of persistence.'),
+   10, 'power_orange', 'condition'),
+  ('power_green',
+   jsonb_build_object('he', 'קבלת כוח האמונה בעצמי', 'en', 'Received the power of self-belief'),
+   jsonb_build_object('he', 'גילית את כוח האמונה בעצמי.', 'en', 'You discovered the power of self-belief.'),
+   10, 'power_green', 'condition'),
+  ('power_blue',
+   jsonb_build_object('he', 'קבלת כוח הצמיחה', 'en', 'Received the power of growth'),
+   jsonb_build_object('he', 'גילית את כוח הצמיחה.', 'en', 'You discovered the power of growth.'),
+   10, 'power_blue', 'condition'),
+  ('power_purple',
+   jsonb_build_object('he', 'קבלת כוח ההוקרה', 'en', 'Received the power of appreciation'),
+   jsonb_build_object('he', 'גילית את כוח ההוקרה.', 'en', 'You discovered the power of appreciation.'),
+   10, 'power_purple', 'condition');
+
+-- Children who already passed a color (or are past the first workout of
+-- their current one) have already seen that power: give them its challenge
+-- without any extra bonus points.
+insert into public.child_challenges (child_id, challenge_id, completed_at)
+select c.id, 'power_' || bl.color, now()
+from public.children c
+join public.bracelet_levels cur on cur.color = c.current_color
+join public.bracelet_levels bl on bl.color in ('white', 'orange', 'green', 'blue', 'purple')
+where bl.order_index < cur.order_index
+   or (bl.order_index = cur.order_index and c.workouts_completed_in_color >= 1)
+on conflict (child_id, challenge_id) do nothing;
+
+-- The old single challenge is superseded (its child_challenges rows cascade).
+delete from public.challenges where id = 'color_starter';

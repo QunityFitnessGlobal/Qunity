@@ -48,6 +48,7 @@ export function JourneyPath({ childId, gender, items, contentHeight, pathWidth }
   const [openSummary, setOpenSummary] = useState<{
     beltColor: BraceletColor;
     localNumber: number;
+    workoutId: string;
   } | null>(null);
 
   useEffect(() => {
@@ -128,12 +129,17 @@ export function JourneyPath({ childId, gender, items, contentHeight, pathWidth }
               title={resolveLocalizedText(station.title, locale)}
               beltColor={station.beltColor}
               localNumber={station.localNumber}
+              partial={station.partial}
               style={positionStyle}
               onOpen={() => {
                 if (station.state === "current") {
                   router.push(`/workout/${station.workoutId}`);
                 } else if (station.state === "done") {
-                  setOpenSummary({ beltColor: station.beltColor, localNumber: station.localNumber });
+                  setOpenSummary({
+                    beltColor: station.beltColor,
+                    localNumber: station.localNumber,
+                    workoutId: station.workoutId,
+                  });
                 }
               }}
             />
@@ -146,6 +152,9 @@ export function JourneyPath({ childId, gender, items, contentHeight, pathWidth }
             beltColor={openSummary.beltColor}
             localNumber={openSummary.localNumber}
             gender={gender}
+            onReplay={() =>
+              router.push(`/workout/${openSummary.workoutId}?replay=${openSummary.localNumber}`)
+            }
             onClose={() => setOpenSummary(null)}
           />
         )}

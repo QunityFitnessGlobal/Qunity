@@ -22,7 +22,11 @@ export type ChallengeConditionType =
   | "streak_3"
   | "streak_5"
   | "total_minutes_100"
-  | "color_starter"
+  | "power_white"
+  | "power_orange"
+  | "power_green"
+  | "power_blue"
+  | "power_purple"
   | "color_finisher";
 
 export type ChallengeType = "condition" | "repeatable_workout";
@@ -90,14 +94,47 @@ export const CHALLENGES: ChallengeDefinition[] = [
     unlockColor: null,
   },
   {
-    id: "color_starter",
-    title: { he: "פותח הצבע", en: "Color Starter" },
-    description: {
-      he: "השלמת את האימון הראשון בצבע חדש.",
-      en: "You completed your first workout in a new color.",
-    },
+    id: "power_white",
+    title: { he: "קבלת כוח ההתחלה", en: "Received the power of starting" },
+    description: { he: "גילית את כוח ההתחלה.", en: "You discovered the power of starting." },
     bonusPoints: 10,
-    conditionType: "color_starter",
+    conditionType: "power_white",
+    challengeType: "condition",
+    unlockColor: null,
+  },
+  {
+    id: "power_orange",
+    title: { he: "קבלת כוח ההתמדה", en: "Received the power of persistence" },
+    description: { he: "גילית את כוח ההתמדה.", en: "You discovered the power of persistence." },
+    bonusPoints: 10,
+    conditionType: "power_orange",
+    challengeType: "condition",
+    unlockColor: null,
+  },
+  {
+    id: "power_green",
+    title: { he: "קבלת כוח האמונה בעצמי", en: "Received the power of self-belief" },
+    description: { he: "גילית את כוח האמונה בעצמי.", en: "You discovered the power of self-belief." },
+    bonusPoints: 10,
+    conditionType: "power_green",
+    challengeType: "condition",
+    unlockColor: null,
+  },
+  {
+    id: "power_blue",
+    title: { he: "קבלת כוח הצמיחה", en: "Received the power of growth" },
+    description: { he: "גילית את כוח הצמיחה.", en: "You discovered the power of growth." },
+    bonusPoints: 10,
+    conditionType: "power_blue",
+    challengeType: "condition",
+    unlockColor: null,
+  },
+  {
+    id: "power_purple",
+    title: { he: "קבלת כוח ההוקרה", en: "Received the power of appreciation" },
+    description: { he: "גילית את כוח ההוקרה.", en: "You discovered the power of appreciation." },
+    bonusPoints: 10,
+    conditionType: "power_purple",
     challengeType: "condition",
     unlockColor: null,
   },

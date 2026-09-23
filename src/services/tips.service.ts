@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { calculateStreakDays, getChallengeDefinitions } from "@/services/challenge.service";
+import { meetsCompletionThreshold } from "@/services/points.service";
 import { TIP_CONDITION_REGISTRY, type ChildTipSnapshot } from "@/services/tip-conditions";
 import type { LocalizedText } from "@/lib/i18n-content";
 
@@ -32,6 +33,7 @@ interface CompletedSessionRow {
   id: string;
   start_time: string;
   actual_duration_seconds: number | null;
+  completion_percent: number | null;
 }
 
 interface WorkoutResultRow {
@@ -77,7 +79,7 @@ export async function buildChildTipSnapshot(
         .single<{ total_workouts_completed: number }>(),
       supabase
         .from("workout_sessions")
-        .select("id, start_time, actual_duration_seconds")
+        .select("id, start_time, actual_duration_seconds, completion_percent")
         .eq("child_id", childId)
         .eq("status", "completed")
         .order("start_time", { ascending: true }),
@@ -129,7 +131,16 @@ export async function buildChildTipSnapshot(
   // hour so a workout with no recommended duration on file doesn't produce
   // a wildly long or short threshold.
   const abandonedThresholdRows = (inProgressSessions ?? []) as InProgressSessionRow[];
-  const hasAbandonedSession = abandonedThresholdRows.some((row) => {
+  // A workout the child stopped early (below the points threshold) in the
+  // last week reads the same way to a parent: they wanted to quit mid-workout.
+  const weekAgoMs = now.getTime() - 7 * MS_PER_DAY;
+  const hasRecentlyStoppedEarly = sessionRows.some(
+    (s) =>
+      s.completion_percent !== null &&
+      !meetsCompletionThreshold(s.completion_percent) &&
+      new Date(s.start_time).getTime() >= weekAgoMs,
+  );
+  const hasAbandonedSession = hasRecentlyStoppedEarly || abandonedThresholdRows.some((row) => {
     const minutes = recommendedDurationMinutes(row.workouts) ?? 30;
     const thresholdSeconds = Math.min(minutes * 2 * 60, 3600);
     const elapsedSeconds = (now.getTime() - new Date(row.start_time).getTime()) / 1000;

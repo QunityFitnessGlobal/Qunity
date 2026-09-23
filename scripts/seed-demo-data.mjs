@@ -344,7 +344,7 @@ async function main() {
     workouts_completed_in_color: 2,
     total_workouts_completed: 12,
     sessions: [...whiteSessionsForMia, ...orangeSessionsForMia],
-    challenges: ["first_workout", "color_starter", "color_finisher"],
+    challenges: ["first_workout", "power_white", "power_orange", "color_finisher"],
   });
 
   console.log("Seeding עומר (gap scenario — triggers a real tip, no manual override needed)...");

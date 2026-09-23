@@ -8,7 +8,6 @@ import type { BraceletColor } from "@/lib/types";
 export interface ChallengeSessionContext {
   sessionId: string;
   parentTrainedTogether: boolean;
-  isFirstWorkoutInColor: boolean;
   didLevelUpThisSession: boolean;
 }
 
@@ -97,8 +96,6 @@ function isConditionMet(
       return data.streakDays >= 5;
     case "total_minutes_100":
       return data.totalMinutes >= 100;
-    case "color_starter":
-      return data.context.isFirstWorkoutInColor;
     case "color_finisher":
       return data.context.didLevelUpThisSession;
     default:
@@ -162,6 +159,44 @@ export async function checkAndAwardChallenges(
   }
 
   return newlyUnlocked;
+}
+
+// "Received power X": unlocked the moment a color's power is revealed (start of
+// its first workout), not by the checks in checkAndAwardChallenges. Pays the
+// challenge's bonus points once. Returns the challenge only when newly
+// unlocked — which is also how the runner knows the reveal was already seen
+// (see the workout page), so a power is only ever revealed once.
+export async function unlockPowerChallenge(
+  supabase: SupabaseClient,
+  childId: string,
+  color: BraceletColor,
+): Promise<ChallengeDefinition | null> {
+  const { data } = await supabase
+    .from("challenges")
+    .select("id, title, description, bonus_points, condition_type, challenge_type, unlock_color")
+    .eq("id", `power_${color}`)
+    .maybeSingle();
+
+  if (!data) {
+    return null;
+  }
+
+  const challenge = mapChallengeRow(data as ChallengeRow);
+
+  const { error } = await supabase
+    .from("child_challenges")
+    .insert({ child_id: childId, challenge_id: challenge.id, completed_at: new Date().toISOString() });
+
+  if (error) {
+    // Already unlocked (unique constraint) — nothing new to report.
+    return null;
+  }
+
+  await awardPoints(childId, null, [
+    { points: challenge.bonusPoints, reason: `challenge_${challenge.id}` },
+  ]);
+
+  return challenge;
 }
 
 // Called alongside checkAndAwardChallenges right after a level-up — looks
