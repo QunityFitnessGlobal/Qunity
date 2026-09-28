@@ -95,15 +95,15 @@ export function ReturnToParentButton() {
             />
             {error && <p className="text-sm text-red-600">{error}</p>}
             <div className="flex gap-2">
-              <Button className="flex-1 bg-zinc-700 hover:bg-zinc-800" onClick={closeModal}>
-                {t("cancel")}
-              </Button>
               <Button
                 className="flex-1"
                 disabled={pin.length !== 4 || loading}
                 onClick={handleSubmit}
               >
                 {loading ? t("checking") : t("confirm")}
+              </Button>
+              <Button className="flex-1 bg-zinc-700 hover:bg-zinc-800" onClick={closeModal}>
+                {t("cancel")}
               </Button>
             </div>
           </div>
