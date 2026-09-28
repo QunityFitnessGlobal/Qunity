@@ -76,7 +76,7 @@
     "start": "Start"
   },
   "colors": {
-    "badge": "{color} bracelet",
+    "badge": "Stage {color}",
     "white": "White",
     "orange": "Orange",
     "green": "Green",
@@ -149,7 +149,7 @@
     "startError": "Error starting the workout",
     "finishError": "Error finishing the workout",
     "submitError": "Error submitting the questionnaire",
-    "colorProgress": "{color} color · workout {index} of {total}",
+    "colorProgress": "Stage {color} · workout {index} of {total}",
     "recommended": "Recommended time: {minutes} minutes · recommended difficulty: {difficulty}",
     "start": "Start",
     "finish": "Finish",
@@ -172,12 +172,12 @@
     "hello": "Hello, {name}",
     "helloExclaim": "Hello, {name}!",
     "noChildDefined": "No child set up yet. Go to Settings and add a child.",
-    "workoutsInColor": "{count} of {total} workouts in the current color",
-    "workoutsInColorAndPoints": "{count} of {total} workouts · {points} points to the next color",
+    "workoutsInColor": "{count} of {total} workouts in the current stage",
+    "workoutsInColorAndPoints": "{count} of {total} workouts · {points} points to the next stage",
     "totalPointsLine": "Total {points} points",
     "stats": {
       "totalPoints": "Total points",
-      "pointsInColor": "Points in current color",
+      "pointsInColor": "Points in current stage",
       "totalWorkouts": "Total workouts",
       "totalActiveTime": "Total active time",
       "averageDifficulty": "Average reported difficulty",
@@ -294,7 +294,7 @@
     "settings": "Settings"
   },
   "journey": {
-    "belt": "Current belt: {color}",
+    "belt": "Current stage: {color}",
     "progress": "{done} of {total}",
     "empty": "No workouts in the system yet.",
     "lockedHint": "Finish the workout before this one to unlock it",

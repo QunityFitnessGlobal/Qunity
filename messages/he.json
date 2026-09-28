@@ -76,7 +76,7 @@
     "start": "התחל"
   },
   "colors": {
-    "badge": "צמיד {color}",
+    "badge": "שלב {color}",
     "white": "לבן",
     "orange": "כתום",
     "green": "ירוק",
@@ -149,7 +149,7 @@
     "startError": "שגיאה בהתחלת האימון",
     "finishError": "שגיאה בסיום האימון",
     "submitError": "שגיאה בשליחת השאלון",
-    "colorProgress": "צבע {color} · אימון {index} מתוך {total}",
+    "colorProgress": "שלב {color} · אימון {index} מתוך {total}",
     "recommended": "זמן מומלץ: {minutes} דקות · רמת קושי מומלצת: {difficulty}",
     "start": "התחל",
     "finish": "סיים",
@@ -172,12 +172,12 @@
     "hello": "שלום, {name}",
     "helloExclaim": "שלום, {name}!",
     "noChildDefined": "אין ילד מוגדר. לך להגדרות והוסף ילד.",
-    "workoutsInColor": "{count} מתוך {total} אימונים בצבע הנוכחי",
-    "workoutsInColorAndPoints": "{count} מתוך {total} אימונים · {points} נקודות עד הצבע הבא",
+    "workoutsInColor": "{count} מתוך {total} אימונים בשלב הנוכחי",
+    "workoutsInColorAndPoints": "{count} מתוך {total} אימונים · {points} נקודות עד השלב הבא",
     "totalPointsLine": "סה\"כ {points} נקודות",
     "stats": {
       "totalPoints": "סה\"כ נקודות",
-      "pointsInColor": "נקודות בצבע הנוכחי",
+      "pointsInColor": "נקודות בשלב הנוכחי",
       "totalWorkouts": "אימונים בסה\"כ",
       "totalActiveTime": "זמן פעילות כולל",
       "averageDifficulty": "קושי ממוצע מדווח",
@@ -294,7 +294,7 @@
     "settings": "הגדרות"
   },
   "journey": {
-    "belt": "צמיד נוכחי: {color}",
+    "belt": "שלב נוכחי: {color}",
     "progress": "{done} מתוך {total}",
     "empty": "אין עדיין אימונים במערכת.",
     "lockedHint": "סיימו קודם את האימון שלפני כדי לפתוח את זה",
