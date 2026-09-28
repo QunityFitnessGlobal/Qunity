@@ -38,10 +38,12 @@ export function evaluateProgression(
 }
 
 // Dashboard progress bar: since leveling up requires BOTH enough workouts AND
-// enough points (see evaluateProgression), showing whichever of the two is
-// further along would overstate progress. We average the two percentages
-// instead — a simple approach that stays honest about the slower-moving
-// requirement.
+// enough points (see evaluateProgression), the requirement that's actually
+// still blocking the level-up is whichever of the two is FURTHER BEHIND, not
+// their average — a workout-heavy child sitting at 100% workouts / 60% points
+// is genuinely only 60% of the way to leveling up, and an average (80%) would
+// overstate that. Taking the minimum keeps the bar from ever promising more
+// progress than the AND actually allows.
 export function calculateProgressPercent(
   pointsInColor: number,
   requiredPoints: number,
@@ -52,7 +54,7 @@ export function calculateProgressPercent(
   const workoutsPercent =
     requiredWorkouts > 0 ? Math.min(1, workoutsCompletedInColor / requiredWorkouts) : 1;
 
-  return Math.round(((pointsPercent + workoutsPercent) / 2) * 100);
+  return Math.round(Math.min(pointsPercent, workoutsPercent) * 100);
 }
 
 interface ChildRow {

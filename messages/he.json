@@ -158,7 +158,7 @@
     "setLabel": "סט",
     "setProgress": "{current} מתוך {total}",
     "resultPartial": "השלמת {percent}% מהאימון, ולכן קיבלת {percent}% מהנקודות.",
-    "resultBelowThreshold": "השלמת רק {percent}% מהאימון. מתחת ל-60% לא מקבלים נקודות.",
+    "resultBelowThreshold": "השלמת רק {percent}% מהאימון. מתחת ל-60% לא מקבלים נקודות, והתחנה הזו תחכה לך שוב באימון הבא.",
     "resultReplayPoints": "כל הכבוד על אימון נוסף! הנקודות נוספו לנקודות שכבר יש לך.",
     "resultReplayNoPoints": "כל הכבוד על אימון נוסף! ההתמדה שלך מחזקת אותך.",
     "replayBadge": "אימון חוזר",

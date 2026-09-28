@@ -120,7 +120,12 @@ export async function getWorkoutsCompletedThisMonth(
 export interface StartWorkoutSessionOptions {
   // Position within the workout's color (the journey map's local number).
   stationNumber: number;
-  // A repeat of an already-passed station: never advances color progress.
+  // Any attempt after the first at this exact station — whether an explicit
+  // replay of an already-passed one, or another try at a still-open one that
+  // fell short before. Recorded for the journey summary and shown to the
+  // child as "אימון חוזר" while training; completeWorkout independently
+  // re-derives whether THIS attempt can still advance color progress, rather
+  // than trusting this flag.
   isReplay: boolean;
 }
 
@@ -179,10 +184,14 @@ export interface WorkoutQuestionnaireAnswers {
 
 export interface CompleteWorkoutResult {
   pointsAwarded: number;
-  // Share of the planned time actually done (0-100) and whether this was a
-  // repeat of an already-passed station; the result screen explains the
-  // points with these.
+  // Share of the planned time actually done (0-100), used by the result
+  // screen to explain the points.
   completionPercent: number;
+  // True only when this station had ALREADY been passed before this attempt
+  // (an explicit replay from the map) — computed fresh from the DB inside
+  // completeWorkout, not from what the caller thought it was starting.
+  // A still-open station that just passed (or failed again) reads false, and
+  // gets the normal success / below-threshold messaging instead.
   isReplay: boolean;
   didLevelUp: boolean;
   newColor?: BraceletColor;
@@ -193,7 +202,9 @@ export interface CompleteWorkoutResult {
 // The best "paid" completion a station has had so far: sessions that passed
 // the threshold count at their percent, sessions below it count as 0 (they
 // earned nothing), and sessions from before completion_percent existed count
-// as 100. A replay only earns points for what it adds on top of this.
+// as 100. A repeat's points toward the color meter are capped by how much of
+// this the station hasn't already paid out — see the payable-percent split
+// in completeWorkout below.
 async function getPaidBestPercent(
   supabase: ReturnType<typeof createClient>,
   childId: string,
@@ -221,7 +232,6 @@ export async function completeWorkout(params: {
   sessionId: string;
   beltColor: BraceletColor;
   stationNumber: number;
-  isReplay: boolean;
   recommendedDifficulty: number;
   recommendedDurationMinutes: number;
   plannedDurationSeconds: number;
@@ -233,7 +243,6 @@ export async function completeWorkout(params: {
     sessionId,
     beltColor,
     stationNumber,
-    isReplay,
     recommendedDifficulty,
     recommendedDurationMinutes,
     plannedDurationSeconds,
@@ -261,8 +270,10 @@ export async function completeWorkout(params: {
     throw new Error(resultError.message);
   }
 
-  // Below the threshold the workout still counts as completed (and advances
-  // the color) — it just pays no points; the questionnaire is asked either way.
+  // The session is always marked "completed" (never left dangling as
+  // in_progress) and its percent recorded, regardless of whether it passed
+  // the threshold — the questionnaire is asked either way. Whether it also
+  // advances the color counter is decided just below.
   const { error: statusError } = await supabase
     .from("workout_sessions")
     .update({ status: "completed", completion_percent: completionPercent })
@@ -271,28 +282,42 @@ export async function completeWorkout(params: {
     throw new Error(statusError.message);
   }
 
+  // Whether this station was ALREADY credited toward the color before this
+  // very session is looked up fresh from the DB rather than trusted from the
+  // caller — a station only ever reaches "done" through a passing attempt
+  // (see below), so stationNumber <= the count already banked means this
+  // exact station has already unlocked the next one at some point, and
+  // nothing from this attempt can unlock it again. A station the child is
+  // still working on (never yet passed, however many tries it's taken)
+  // reads as NOT already done, so a passing attempt here always gets full,
+  // fresh credit — trying and failing first doesn't cost anything later.
+  const { data: childBefore } = await supabase
+    .from("children")
+    .select("workouts_completed_in_color")
+    .eq("id", childId)
+    .single<{ workouts_completed_in_color: number }>();
+  const workoutsCompletedBefore = childBefore?.workouts_completed_in_color ?? 0;
+  const stationAlreadyDone = stationNumber <= workoutsCompletedBefore;
+  // This is the attempt that actually unlocks the next station: the station
+  // wasn't done yet, and this attempt cleared the threshold.
+  const advancesColor = !stationAlreadyDone && passedThreshold;
+
   let isFirstWorkoutInColor = false;
-  if (isReplay) {
-    // A repeat is a real workout for the parent's totals, but never moves the
-    // color's progress counter.
-    const { error: incrementError } = await supabase.rpc("increment_child_total_workouts_only", {
+  if (advancesColor) {
+    isFirstWorkoutInColor = workoutsCompletedBefore === 0;
+    // Atomic increment via RPC — see points.service.ts for why this can't be a
+    // JS read-then-write.
+    const { error: incrementError } = await supabase.rpc("increment_child_workout_counts", {
       p_child_id: childId,
     });
     if (incrementError) {
       throw new Error(incrementError.message);
     }
   } else {
-    const { data: childBefore } = await supabase
-      .from("children")
-      .select("workouts_completed_in_color")
-      .eq("id", childId)
-      .single<{ workouts_completed_in_color: number }>();
-
-    isFirstWorkoutInColor = (childBefore?.workouts_completed_in_color ?? 0) === 0;
-
-    // Atomic increment via RPC — see points.service.ts for why this can't be a
-    // JS read-then-write.
-    const { error: incrementError } = await supabase.rpc("increment_child_workout_counts", {
+    // Still a real workout for the parent's totals, but it doesn't move the
+    // color's progress counter — either because this exact station already
+    // has, or because this attempt itself fell short of 60%.
+    const { error: incrementError } = await supabase.rpc("increment_child_total_workouts_only", {
       p_child_id: childId,
     });
     if (incrementError) {
@@ -308,21 +333,32 @@ export async function completeWorkout(params: {
     isFirstWorkoutInColor,
   });
 
-  // Regular workout: the completion percent of the full value. Replay: only
-  // the part above what the station has already paid out, so repeating an
-  // already-full station is free practice.
-  let payablePercent = passedThreshold ? completionPercent : 0;
-  if (isReplay && payablePercent > 0) {
-    const paidBest = await getPaidBestPercent(supabase, childId, beltColor, stationNumber, sessionId);
-    payablePercent = Math.max(0, payablePercent - paidBest);
-  }
-  const scaledBreakdown = scaleBreakdown(breakdown, payablePercent);
-  const pointsAwarded =
-    scaledBreakdown.length > 0
-      ? await awardPoints(childId, sessionId, scaledBreakdown, { countTowardColor: !isReplay })
-      : 0;
+  // Every attempt earns its own full value toward the child's total points —
+  // effort is effort, every time. But only the part that's NEW for this
+  // station counts toward the color meter, capped at the station's full
+  // value: a first pass at 70% banks 70 toward the color; a later repeat at
+  // 90% adds the 20-point difference to the color and the full 90 to the
+  // total; once a station has been paid out at 100%, further repeats add
+  // only to the total. Below the threshold, this attempt is worth 0 either
+  // way. getPaidBestPercent naturally returns 0 for a station that's only
+  // ever had failed attempts, so a first pass there banks its full value —
+  // failing first costs nothing.
+  const fullPercent = passedThreshold ? completionPercent : 0;
+  const paidBest = fullPercent > 0 ? await getPaidBestPercent(supabase, childId, beltColor, stationNumber, sessionId) : 0;
+  const colorPercent = Math.max(0, fullPercent - paidBest);
+  const totalOnlyPercent = fullPercent - colorPercent;
 
-  if (isReplay) {
+  const colorBreakdown = scaleBreakdown(breakdown, colorPercent);
+  const totalOnlyBreakdown = scaleBreakdown(breakdown, totalOnlyPercent);
+  let pointsAwarded = 0;
+  if (colorBreakdown.length > 0) {
+    pointsAwarded += await awardPoints(childId, sessionId, colorBreakdown, { countTowardColor: true });
+  }
+  if (totalOnlyBreakdown.length > 0) {
+    pointsAwarded += await awardPoints(childId, sessionId, totalOnlyBreakdown, { countTowardColor: false });
+  }
+
+  if (!advancesColor) {
     const newChallenges = await checkAndAwardChallenges(childId, {
       sessionId,
       parentTrainedTogether: answers.parentTrainedTogether,
@@ -331,7 +367,10 @@ export async function completeWorkout(params: {
     return {
       pointsAwarded,
       completionPercent,
-      isReplay,
+      // Only framed as a "repeat" on the result screen when the station was
+      // already done before — a still-open station that just now passed (or
+      // failed again) gets the normal success/below-threshold messaging.
+      isReplay: stationAlreadyDone,
       didLevelUp: false,
       newChallenges,
       unlockedChallenge: null,
@@ -357,7 +396,7 @@ export async function completeWorkout(params: {
   return {
     pointsAwarded,
     completionPercent,
-    isReplay,
+    isReplay: false,
     didLevelUp: progression.didLevelUp,
     newColor: progression.newColor,
     newChallenges,

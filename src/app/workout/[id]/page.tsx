@@ -7,7 +7,9 @@ import type { BraceletColor, Gender, Role, Workout } from "@/lib/types";
 
 interface WorkoutPageProps {
   params: Promise<{ id: string }>;
-  // ?replay=<station number> repeats an already-passed station from the map.
+  // ?replay=<station number> explicitly repeats an already-passed station
+  // from the map. A repeat of the child's own current (unfinished) station is
+  // detected automatically instead — see naturalStationNumber below.
   searchParams: Promise<{ replay?: string }>;
 }
 
@@ -72,11 +74,20 @@ export default async function WorkoutPage({ params, searchParams }: WorkoutPageP
     }>();
 
   const workoutColor = workout.color ?? child?.current_color ?? "white";
+  const naturalStationNumber = (child?.workouts_completed_in_color ?? 0) + 1;
 
-  // A replay is only allowed for stations the journey shows as done: any
-  // station of an earlier color, or one already completed in the current color.
+  // A repeat is either explicitly requested (?replay=<station>, tapping an
+  // already-passed station on the map) or detected automatically: the
+  // child's natural "current" station already has a completed attempt on
+  // record, meaning it fell short of 60% last time and this is another go at
+  // it (see completeWorkout's increment logic) — no explicit param needed for
+  // that case, since "Next workout" naturally lands back on the same station
+  // until it's passed.
   let replayStation: number | null = null;
   if (requestedReplay !== null) {
+    // Explicitly requested: only allowed for a station the journey shows as
+    // done — any station of an earlier color, or one already passed in the
+    // current color.
     const { data: levels } = await supabase.from("bracelet_levels").select("color, order_index");
     const orderByColor = new Map(
       ((levels ?? []) as { color: BraceletColor; order_index: number }[]).map((l) => [l.color, l.order_index]),
@@ -90,6 +101,17 @@ export default async function WorkoutPage({ params, searchParams }: WorkoutPageP
       redirect("/dashboard/journey");
     }
     replayStation = requestedReplay;
+  } else {
+    const { count } = await supabase
+      .from("workout_sessions")
+      .select("id, workouts!inner(color)", { count: "exact", head: true })
+      .eq("child_id", user.id)
+      .eq("status", "completed")
+      .eq("station_number", naturalStationNumber)
+      .eq("workouts.color", workoutColor);
+    if (count) {
+      replayStation = naturalStationNumber;
+    }
   }
 
   // A power is only revealed once: the reveal unlocks its "received power"
@@ -100,8 +122,7 @@ export default async function WorkoutPage({ params, searchParams }: WorkoutPageP
     .eq("child_id", user.id)
     .eq("challenge_id", `power_${workoutColor}`)
     .maybeSingle();
-  const showPowerReveal =
-    replayStation === null && (child?.workouts_completed_in_color ?? 0) === 0 && !powerRow;
+  const showPowerReveal = replayStation === null && naturalStationNumber === 1 && !powerRow;
 
   const exercises = await getWorkoutExercises(supabase, workout.id);
   const tColors = await getTranslations("colors");
@@ -111,7 +132,7 @@ export default async function WorkoutPage({ params, searchParams }: WorkoutPageP
       <WorkoutRunner
         childId={user.id}
         workout={workout}
-        workoutIndex={replayStation ?? (child?.workouts_completed_in_color ?? 0) + 1}
+        workoutIndex={replayStation ?? naturalStationNumber}
         replayStation={replayStation}
         showPowerReveal={showPowerReveal}
         requiredWorkouts={level?.required_workouts ?? 0}

@@ -1490,3 +1490,32 @@ on conflict (child_id, challenge_id) do nothing;
 
 -- The old single challenge is superseded (its child_challenges rows cascade).
 delete from public.challenges where id = 'color_starter';
+
+-- ============================================================================
+-- ADDED FOR LEADERBOARD ORDERING BY STAGE FIRST, POINTS AS TIE-BREAKER
+--
+-- Ranking is now (bracelet color order desc, total_points desc) instead of
+-- total_points alone: a child further along the color track always outranks
+-- one who is earlier, no matter how many points the earlier child has piled
+-- up (e.g. from repeating workouts) — points only break ties within the
+-- same color. Same signature/return shape as before, so no client change.
+-- ============================================================================
+
+create or replace function public.get_leaderboard(p_limit integer default 20)
+returns table (
+  id uuid,
+  nickname text,
+  current_color text,
+  total_points integer
+)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select c.id, c.nickname, c.current_color, c.total_points
+  from public.children c
+  join public.bracelet_levels bl on bl.color = c.current_color
+  order by bl.order_index desc, c.total_points desc
+  limit p_limit;
+$$;

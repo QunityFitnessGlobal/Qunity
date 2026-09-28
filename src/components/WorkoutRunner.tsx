@@ -272,7 +272,6 @@ export function WorkoutRunner({
         sessionId,
         beltColor: color,
         stationNumber: replayStation ?? workoutIndex,
-        isReplay: replayStation !== null,
         recommendedDifficulty: workout.recommended_difficulty ?? 1,
         recommendedDurationMinutes,
         plannedDurationSeconds,

@@ -11,7 +11,10 @@ interface JourneyStationProps {
   title: string;
   beltColor: BraceletColor;
   localNumber: number;
-  // Done but never reached the points threshold: half star instead of full.
+  // Done but never finished at 100%: half star instead of full. On a
+  // "current" station, means there's already an unfinished attempt on record
+  // (always below the 60% pass mark, or it would already be "done") — shown
+  // as a half star instead of the plain station number.
   partial?: boolean;
   // Called for "current" (start the workout) and "done" (open its summary).
   // Never called for "locked" — the component handles that tap itself.
@@ -77,6 +80,8 @@ export function JourneyStation({
           ) : (
             <StarIcon className="h-6 w-6 text-yellow-400" />
           )
+        ) : isCurrent && partial ? (
+          <HalfStarIcon className="h-6 w-6 text-yellow-400" />
         ) : (
           <span>{localNumber}</span>
         )}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evaluateProgression } from "@/services/progression.service";
+import { calculateProgressPercent, evaluateProgression } from "@/services/progression.service";
 
 const WHITE_LEVEL = { requiredWorkouts: 10, requiredPoints: 200 };
 
@@ -47,5 +47,21 @@ describe("evaluateProgression", () => {
     );
 
     expect(result).toEqual({ didLevelUp: false, nextColor: null });
+  });
+});
+
+describe("calculateProgressPercent", () => {
+  it("takes the slower-moving requirement, not the average", () => {
+    // 100% of workouts done but only 60% of points — the level-up is still
+    // blocked by points, so the bar must read 60, not the 80 an average gives.
+    expect(calculateProgressPercent(120, 200, 10, 10)).toBe(60);
+  });
+
+  it("is symmetric: a points-heavy, workout-light child also reads the lower one", () => {
+    expect(calculateProgressPercent(200, 200, 3, 10)).toBe(30);
+  });
+
+  it("reads 100 only once both requirements are actually met", () => {
+    expect(calculateProgressPercent(200, 200, 10, 10)).toBe(100);
   });
 });

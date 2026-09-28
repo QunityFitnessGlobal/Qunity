@@ -1,7 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { BraceletColor, JourneyStation } from "@/lib/types";
 import type { LocalizedText } from "@/lib/i18n-content";
-import { meetsCompletionThreshold } from "@/services/points.service";
 
 interface BraceletLevelRow {
   color: BraceletColor;
@@ -67,15 +66,20 @@ export async function getJourneyStations(
       .not("station_number", "is", null),
   ]);
 
-  // Per station (color + number): did any attempt reach the points threshold?
-  // Sessions from before completion_percent existed count as full.
-  const passedByStation = new Map<string, boolean>();
+  // Per station (color + number): the best completion percent across every
+  // attempt (replays included). Sessions from before completion_percent
+  // existed count as a full 100 (the original "completed = done" behavior).
+  // A "done" station below 100 gets a half star; a "current" station that
+  // already has an attempt on record (necessarily below the 60% pass mark,
+  // or it would already be "done") also gets a half star, to show the child
+  // they've tried this one and haven't finished it yet.
+  const bestPercentByStation = new Map<string, number>();
   for (const row of (attempts ?? []) as unknown as AttemptRow[]) {
     const color = Array.isArray(row.workouts) ? row.workouts[0]?.color : row.workouts?.color;
     if (!color || row.station_number == null) continue;
     const key = `${color}:${row.station_number}`;
-    const passed = row.completion_percent == null || meetsCompletionThreshold(row.completion_percent);
-    passedByStation.set(key, (passedByStation.get(key) ?? false) || passed);
+    const percent = row.completion_percent ?? 100;
+    bestPercentByStation.set(key, Math.max(bestPercentByStation.get(key) ?? 0, percent));
   }
 
   const levelRows = (levels ?? []) as BraceletLevelRow[];
@@ -111,6 +115,14 @@ export async function getJourneyStations(
           ? "current"
           : "locked";
 
+    const bestPercent = bestPercentByStation.get(`${beltColor}:${localNumber}`);
+    const partial =
+      state === "done"
+        ? (bestPercent ?? 100) < 100
+        : state === "current"
+          ? bestPercent !== undefined
+          : false;
+
     return {
       workoutId: workout.id,
       title: workout.title,
@@ -118,7 +130,7 @@ export async function getJourneyStations(
       localNumber,
       globalNumber: index + 1,
       state,
-      partial: state === "done" && passedByStation.get(`${beltColor}:${localNumber}`) === false,
+      partial,
     };
   });
 

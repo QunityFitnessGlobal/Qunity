@@ -158,7 +158,7 @@
     "setLabel": "Set",
     "setProgress": "{current} of {total}",
     "resultPartial": "You completed {percent}% of the workout, so you earned {percent}% of the points.",
-    "resultBelowThreshold": "You completed only {percent}% of the workout. Below 60% there are no points.",
+    "resultBelowThreshold": "You completed only {percent}% of the workout. Below 60% there are no points, and this station will be waiting for you again next time.",
     "resultReplayPoints": "Great job on another workout! The points were added to the points you already have.",
     "resultReplayNoPoints": "Great job on another workout! Your persistence is making you stronger.",
     "replayBadge": "Repeat workout",

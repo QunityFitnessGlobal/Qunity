@@ -93,8 +93,10 @@ export interface JourneyStation {
   localNumber: number;
   globalNumber: number;
   state: JourneyStationState;
-  // A done station whose every attempt stopped below the points threshold:
-  // shown as a half star (it can still be replayed to earn the full one).
+  // Shown as a half star instead of a full one: a "done" station whose best
+  // attempt never reached 100%, or a "current" station that already has an
+  // unfinished attempt on record (necessarily below the 60% pass mark, or it
+  // would already be "done").
   partial: boolean;
 }
 
