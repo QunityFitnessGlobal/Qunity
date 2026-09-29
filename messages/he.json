@@ -207,7 +207,8 @@
     "unlockedByPower": "נפתח בזכות {power}",
     "mysteryTitle": "אתגר מסתורי",
     "mysteryHint": "עדיין לא נפתח",
-    "lockedGroup": "נעולים · {count}"
+    "lockedGroup": "נעולים · {count}",
+    "revealedPointsLine": "+{points} נק' · נשמר באתגרים שבוצעו"
   },
   "challengeRunner": {
     "badge": "אתגר",

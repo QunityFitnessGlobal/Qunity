@@ -207,7 +207,8 @@
     "unlockedByPower": "Unlocked by {power}",
     "mysteryTitle": "Mystery challenge",
     "mysteryHint": "Not unlocked yet",
-    "lockedGroup": "Locked · {count}"
+    "lockedGroup": "Locked · {count}",
+    "revealedPointsLine": "+{points} pts · saved under Completed"
   },
   "challengeRunner": {
     "badge": "Challenge",

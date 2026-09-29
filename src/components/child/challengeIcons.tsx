@@ -2,7 +2,7 @@
 // FlameIcon/StarIcon/TrendingUpIcon from powerIcons.tsx and adds the two
 // missing shapes (parent_power, total_minutes_100) plus a stairs icon for
 // repeatable_workout challenges.
-import type { ComponentType, SVGProps } from "react";
+import type { SVGProps } from "react";
 import { FlameIcon, StarIcon, TrendingUpIcon } from "@/components/child/powerIcons";
 import type { ChallengeConditionType, ChallengeType } from "@/data/challenges.data";
 
@@ -31,25 +31,29 @@ export function StairsIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-const CONDITION_ICON: Partial<Record<ChallengeConditionType, ComponentType<SVGProps<SVGSVGElement>>>> = {
-  first_workout: StarIcon,
-  parent_power: HeartIcon,
-  streak_3: FlameIcon,
-  streak_5: FlameIcon,
-  total_minutes_100: ClockIcon,
-  color_finisher: TrendingUpIcon,
-};
+interface ChallengeIconProps extends SVGProps<SVGSVGElement> {
+  conditionType: ChallengeConditionType | null;
+  challengeType: ChallengeType;
+}
 
 // A repeatable challenge always gets the stairs icon; a condition challenge
-// is looked up by its conditionType, falling back to the generic star (this
-// also covers power_* challenges, which never actually reach this — they're
-// unlocked and completed before ever showing up as a pending/new entry).
-export function getChallengeIcon(
-  conditionType: ChallengeConditionType | null,
-  challengeType: ChallengeType,
-): ComponentType<SVGProps<SVGSVGElement>> {
+// goes by its conditionType, falling back to the generic star (which also
+// covers first_workout and the power_* challenges).
+export function ChallengeIcon({ conditionType, challengeType, ...props }: ChallengeIconProps) {
   if (challengeType === "repeatable_workout") {
-    return StairsIcon;
+    return <StairsIcon {...props} />;
   }
-  return (conditionType && CONDITION_ICON[conditionType]) || StarIcon;
+  switch (conditionType) {
+    case "parent_power":
+      return <HeartIcon {...props} />;
+    case "streak_3":
+    case "streak_5":
+      return <FlameIcon {...props} />;
+    case "total_minutes_100":
+      return <ClockIcon {...props} />;
+    case "color_finisher":
+      return <TrendingUpIcon {...props} />;
+    default:
+      return <StarIcon {...props} />;
+  }
 }

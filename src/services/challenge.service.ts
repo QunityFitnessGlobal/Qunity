@@ -238,6 +238,9 @@ export interface CompletedChallengeEntry {
   id: string;
   challengeId: string;
   title: LocalizedText;
+  description: LocalizedText | null;
+  challengeType: ChallengeType;
+  conditionType: ChallengeConditionType | null;
   completedAt: string | null;
   pointsAwarded: number | null;
   durationSeconds: number | null;
@@ -279,6 +282,9 @@ export async function getCompletedChallengeHistory(
         id: `unlock_${challengeId}`,
         challengeId,
         title: def?.title ?? { he: challengeId, en: challengeId },
+        description: def?.description ?? null,
+        challengeType: "condition" as const,
+        conditionType: def?.conditionType ?? null,
         completedAt: row.completed_at as string | null,
         pointsAwarded: def?.bonusPoints ?? null,
         durationSeconds: null,
@@ -292,6 +298,9 @@ export async function getCompletedChallengeHistory(
         id: row.id,
         challengeId: row.challenge_id,
         title: def?.title ?? { he: row.challenge_id, en: row.challenge_id },
+        description: def?.description ?? null,
+        challengeType: "repeatable_workout" as const,
+        conditionType: null,
         completedAt: row.end_time,
         pointsAwarded: row.points_awarded,
         durationSeconds: row.actual_duration_seconds,

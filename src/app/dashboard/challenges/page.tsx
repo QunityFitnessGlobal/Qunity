@@ -41,7 +41,7 @@ export default async function ChallengesPage({ searchParams }: ChallengesPagePro
     return (
       <div className="flex flex-1 flex-col items-center gap-4 px-4 py-16">
         <h1 className="font-display text-2xl font-bold">{t("myTitle")}</h1>
-        <ChallengesTabs completed={completed} pending={pending} canPerform />
+        <ChallengesTabs completed={completed} pending={pending} canPerform viewerId={user.id} />
       </div>
     );
   }
