@@ -14,6 +14,7 @@ import {
 } from "@/services/workout.service";
 import { Button } from "@/components/ui/Button";
 import { ChallengeUnlockedModal } from "@/components/child/ChallengeUnlockedModal";
+import { ChallengeRevealPopup } from "@/components/child/ChallengeRevealPopup";
 import { unlockPowerChallenge } from "@/services/challenge.service";
 import { calculateCompletionPercent, meetsCompletionThreshold } from "@/services/points.service";
 import type { ChallengeDefinition } from "@/data/challenges.data";
@@ -97,6 +98,11 @@ export function WorkoutRunner({
   const [feelingAfter, setFeelingAfter] = useState<FeelingCode>(FEELING_CODES[0]);
   const [nextWorkoutLoading, setNextWorkoutLoading] = useState(false);
   const [showChallengeModal, setShowChallengeModal] = useState(false);
+  // The mystery-box reveal popup for condition challenges earned by THIS
+  // workout (result.newChallenges) — shown once, over the result screen,
+  // then dismissed for good. A power challenge is never included here: its
+  // own reveal already happened on the power screen (handlePowerContinue).
+  const [revealDismissed, setRevealDismissed] = useState(false);
   // Finishing below the points threshold asks for confirmation first; the
   // timer stays paused while that question is open.
   const [stopConfirmOpen, setStopConfirmOpen] = useState(false);
@@ -364,6 +370,13 @@ export function WorkoutRunner({
             {t("finishSession")}
           </Button>
         </div>
+
+        {!revealDismissed && result.newChallenges.length > 0 && (
+          <ChallengeRevealPopup
+            challenges={result.newChallenges}
+            onDone={() => setRevealDismissed(true)}
+          />
+        )}
 
         {showChallengeModal && result.unlockedChallenge && result.newColor && (
           <ChallengeUnlockedModal

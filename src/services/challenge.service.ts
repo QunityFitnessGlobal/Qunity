@@ -314,11 +314,18 @@ export interface PendingChallengeEntry {
   challengeType: ChallengeType;
   completionCount: number;
   unlockColor: BraceletColor | null;
+  // False for any challenge not yet unlocked, of either kind — the UI shows
+  // these as an identical "mystery box" (MysteryBoxCard) instead of their
+  // real title, so a repeatable challenge tied to a future color is no
+  // longer simply absent from the list the way it used to be.
+  unlocked: boolean;
 }
 
 // Challenges "to do" tab: unlocked 'repeatable_workout' challenges (can be
-// started again any time) plus 'condition' challenges not yet achieved
-// (shown read-only, as a preview of what's still to unlock).
+// started again any time) plus every not-yet-unlocked challenge of either
+// kind, shown as a locked "mystery box" — a repeatable challenge used to be
+// invisible until unlocked while a condition one already showed its full
+// title while locked; both now get the same treatment either way.
 export async function getPendingChallenges(
   supabase: SupabaseClient,
   childId: string,
@@ -339,11 +346,11 @@ export async function getPendingChallenges(
   const unlockedRepeatable = challenges.filter(
     (c) => c.challengeType === "repeatable_workout" && unlockedIds.has(c.id),
   );
-  const notYetDoneCondition = challenges.filter(
-    (c) => c.challengeType === "condition" && !unlockedIds.has(c.id),
-  );
+  // Everything not yet unlocked, of either kind — grouped together as the
+  // locked section of the list, in the DB's own definition order.
+  const locked = challenges.filter((c) => !unlockedIds.has(c.id));
 
-  return [...unlockedRepeatable, ...notYetDoneCondition].map((c) => ({
+  return [...unlockedRepeatable, ...locked].map((c) => ({
     challengeId: c.id,
     title: c.title,
     description: c.description,
@@ -351,6 +358,7 @@ export async function getPendingChallenges(
     challengeType: c.challengeType,
     completionCount: completionCounts.get(c.id) ?? 0,
     unlockColor: c.unlockColor,
+    unlocked: unlockedIds.has(c.id),
   }));
 }
 

@@ -204,7 +204,10 @@
     "lockedHint": "עדיין לא הושג",
     "perCompletion": "+{points} לכל ביצוע",
     "doItAgain": "בצע שוב",
-    "unlockedByPower": "נפתח בזכות {power}"
+    "unlockedByPower": "נפתח בזכות {power}",
+    "mysteryTitle": "אתגר מסתורי",
+    "mysteryHint": "עדיין לא נפתח",
+    "lockedGroup": "נעולים · {count}"
   },
   "challengeRunner": {
     "badge": "אתגר",
@@ -355,5 +358,16 @@
     "save": "שמירה",
     "cancel": "ביטול",
     "preview": "השמע: {name}"
+  },
+  "challengeRevealPopup": {
+    "label": "אתגר חדש נפתח",
+    "titleLocked": "מה מסתתר בקופסה?",
+    "titleRevealed": "פתחת אתגר!",
+    "mysteryTitle": "אתגר מסתורי",
+    "mysteryHint": "עוד רגע תגלה מה בפנים",
+    "achievedBadge": "הושג!",
+    "pointsAdded": "+{points} נק' נוספו לחשבון שלך",
+    "progress": "{current} מתוך {total}",
+    "continue": "המשך"
   }
 }

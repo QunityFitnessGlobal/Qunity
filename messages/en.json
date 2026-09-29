@@ -204,7 +204,10 @@
     "lockedHint": "Not yet achieved",
     "perCompletion": "+{points} per completion",
     "doItAgain": "Do it again",
-    "unlockedByPower": "Unlocked by {power}"
+    "unlockedByPower": "Unlocked by {power}",
+    "mysteryTitle": "Mystery challenge",
+    "mysteryHint": "Not unlocked yet",
+    "lockedGroup": "Locked · {count}"
   },
   "challengeRunner": {
     "badge": "Challenge",
@@ -355,5 +358,16 @@
     "save": "Save",
     "cancel": "Cancel",
     "preview": "Play: {name}"
+  },
+  "challengeRevealPopup": {
+    "label": "New challenge unlocked",
+    "titleLocked": "What's hiding in the box?",
+    "titleRevealed": "Challenge unlocked!",
+    "mysteryTitle": "Mystery challenge",
+    "mysteryHint": "You're about to find out",
+    "achievedBadge": "Achieved!",
+    "pointsAdded": "+{points} points added to your account",
+    "progress": "{current} of {total}",
+    "continue": "Continue"
   }
 }

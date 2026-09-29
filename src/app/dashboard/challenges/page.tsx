@@ -40,7 +40,7 @@ export default async function ChallengesPage({ searchParams }: ChallengesPagePro
 
     return (
       <div className="flex flex-1 flex-col items-center gap-4 px-4 py-16">
-        <h1 className="text-2xl font-bold">{t("myTitle")}</h1>
+        <h1 className="font-display text-2xl font-bold">{t("myTitle")}</h1>
         <ChallengesTabs completed={completed} pending={pending} canPerform />
       </div>
     );
@@ -57,7 +57,7 @@ export default async function ChallengesPage({ searchParams }: ChallengesPagePro
 
   return (
     <div className="flex flex-1 flex-col items-center gap-4 px-4 py-16">
-      <h1 className="text-2xl font-bold">{t("completedTitle")}</h1>
+      <h1 className="font-display text-2xl font-bold">{t("completedTitle")}</h1>
 
       {linkedChildren.length === 0 && (
         <p className="text-zinc-600">{tDashboard("noChildDefined")}</p>
