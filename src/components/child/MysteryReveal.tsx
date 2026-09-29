@@ -111,6 +111,12 @@ export function MysteryReveal({
     onRevealedRef.current = onRevealed;
   }, [onRevealed]);
 
+  // Reduced motion shows the card open from the start; it still counts as
+  // revealed, so the caller can record it just like after the animation.
+  useEffect(() => {
+    if (!animate && !initiallyRevealed) onRevealedRef.current?.();
+  }, [animate, initiallyRevealed]);
+
   useEffect(() => {
     if (!animate) return;
     let cancelled = false;

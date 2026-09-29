@@ -244,6 +244,10 @@ export interface CompletedChallengeEntry {
   completedAt: string | null;
   pointsAwarded: number | null;
   durationSeconds: number | null;
+  // A one-time challenge whose mystery box the challenges screen hasn't
+  // opened yet (child_challenges.revealed_at is null) — it gets one
+  // automatic reveal there. Always false for repeatable attempts.
+  awaitingReveal: boolean;
 }
 
 interface ChallengeSessionRow {
@@ -263,7 +267,7 @@ export async function getCompletedChallengeHistory(
 ): Promise<CompletedChallengeEntry[]> {
   const [challenges, { data: unlockedRows }, { data: sessionRows }] = await Promise.all([
     getChallengeDefinitions(supabase),
-    supabase.from("child_challenges").select("challenge_id, completed_at").eq("child_id", childId),
+    supabase.from("child_challenges").select("challenge_id, completed_at, revealed_at").eq("child_id", childId),
     supabase
       .from("challenge_sessions")
       .select("id, challenge_id, points_awarded, actual_duration_seconds, end_time")
@@ -288,6 +292,7 @@ export async function getCompletedChallengeHistory(
         completedAt: row.completed_at as string | null,
         pointsAwarded: def?.bonusPoints ?? null,
         durationSeconds: null,
+        awaitingReveal: row.revealed_at == null,
       };
     });
 
@@ -304,6 +309,7 @@ export async function getCompletedChallengeHistory(
         completedAt: row.end_time,
         pointsAwarded: row.points_awarded,
         durationSeconds: row.actual_duration_seconds,
+        awaitingReveal: false,
       };
     },
   );
@@ -313,6 +319,18 @@ export async function getCompletedChallengeHistory(
     const bTime = b.completedAt ? new Date(b.completedAt).getTime() : 0;
     return bTime - aTime;
   });
+}
+
+// Called by the challenges screen only once a challenge's mystery box has
+// actually flipped open there — a child who leaves before it opens gets the
+// reveal again next time. A failed write just means one more replay.
+export async function markChallengeRevealed(childId: string, challengeId: string): Promise<void> {
+  const supabase = createClient();
+  await supabase
+    .from("child_challenges")
+    .update({ revealed_at: new Date().toISOString() })
+    .eq("child_id", childId)
+    .eq("challenge_id", challengeId);
 }
 
 export interface PendingChallengeEntry {

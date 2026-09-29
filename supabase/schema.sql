@@ -1519,3 +1519,22 @@ as $$
   order by bl.order_index desc, c.total_points desc
   limit p_limit;
 $$;
+
+-- ============================================================================
+-- ADDED FOR CHALLENGES-SCREEN REVEAL TRACKING
+--
+-- A one-time challenge is revealed twice: first in the popup on the workout
+-- result screen, then once more on the challenges screen, where its mystery
+-- box opens by itself on the child's next visit. revealed_at records that
+-- second reveal. Null means "not opened there yet". The app sets it only
+-- after the box has actually flipped open, through the existing
+-- child_challenges_update_own policy, so no new policy is needed.
+--
+-- Everything already earned before this change counts as revealed, so no
+-- child gets a flood of old boxes opening at once.
+-- ============================================================================
+
+alter table public.child_challenges add column revealed_at timestamptz;
+
+update public.child_challenges
+set revealed_at = coalesce(completed_at, now());

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { resolveLocalizedText } from "@/lib/i18n-content";
@@ -10,7 +10,11 @@ import { StarIcon } from "@/components/child/journeyIcons";
 import { MysteryBoxCard } from "@/components/child/MysteryBoxCard";
 import { MysteryReveal } from "@/components/child/MysteryReveal";
 import { ChallengeIcon } from "@/components/child/challengeIcons";
-import type { CompletedChallengeEntry, PendingChallengeEntry } from "@/services/challenge.service";
+import {
+  markChallengeRevealed,
+  type CompletedChallengeEntry,
+  type PendingChallengeEntry,
+} from "@/services/challenge.service";
 
 interface ChallengesTabsProps {
   completed: CompletedChallengeEntry[];
@@ -18,87 +22,25 @@ interface ChallengesTabsProps {
   // Only the child's own view can actually start a challenge — a parent
   // viewing a linked child's challenges sees the same lists read-only.
   canPerform?: boolean;
-  // The child whose own screen this is — scopes the per-device "last seen"
-  // marker, so siblings sharing a tablet don't clear each other's reveals.
+  // The child whose own screen this is. Only then are one-time challenges
+  // still awaiting their reveal opened here — and marked as revealed — so a
+  // parent looking at the same child never uses up the child's reveal.
   viewerId?: string;
 }
 
 type Tab = "done" | "todo";
 
-// Per-device marker of when this child last opened the challenges screen —
-// not synced anywhere, just a local convenience. Any one-time challenge
-// earned after it gets replayed once as an auto-opening mystery box, and
-// counted on the done-tab bubble.
-const SEEN_KEY_PREFIX = "qunity:challengesSeenAt:";
-// Placeholder for the server render and for "no marker available": nothing
-// counts as new. The server always renders with it, so hydration matches.
-const NEVER_SEEN = Number.MAX_SAFE_INTEGER;
-
-function subscribeNoop() {
-  return () => {};
-}
-
-function readSeenAtServer(): number {
-  return NEVER_SEEN;
-}
-
-// First-ever visit writes "now" as the baseline rather than reporting
-// "never", so a child's existing achievements don't all replay at once.
-function readSeenAt(key: string): number {
-  try {
-    const stored = window.localStorage.getItem(key);
-    if (stored !== null) return Number(stored);
-    const now = Date.now();
-    window.localStorage.setItem(key, String(now));
-    return now;
-  } catch {
-    return NEVER_SEEN;
-  }
-}
-
-function earnedSince(completed: CompletedChallengeEntry[], seenAt: number): CompletedChallengeEntry[] {
-  return completed
-    .filter((entry) => entry.challengeType === "condition" && entry.completedAt && new Date(entry.completedAt).getTime() > seenAt)
-    .reverse();
-}
-
-export function ChallengesTabs(props: ChallengesTabsProps) {
-  const storageKey = props.canPerform && props.viewerId ? `${SEEN_KEY_PREFIX}${props.viewerId}` : null;
-  const getSnapshot = useCallback(() => (storageKey ? readSeenAt(storageKey) : NEVER_SEEN), [storageKey]);
-  const seenAt = useSyncExternalStore(subscribeNoop, getSnapshot, readSeenAtServer);
-
-  // Remounts exactly once, right after hydration, when the real stored value
-  // replaces the server placeholder — the content then freezes that value
-  // for the rest of the visit, even after it writes a new marker below.
-  return (
-    <ChallengesTabsContent
-      key={seenAt === NEVER_SEEN ? "placeholder" : "stored"}
-      {...props}
-      seenAt={seenAt}
-      storageKey={storageKey}
-    />
-  );
-}
-
-interface ChallengesTabsContentProps extends ChallengesTabsProps {
-  seenAt: number;
-  storageKey: string | null;
-}
-
-function ChallengesTabsContent({
-  completed,
-  pending,
-  canPerform = false,
-  seenAt,
-  storageKey,
-}: ChallengesTabsContentProps) {
+export function ChallengesTabs({ completed, pending, canPerform = false, viewerId }: ChallengesTabsProps) {
   const t = useTranslations("challengesPage");
   const tPowers = useTranslations("powers");
   const locale = useLocale();
-  const [frozenSeenAt] = useState(seenAt);
-  const fresh = earnedSince(completed, frozenSeenAt);
+  // Taken once from the server data for this visit (oldest first), so a card
+  // stays on screen after its reveal is written back to the database.
+  const [fresh] = useState(() =>
+    canPerform && viewerId ? completed.filter((entry) => entry.awaitingReveal).reverse() : [],
+  );
   // Something to reveal → land on the to-do tab, where the boxes are.
-  const [tab, setTab] = useState<Tab>(() => (earnedSince(completed, seenAt).length > 0 ? "todo" : "done"));
+  const [tab, setTab] = useState<Tab>(fresh.length > 0 ? "todo" : "done");
   const [revealedIds, setRevealedIds] = useState<ReadonlySet<string>>(() => new Set());
   const [bubbleCleared, setBubbleCleared] = useState(false);
 
@@ -106,24 +48,14 @@ function ChallengesTabsContent({
   const locked = pending.filter((entry) => !entry.unlocked);
   const unseenCount = bubbleCleared ? 0 : fresh.length;
 
-  // Mark this visit as seen right away — the reveal set above is already
-  // frozen, so this only affects the next visit (no replay, no bubble).
-  useEffect(() => {
-    if (!storageKey || frozenSeenAt === NEVER_SEEN) return;
-    try {
-      window.localStorage.setItem(storageKey, String(Date.now()));
-    } catch {
-      // Nothing to persist if storage isn't available.
-    }
-  }, [storageKey, frozenSeenAt]);
-
   function handleDoneTabClick() {
     setTab("done");
     setBubbleCleared(true);
   }
 
-  function markRevealed(id: string) {
-    setRevealedIds((prev) => new Set(prev).add(id));
+  function markRevealed(entry: CompletedChallengeEntry) {
+    setRevealedIds((prev) => new Set(prev).add(entry.id));
+    if (viewerId) void markChallengeRevealed(viewerId, entry.challengeId);
   }
 
   return (
@@ -237,9 +169,10 @@ function ChallengesTabsContent({
             );
           })}
 
-          {/* One-time challenges earned since the last visit: shown as the
-              same mystery box and opened automatically, one after another.
-              They already live in the done tab too; this is the replay. */}
+          {/* One-time challenges this screen hasn't revealed yet: shown as
+              the same mystery box and opened automatically, one after
+              another. They already live in the done tab too; this is the
+              one-time replay. */}
           {fresh.map((entry, i) => (
             <div key={entry.id} className="pt-2">
               <MysteryReveal
@@ -248,7 +181,7 @@ function ChallengesTabsContent({
                 delayMs={700 + i * 1600}
                 size="sm"
                 initiallyRevealed={revealedIds.has(entry.id)}
-                onRevealed={() => markRevealed(entry.id)}
+                onRevealed={() => markRevealed(entry)}
               />
             </div>
           ))}
