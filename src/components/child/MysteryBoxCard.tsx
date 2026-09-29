@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { MysteryBoxContents } from "@/components/child/MysteryBoxContents";
 
 // A locked challenge, of either kind (condition or repeatable), shown as an
 // identical grey "mystery box" until it unlocks — see getPendingChallenges
@@ -25,23 +26,11 @@ export function MysteryBoxCard() {
       type="button"
       onClick={handleTap}
       aria-label={t("mysteryHint")}
-      className={`relative flex w-full items-center gap-3 overflow-hidden rounded-2xl border border-zinc-300/60 bg-gradient-to-br from-zinc-200 to-zinc-300 p-3 text-right shadow-[0_3px_0_theme(colors.zinc.400)] ${
+      className={`relative flex w-full items-center gap-3 overflow-hidden rounded-2xl border border-box-edge/40 bg-gradient-to-br from-box-a to-box-b p-3 text-right shadow-[0_3px_0_var(--color-box-edge)] transition-transform hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-[0_1px_0_var(--color-box-edge)] ${
         shaking ? "animate-journey-shake" : ""
       }`}
     >
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -translate-x-[120%] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-mystery-shine"
-      />
-      <span className="relative flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-gradient-to-br from-white to-zinc-200 shadow-[inset_0_-2px_0_theme(colors.zinc.400)]">
-        <span className="inline-block animate-mystery-bob font-bold text-zinc-500" style={{ fontSize: 28 }}>
-          ?
-        </span>
-      </span>
-      <span className="relative min-w-0 flex-1">
-        <span className="block text-sm font-semibold text-zinc-500">{t("mysteryTitle")}</span>
-        <span className="block text-xs text-zinc-400">{t("mysteryHint")}</span>
-      </span>
+      <MysteryBoxContents size="sm" />
     </button>
   );
 }

@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { resolveLocalizedText } from "@/lib/i18n-content";
 import { Button } from "@/components/ui/Button";
-import { StarIcon } from "@/components/child/journeyIcons";
+import { MysteryBoxContents } from "@/components/child/MysteryBoxContents";
+import { getChallengeIcon } from "@/components/child/challengeIcons";
 import type { ChallengeDefinition } from "@/data/challenges.data";
 
 interface ChallengeRevealPopupProps {
@@ -17,6 +18,7 @@ interface ChallengeRevealPopupProps {
 }
 
 const BURST_COLORS = ["var(--color-brand-purple)", "var(--color-reward-gold)"];
+const STAR_CLIP = "polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%)";
 
 function wait(ms: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -49,8 +51,10 @@ function burst(container: HTMLDivElement, origin: HTMLElement) {
 
   for (let k = 0; k < 18; k++) {
     const p = document.createElement("span");
-    const size = k % 3 === 0 ? 12 : 8;
-    p.style.cssText = `position:absolute;left:${cx - size / 2}px;top:${cy - size / 2}px;width:${size}px;height:${size}px;border-radius:2px;background:${BURST_COLORS[k % 2]};`;
+    const isStar = k % 3 === 0;
+    const size = isStar ? 14 : 8;
+    const shape = isStar ? `clip-path:${STAR_CLIP};border-radius:0;` : "border-radius:2px;";
+    p.style.cssText = `position:absolute;left:${cx - size / 2}px;top:${cy - size / 2}px;width:${size}px;height:${size}px;${shape}background:${BURST_COLORS[k % 2]};`;
     container.appendChild(p);
     const angle = (Math.PI * 2 * k) / 18 + Math.random() * 0.4;
     const dist = 60 + Math.random() * 70;
@@ -143,6 +147,14 @@ function RevealCard({ challenge, indexLabel, onContinue }: RevealCardProps) {
       [{ transform: "rotateY(-90deg) scale(1.05)" }, { transform: "rotateY(8deg) scale(1.02)", offset: 0.7 }, { transform: "rotateY(0) scale(1)" }],
       { duration: 500, easing: "ease-out" },
     );
+    // A gold ring that fades out from the card's own edge, echoing the burst.
+    card.animate(
+      [
+        { boxShadow: "0 0 0 0 var(--color-reward-gold)" },
+        { boxShadow: "0 0 0 8px transparent" },
+      ],
+      { duration: 900, delay: 250 },
+    );
     burst(fxRef.current, card);
   }, [reduceMotion, revealed]);
 
@@ -161,30 +173,21 @@ function RevealCard({ challenge, indexLabel, onContinue }: RevealCardProps) {
           {!revealed ? (
             <div
               key="mystery"
-              className="relative flex items-center gap-3 overflow-hidden rounded-2xl border border-zinc-300/60 bg-gradient-to-br from-zinc-200 to-zinc-300 p-4 text-right shadow-[0_3px_0_theme(colors.zinc.400)]"
+              className="relative flex items-center gap-3 overflow-hidden rounded-2xl border border-box-edge/40 bg-gradient-to-br from-box-a to-box-b p-4 text-right shadow-[0_3px_0_var(--color-box-edge)]"
             >
-              <span
-                aria-hidden
-                className="pointer-events-none absolute inset-0 -translate-x-[120%] bg-gradient-to-r from-transparent via-white/70 to-transparent animate-mystery-shine"
-              />
-              <span className="relative flex h-14 w-14 flex-none items-center justify-center rounded-xl bg-gradient-to-br from-white to-zinc-200 shadow-[inset_0_-2px_0_theme(colors.zinc.400)]">
-                <span className="inline-block animate-mystery-bob font-bold text-zinc-500" style={{ fontSize: 34 }}>
-                  ?
-                </span>
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold text-zinc-500">{t("mysteryTitle")}</span>
-                <span className="block text-xs text-zinc-400">{t("mysteryHint")}</span>
-              </span>
+              <MysteryBoxContents size="lg" />
             </div>
           ) : (
             <div key="card" className="relative rounded-2xl border border-zinc-200 bg-white p-4 text-right shadow-md">
-              <span className="absolute -top-2 inset-inline-start-3 rounded-full bg-reward-gold-soft px-2.5 py-0.5 text-xs font-bold text-reward-gold-ink shadow-sm">
+              <span className="absolute -top-2 start-3 animate-reveal-badge-pop rounded-full bg-reward-gold px-2.5 py-0.5 text-xs font-bold text-reward-gold-on shadow-sm">
                 {t("achievedBadge")}
               </span>
               <div className="flex items-start gap-3">
                 <span className="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-reward-gold-soft text-reward-gold-ink">
-                  <StarIcon className="h-6 w-6" />
+                  {(() => {
+                    const ChallengeIcon = getChallengeIcon(challenge.conditionType, challenge.challengeType);
+                    return <ChallengeIcon className="h-6 w-6" />;
+                  })()}
                 </span>
                 <div className="min-w-0 flex-1">
                   <h3 className="text-base font-bold">{resolveLocalizedText(challenge.title, locale)}</h3>
@@ -203,10 +206,19 @@ function RevealCard({ challenge, indexLabel, onContinue }: RevealCardProps) {
 
       {revealed && (
         <div className="mt-4 space-y-2">
-          {indexLabel && <p className="text-xs text-zinc-500">{indexLabel}</p>}
-          <Button className="w-full" onClick={onContinue}>
-            {t("continue")}
-          </Button>
+          {indexLabel && (
+            <p
+              className="text-xs text-zinc-500 animate-power-fade-up"
+              style={{ "--power-fade-delay": "0s" } as CSSProperties}
+            >
+              {indexLabel}
+            </p>
+          )}
+          <div className="animate-power-fade-up" style={{ "--power-fade-delay": "0.12s" } as CSSProperties}>
+            <Button className="w-full" onClick={onContinue}>
+              {t("continue")}
+            </Button>
+          </div>
         </div>
       )}
     </div>

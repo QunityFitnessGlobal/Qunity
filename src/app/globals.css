@@ -33,6 +33,20 @@
   --color-reward-gold: #ffc233;
   --color-reward-gold-soft: #fff4d3;
   --color-reward-gold-ink: #8a5d00;
+  /* Text color for content sitting directly on solid reward-gold (the
+     "הושג!" badge) — reward-gold-ink is tuned for the much lighter
+     reward-gold-soft background and reads too pale on the solid color. */
+  --color-reward-gold-on: #3a2800;
+
+  /* Mystery-box palette — a purple-tinted grey (not plain zinc) so the
+     locked "?" boxes read as part of the brand palette, matching the
+     mockup this was built from. Used by MysteryBoxContents. */
+  --color-box-a: #dcd9e5;
+  --color-box-b: #c7c3d3;
+  --color-box-edge: #aaa5b9;
+  --color-box-ink: #7d778e;
+  --color-box-tile-a: #f3f2f7;
+  --color-box-tile-b: #dedbe7;
 }
 
 :root {
@@ -128,4 +142,27 @@ body {
 }
 .animate-mystery-bob {
   animation: mystery-bob 2.6s ease-in-out infinite;
+}
+
+/* Small star-shaped sparkles scattered on a mystery box (MysteryBoxContents),
+   staggered via each element's own --twinkle-delay. */
+@keyframes mystery-twinkle {
+  0%, 70%, 100% { transform: scale(0) rotate(0); }
+  80% { transform: scale(1) rotate(45deg); }
+  90% { transform: scale(0.4) rotate(90deg); }
+}
+.animate-mystery-twinkle {
+  animation: mystery-twinkle 3.2s ease-in-out infinite;
+  animation-delay: var(--twinkle-delay, 0s);
+}
+
+/* ChallengeRevealPopup: the "הושג!" badge bounces in once the card lands. */
+@keyframes reveal-badge-pop {
+  0% { transform: scale(0) rotate(-20deg); }
+  70% { transform: scale(1.25) rotate(6deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+.animate-reveal-badge-pop {
+  animation: reveal-badge-pop 0.48s ease-out both;
+  animation-delay: 0.3s;
 }
