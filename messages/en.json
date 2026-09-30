@@ -190,7 +190,14 @@
     "comingSoon": "Coming soon!",
     "empty": "No data to show yet.",
     "you": "(you)",
-    "points": "{points} pts"
+    "points": "{points, number} pts",
+    "rank": "You're in place {rank}",
+    "weekPoints": "+{points, number} points this week",
+    "climbPoints1": "<b>{points, plural, one {1 more point} other {# more points}}</b> to the next place. Every workout brings you closer!",
+    "climbPoints2": "<b>{points, plural, one {1 more point} other {# more points}}</b> and you move up a place. You're on the right track!",
+    "climbPoints3": "<b>{points, plural, one {1 more point} other {# more points}}</b> to the next place. You're already stronger than yesterday!",
+    "climbStage": "Every workout brings you closer to the next stage, keep training hard",
+    "top": "You're at the top! Keep training hard"
   },
   "challengesPage": {
     "myTitle": "My challenges",

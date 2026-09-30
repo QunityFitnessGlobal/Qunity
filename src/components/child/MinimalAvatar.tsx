@@ -10,10 +10,8 @@ interface MinimalAvatarProps {
 // Minimal avatar MVP: a plain neutral circle (no illustrated character) with
 // a colored ring showing the current belt and a small corner badge showing
 // the belt's "power" icon (see src/lib/powers.ts) — same visual language as
-// PowerRevealScreen, just at everyday-dashboard scale. Placed wherever
-// ColorBadge used to sit (child's own dashboard home, parent's per-child
-// view of that dashboard); ColorBadge itself is unchanged and still used
-// for the leaderboard's small per-row badges.
+// PowerRevealScreen, just at everyday-dashboard scale. Shown on the child's
+// own dashboard home and on the parent's per-child view of it.
 export async function MinimalAvatar({ color }: MinimalAvatarProps) {
   const t = await getTranslations("colors");
   const Icon = POWER_ICON[color];

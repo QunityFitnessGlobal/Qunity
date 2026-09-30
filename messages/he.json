@@ -189,8 +189,15 @@
     "title": "טבלת מובילים",
     "comingSoon": "בקרוב!",
     "empty": "אין עדיין נתונים להצגה.",
-    "you": "(אתה)",
-    "points": "{points} נק'"
+    "you": "{gender, select, female {(את)} other {(אתה)}}",
+    "points": "{points, number} נק'",
+    "rank": "{gender, select, female {את במקום {rank}} other {אתה במקום {rank}}}",
+    "weekPoints": "+{points, number} נקודות השבוע",
+    "climbPoints1": "{gender, select, female {עוד <b>{points, plural, one {נקודה אחת} other {# נקודות}}</b> למקום הבא. כל אימון מקרב אותך!} other {עוד <b>{points, plural, one {נקודה אחת} other {# נקודות}}</b> למקום הבא. כל אימון מקרב אותך!}}",
+    "climbPoints2": "{gender, select, female {עוד <b>{points, plural, one {נקודה אחת} other {# נקודות}}</b> ואת עולה מקום. את בדרך הנכונה!} other {עוד <b>{points, plural, one {נקודה אחת} other {# נקודות}}</b> ואתה עולה מקום. אתה בדרך הנכונה!}}",
+    "climbPoints3": "{gender, select, female {עוד <b>{points, plural, one {נקודה אחת} other {# נקודות}}</b> למקום הבא. את כבר יותר חזקה מאתמול!} other {עוד <b>{points, plural, one {נקודה אחת} other {# נקודות}}</b> למקום הבא. אתה כבר יותר חזק מאתמול!}}",
+    "climbStage": "{gender, select, female {כל אימון מקרב אותך לשלב הבא, תמשיכי להתאמן חזק} other {כל אימון מקרב אותך לשלב הבא, תמשיך להתאמן חזק}}",
+    "top": "{gender, select, female {את בראש הטבלה! תמשיכי להתאמן חזק} other {אתה בראש הטבלה! תמשיך להתאמן חזק}}"
   },
   "challengesPage": {
     "myTitle": "האתגרים שלי",
