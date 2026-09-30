@@ -303,7 +303,7 @@
     "nextStage": "השלב הבא: {color}",
     "empty": "אין עדיין אימונים במערכת.",
     "lockedHint": "סיימו קודם את האימון שלפני כדי לפתוח את זה",
-    "youAreHere": "{gender, select, female {את כאן} male {אתה כאן} other {את/ה כאן}}",
+    "youAreHere": "{gender, select, female {את כאן} other {אתה כאן}}",
     "gateTitle": "השער לשלב ה{color}",
     "gateHint": "כוח חדש מחכה בפנים",
     "summary": {

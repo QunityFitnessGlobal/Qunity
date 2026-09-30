@@ -193,7 +193,7 @@ export function JourneyPath({ childId, gender, childInitial, items, contentHeigh
           >
             <div className="flex flex-col items-center gap-1 animate-journey-bob">
               <span className="whitespace-nowrap rounded-full bg-brand-purple px-2.5 py-0.5 text-xs font-bold text-white">
-                {t("youAreHere", { gender: gender ?? "other" })}
+                {t("youAreHere", { gender: gender ?? "male" })}
               </span>
               <span
                 className="relative flex h-10 w-10 items-center justify-center rounded-full border-[3px] bg-white font-display text-lg font-semibold text-zinc-700 shadow-md"
