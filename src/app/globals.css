@@ -77,9 +77,14 @@
  * haven't seen yet) turning into a visible sideways wobble on mobile —
  * without this, Android Chrome lets the page rubber-band sideways and
  * snap back, which can look like a repeating jitter when something else
- * on the page is animating continuously (e.g. the power glow-pulse). */
+ * on the page is animating continuously (e.g. the power glow-pulse).
+ * `clip`, not `hidden`: hidden turns html/body into scroll containers,
+ * which silently breaks every `position: sticky` (e.g. the journey page's
+ * header); clip cuts the overflow without that. `hidden` stays only as the
+ * fallback for browsers that don't know `clip`. */
 html {
   overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
@@ -87,6 +92,7 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* Locked journey-map station tap feedback (see JourneyStation.tsx). */
@@ -97,6 +103,55 @@ body {
 }
 .animate-journey-shake {
   animation: journey-shake 0.3s ease-in-out;
+}
+
+/* Journey map: the finished stretch of road draws itself in (a path with
+   pathLength="1"), the current workout pops in with a pulsing ring, the
+   "you are here" marker bobs, and the header's current segment breathes. */
+@keyframes journey-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes journey-pulse-ring {
+  0% { transform: scale(1); opacity: 0.55; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+@keyframes journey-pop {
+  0% { transform: scale(0.3); opacity: 0; }
+  70% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes journey-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes journey-seg-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.animate-journey-draw {
+  animation: journey-draw 1.4s ease-out 0.2s both;
+}
+.animate-journey-pulse-ring {
+  animation: journey-pulse-ring 1.8s ease-out infinite;
+}
+.animate-journey-pop {
+  animation: journey-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.animate-journey-bob {
+  animation: journey-bob 1.6s ease-in-out infinite;
+}
+.animate-journey-seg-pulse {
+  animation: journey-seg-pulse 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-journey-draw,
+  .animate-journey-pulse-ring,
+  .animate-journey-pop,
+  .animate-journey-bob,
+  .animate-journey-seg-pulse {
+    animation: none;
+  }
 }
 
 /* PowerRevealScreen: badge bounces in, then glows continuously; text lines

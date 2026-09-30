@@ -63,14 +63,25 @@ export function JourneyStation({
     ? { borderWidth: 3, borderStyle: "solid", borderColor: BRACELET_CSS_VAR[beltColor] }
     : {};
 
+  // Done workouts sit on a darker bottom edge, like a pressed-in game tile;
+  // the current one pops in on arrival (the pulsing ring is its sibling).
+  const depthClass = isDone ? "shadow-[0_3px_0_rgba(0,0,0,0.2)]" : "shadow-sm";
+  const arrivalClass = isCurrent ? "animate-journey-pop" : "";
+
   return (
     <div id={id} style={style} className="absolute flex flex-col items-center gap-1">
+      {isCurrent && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute left-0 top-0 h-16 w-16 rounded-full bg-brand-purple animate-journey-pulse-ring"
+        />
+      )}
       <button
         type="button"
         onClick={handleClick}
         aria-label={title}
         style={lockedBorderStyle}
-        className={`relative flex ${circleSize} items-center justify-center rounded-full font-bold text-zinc-800 shadow-sm transition-transform ${fillClass} ${emphasis} ${
+        className={`relative flex ${circleSize} items-center justify-center rounded-full font-bold text-zinc-800 transition-transform ${depthClass} ${fillClass} ${emphasis} ${arrivalClass} ${
           showLockedHint ? "animate-journey-shake" : ""
         }`}
       >

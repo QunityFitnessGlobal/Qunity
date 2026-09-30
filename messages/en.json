@@ -298,10 +298,14 @@
     "settings": "Settings"
   },
   "journey": {
-    "belt": "Current stage: {color}",
-    "progress": "{done} of {total}",
+    "stageTitle": "{color} stage · {power}",
+    "workoutProgress": "Workout {done} of {total}",
+    "nextStage": "Next stage: {color}",
     "empty": "No workouts in the system yet.",
     "lockedHint": "Finish the workout before this one to unlock it",
+    "youAreHere": "You are here",
+    "gateTitle": "Gate to the {color} stage",
+    "gateHint": "A new power waits inside",
     "summary": {
       "loading": "Loading...",
       "notFound": "No information found for this workout",

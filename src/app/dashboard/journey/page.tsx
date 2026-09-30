@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getJourneyStations } from "@/services/journey.service";
+import { COLOR_ORDER } from "@/services/progression.service";
+import { BRACELET_CSS_VAR } from "@/lib/colors";
 import { JourneyPath, type JourneyRenderItem } from "@/components/child/JourneyPath";
 import type { BraceletColor, Gender, Role } from "@/lib/types";
 
@@ -27,9 +29,9 @@ export default async function JourneyPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("role, gender")
+    .select("role, gender, full_name")
     .eq("id", user.id)
-    .single<{ role: Role; gender: Gender | null }>();
+    .single<{ role: Role; gender: Gender | null; full_name: string | null }>();
 
   if (profile?.role !== "child") {
     redirect("/dashboard");
@@ -45,15 +47,25 @@ export default async function JourneyPage() {
   const { stations } = await getJourneyStations(supabase, user.id);
   const t = await getTranslations("journey");
   const tColors = await getTranslations("colors");
+  const tPowers = await getTranslations("powers");
 
-  // Progress shown in the header is scoped to the current belt only (e.g.
-  // "1 of 10" for white), not the full 90-station total.
+  // Progress shown in the header is scoped to the current stage only (e.g.
+  // "workout 1 of 10" for white), not the full 90-workout total.
   const currentStation = stations.find((s) => s.state === "current");
-  const currentBeltStations = stations.filter(
-    (s) => s.beltColor === (currentStation?.beltColor ?? currentColor),
-  );
+  const stageColor = currentStation?.beltColor ?? currentColor;
+  const currentBeltStations = stations
+    .filter((s) => s.beltColor === stageColor)
+    .sort((a, b) => a.localNumber - b.localNumber);
   const beltProgress = currentStation?.localNumber ?? currentBeltStations.length;
   const beltTotal = currentBeltStations.length;
+  const nextStageColor = COLOR_ORDER[COLOR_ORDER.indexOf(stageColor) + 1] ?? null;
+  // Bracelet white would vanish on the white header; use its dark outline.
+  const stageFill = stageColor === "white" ? "var(--color-bracelet-white-outline)" : BRACELET_CSS_VAR[stageColor];
+
+  // A stage's power is revealed when its first workout starts, so its gate
+  // counts as open once that workout is done.
+  const powerRevealed = (color: BraceletColor) =>
+    stations.some((s) => s.beltColor === color && s.localNumber === 1 && s.state === "done");
 
   // Rendered top-to-bottom = descending global_number, so the highest
   // (future) stations sit at the top of the page (scrollY≈0) and the
@@ -67,7 +79,13 @@ export default async function JourneyPage() {
 
   descending.forEach((station, index) => {
     if (lastBeltColor !== null && station.beltColor !== lastBeltColor) {
-      items.push({ type: "marker", beltColor: lastBeltColor, top, left: PATH_WIDTH_PX / 2 });
+      items.push({
+        type: "marker",
+        beltColor: lastBeltColor,
+        gate: powerRevealed(lastBeltColor) ? "open" : "locked",
+        top,
+        left: PATH_WIDTH_PX / 2,
+      });
       top += STATION_SPACING_PX;
     }
     const left = PATH_WIDTH_PX / 2 + ZIGZAG_AMPLITUDE_PX * Math.sin(index * 0.9);
@@ -76,15 +94,51 @@ export default async function JourneyPage() {
     lastBeltColor = station.beltColor;
   });
 
+  // The closed gate nearest the child (lowest on the page) is the one they're
+  // heading for: it gets the live mystery-box treatment.
+  for (let i = items.length - 1; i >= 0; i--) {
+    const item = items[i];
+    if (item.type === "marker" && item.gate === "locked") {
+      items[i] = { ...item, gate: "next" };
+      break;
+    }
+  }
+
   const contentHeight = Math.max(top, STATION_SPACING_PX);
 
   return (
     <div className="flex flex-1 flex-col items-center">
-      <div className="sticky top-0 z-10 w-full max-w-sm bg-white/95 px-4 py-3 text-center shadow-sm backdrop-blur">
-        <p className="text-sm font-semibold text-text-muted">
-          {t("belt", { color: tColors(currentColor) })}
-        </p>
-        <p className="text-lg font-bold">{t("progress", { done: beltProgress, total: beltTotal })}</p>
+      <div className="sticky top-0 z-10 w-full max-w-sm bg-white/95 px-4 pb-3 pt-3.5 shadow-sm backdrop-blur">
+        <div className="flex items-baseline justify-between gap-3">
+          <h1 className="font-display text-lg font-bold">
+            {t("stageTitle", { color: tColors(stageColor), power: tPowers(`${stageColor}.name`) })}
+          </h1>
+          <p className="shrink-0 text-sm text-text-muted">
+            {t("workoutProgress", { done: beltProgress, total: beltTotal })}
+          </p>
+        </div>
+        {beltTotal > 0 && (
+          <div className="mt-2.5 flex items-center gap-1">
+            {currentBeltStations.map((s) => (
+              <span
+                key={s.workoutId}
+                aria-hidden
+                className={`h-2 flex-1 rounded-full ${s.state === "locked" ? "bg-zinc-200" : ""} ${
+                  s.state === "current" ? "animate-journey-seg-pulse" : ""
+                }`}
+                style={s.state === "locked" ? undefined : { backgroundColor: stageFill }}
+              />
+            ))}
+            {nextStageColor && (
+              <span
+                role="img"
+                aria-label={t("nextStage", { color: tColors(nextStageColor) })}
+                className="h-[18px] w-[18px] flex-none rounded-full border-[3px] bg-white"
+                style={{ borderColor: BRACELET_CSS_VAR[nextStageColor] }}
+              />
+            )}
+          </div>
+        )}
       </div>
 
       {stations.length === 0 ? (
@@ -93,6 +147,7 @@ export default async function JourneyPage() {
         <JourneyPath
           childId={user.id}
           gender={profile?.gender ?? null}
+          childInitial={profile?.full_name?.trim().charAt(0) || null}
           items={items}
           contentHeight={contentHeight}
           pathWidth={PATH_WIDTH_PX}
