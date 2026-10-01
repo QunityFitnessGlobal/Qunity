@@ -10,14 +10,13 @@ import { getChildStatsForParent } from "@/services/parent-stats.service";
 import { getRelevantTips, logShownTips } from "@/services/tips.service";
 import { formatDurationClock } from "@/lib/format";
 import { averageDifficultyLabelKey } from "@/lib/workout-labels";
-import { ChildCodeCard } from "@/components/ChildCodeCard";
 import { MinimalAvatar } from "@/components/child/MinimalAvatar";
 import { EnergyMeter } from "@/components/child/EnergyMeter";
-import { NextWorkoutCard } from "@/components/child/NextWorkoutCard";
-import { EncouragementBanner } from "@/components/child/EncouragementBanner";
 import { ChildSelector } from "@/components/parent/ChildSelector";
 import { StatsGrid } from "@/components/parent/StatsGrid";
 import { TipsPanel } from "@/components/parent/TipsPanel";
+import { ChildHomeView } from "@/components/child/ChildHomeView";
+import { getChildHomeStats } from "@/services/child-home.service";
 import type { BraceletColor, Gender, Role } from "@/lib/types";
 
 interface DashboardPageProps {
@@ -140,8 +139,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     );
   }
 
-  const t = await getTranslations("dashboard");
-
   const { data: child } = await supabase
     .from("children")
     .select(
@@ -173,9 +170,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     .eq("color", currentColor)
     .single<{ required_points: number; required_workouts: number }>();
 
-  const [nextWorkout, workoutsThisMonth] = await Promise.all([
+  const [nextWorkout, workoutsThisMonth, homeStats] = await Promise.all([
     getNextWorkout(supabase, user.id),
     getWorkoutsCompletedThisMonth(supabase, user.id),
+    getChildHomeStats(supabase, user.id, currentColor),
   ]);
 
   const requiredPoints = level?.required_points ?? 0;
@@ -208,33 +206,23 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         />
       </header>
 
-      <div className="flex w-full flex-col items-center gap-6 px-4">
-        {profile?.full_name && (
-          <p className="text-zinc-600">{t("helloExclaim", { name: profile.full_name })}</p>
-        )}
-
-        <MinimalAvatar color={currentColor} />
-
-        <div className="w-full max-w-sm space-y-2 text-center">
-          <p className="text-sm text-text-muted">
-            {t("workoutsInColorAndPoints", {
-              count: workoutsCompletedInColor,
-              total: requiredWorkouts,
-              points: pointsToNextColor,
-            })}
-          </p>
-          <EnergyMeter percent={progressPercent} color={currentColor} />
-        </div>
-
-        <p className="text-lg font-bold">
-          {t("totalPointsLine", { points: child?.total_points ?? 0 })}
-        </p>
-
-        <EncouragementBanner message={encouragementMessage} />
-
-        {showCodeInline && child?.child_code && <ChildCodeCard code={child.child_code} />}
-
-        <NextWorkoutCard nextWorkout={nextWorkout} />
+      <div className="flex w-full flex-col items-center px-4">
+        <ChildHomeView
+          name={profile?.full_name ?? null}
+          gender={profile?.gender ?? null}
+          color={currentColor}
+          totalPoints={child?.total_points ?? 0}
+          lastWorkoutPoints={homeStats.lastWorkoutPoints}
+          streakDays={homeStats.streakDays}
+          encouragement={encouragementMessage}
+          workoutsDone={workoutsCompletedInColor}
+          requiredWorkouts={requiredWorkouts}
+          pointsLeft={pointsToNextColor}
+          progressPercent={progressPercent}
+          powerRevealed={homeStats.powerRevealed}
+          nextWorkout={nextWorkout ? { id: nextWorkout.workout.id, number: nextWorkout.workoutIndex } : null}
+          childCode={showCodeInline ? (child?.child_code ?? null) : null}
+        />
       </div>
     </div>
   );

@@ -4,14 +4,16 @@ import { useTranslations } from "next-intl";
 import { POWER_REVEAL_THEME } from "@/lib/colors";
 import { POWER_ICON } from "@/lib/powers";
 import { Button } from "@/components/ui/Button";
-import type { BraceletColor } from "@/lib/types";
+import type { BraceletColor, Gender } from "@/lib/types";
 
 interface PowerRevealScreenProps {
   color: BraceletColor;
   onContinue: () => void;
+  // Picks the power sentence's girl or boy form; masculine when unknown.
+  gender?: Gender | null;
 }
 
-export function PowerRevealScreen({ color, onContinue }: PowerRevealScreenProps) {
+export function PowerRevealScreen({ color, onContinue, gender }: PowerRevealScreenProps) {
   const t = useTranslations("powers");
   const tColors = useTranslations("colors");
   const theme = POWER_REVEAL_THEME[color];
@@ -63,7 +65,7 @@ export function PowerRevealScreen({ color, onContinue }: PowerRevealScreenProps)
           {t(`${color}.code`)}
         </span>
         <p className="text-base italic" style={{ color: theme.heading }}>
-          “{t(`${color}.quote`)}”
+          “{t(`${color}.quote`, { gender: gender ?? "male" })}”
         </p>
       </div>
 

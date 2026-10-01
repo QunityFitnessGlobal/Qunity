@@ -3,9 +3,23 @@
     "description": "Qunity — your child's physical activity becomes a game"
   },
   "home": {
-    "tagline": "Your child's colorful journey to physical activity starts here.",
-    "login": "Log in",
-    "signup": "Sign up"
+    "greeting": "Hi {name}!",
+    "streak": "{count} days in a row",
+    "myPoints": "My points",
+    "lastWorkout": "from the last workout",
+    "stageTitle": "{color} stage",
+    "stageWorkouts": "{done} of {total} workouts",
+    "nextStage": "Next stage: {color}",
+    "targetNextStage": "to the {color} stage",
+    "targetFinishStage": "to finish the stage",
+    "remainingBoth": "{workouts, plural, one {1 more workout} other {# more workouts}} and {points, number} pts {target}",
+    "remainingWorkouts": "{workouts, plural, one {1 more workout} other {# more workouts}} {target}",
+    "remainingPoints": "{points, number} more pts {target}",
+    "powerLabel": "My power · {code}",
+    "nextMission": "Next mission",
+    "missionTitle": "Workout {number} of the {color} stage",
+    "missionPoints": "<num>+{points}</num> pts",
+    "go": "Let's go"
   },
   "auth": {
     "login": {
@@ -71,9 +85,7 @@
     "copied": "Copied!"
   },
   "nextWorkout": {
-    "none": "No workout available right now.",
-    "label": "Next workout - worth {points} points",
-    "start": "Start"
+    "none": "No workout available right now."
   },
   "colors": {
     "badge": "Stage {color}",
@@ -180,11 +192,8 @@
     "parentTitle": "Parent Dashboard",
     "childTitleComingSoon": "Child Dashboard — Coming Soon",
     "hello": "Hello, {name}",
-    "helloExclaim": "Hello, {name}!",
     "noChildDefined": "No child set up yet. Go to Settings and add a child.",
     "workoutsInColor": "{count} of {total} workouts in the current stage",
-    "workoutsInColorAndPoints": "{count} of {total} workouts · {points} points to the next stage",
-    "totalPointsLine": "Total {points} points",
     "stats": {
       "totalPoints": "Total points",
       "pointsInColor": "Points in current stage",

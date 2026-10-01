@@ -3,9 +3,23 @@
     "description": "Qunity — הפעילות הגופנית של הילד שלך הופכת למשחק"
   },
   "home": {
-    "tagline": "המסע הצבעוני של הילד שלך לפעילות גופנית מתחיל כאן.",
-    "login": "התחברות",
-    "signup": "הרשמה"
+    "greeting": "היי {name}!",
+    "streak": "{count} ימים ברצף",
+    "myPoints": "הנקודות שלי",
+    "lastWorkout": "מהאימון האחרון",
+    "stageTitle": "שלב {color}",
+    "stageWorkouts": "{done} מתוך {total} אימונים",
+    "nextStage": "השלב הבא: {color}",
+    "targetNextStage": "לשלב ה{color}",
+    "targetFinishStage": "לסיום השלב",
+    "remainingBoth": "עוד {workouts, plural, one {אימון אחד} other {# אימונים}} ו-{points, number} נק' {target}",
+    "remainingWorkouts": "עוד {workouts, plural, one {אימון אחד} other {# אימונים}} {target}",
+    "remainingPoints": "עוד {points, number} נק' {target}",
+    "powerLabel": "הכוח שלי · {code}",
+    "nextMission": "המשימה הבאה",
+    "missionTitle": "אימון {number} בשלב ה{color}",
+    "missionPoints": "<num>+{points}</num> נק'",
+    "go": "יוצאים לדרך"
   },
   "auth": {
     "login": {
@@ -71,9 +85,7 @@
     "copied": "הועתק!"
   },
   "nextWorkout": {
-    "none": "אין אימון זמין כרגע.",
-    "label": "האימון הבא - שווי {points} נקודות",
-    "start": "התחל"
+    "none": "אין אימון זמין כרגע."
   },
   "colors": {
     "badge": "שלב {color}",
@@ -180,11 +192,8 @@
     "parentTitle": "לוח הורה",
     "childTitleComingSoon": "Child Dashboard — Coming Soon",
     "hello": "שלום, {name}",
-    "helloExclaim": "שלום, {name}!",
     "noChildDefined": "אין ילד מוגדר. לך להגדרות והוסף ילד.",
     "workoutsInColor": "{count} מתוך {total} אימונים בשלב הנוכחי",
-    "workoutsInColorAndPoints": "{count} מתוך {total} אימונים · {points} נקודות עד השלב הבא",
-    "totalPointsLine": "סה\"כ {points} נקודות",
     "stats": {
       "totalPoints": "סה\"כ נקודות",
       "pointsInColor": "נקודות בשלב הנוכחי",
@@ -355,27 +364,27 @@
     "white": {
       "name": "כוח ההתחלה",
       "code": "GO NOW",
-      "quote": "אני מתחיל גם כשאני לא בטוח"
+      "quote": "{gender, select, female {אני מתחילה גם כשאני לא בטוחה} other {אני מתחיל גם כשאני לא בטוח}}"
     },
     "orange": {
       "name": "כוח ההתמדה",
       "code": "PUSH IT",
-      "quote": "אני ממשיך גם כשקשה"
+      "quote": "{gender, select, female {אני ממשיכה גם כשקשה} other {אני ממשיך גם כשקשה}}"
     },
     "green": {
       "name": "כוח האמונה בעצמי",
       "code": "YOU WIN",
-      "quote": "אני רואה כמה כבר הצלחתי"
+      "quote": "{gender, select, female {אני רואה כמה כבר הצלחתי} other {אני רואה כמה כבר הצלחתי}}"
     },
     "blue": {
       "name": "כוח הצמיחה",
       "code": "LEVEL UP",
-      "quote": "אני משתפר בכל פעם"
+      "quote": "{gender, select, female {אני משתפרת בכל פעם} other {אני משתפר בכל פעם}}"
     },
     "purple": {
       "name": "כוח ההוקרה",
       "code": "CELEBRATE",
-      "quote": "אני יודע לעצור ולשמוח בדרך שעשיתי"
+      "quote": "{gender, select, female {אני יודעת לעצור ולשמוח בדרך שעשיתי} other {אני יודע לעצור ולשמוח בדרך שעשיתי}}"
     }
   },
   "workoutSound": {

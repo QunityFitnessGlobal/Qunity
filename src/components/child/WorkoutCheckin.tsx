@@ -236,7 +236,7 @@ export function WorkoutCheckin({
         className={`block min-h-14 w-full rounded-2xl font-display text-lg font-semibold transition-[transform,box-shadow] ${
           answersLeft > 0
             ? "cursor-not-allowed bg-zinc-200 text-zinc-600"
-            : "animate-checkin-ready bg-green-600 text-white shadow-[0_4px_0_theme(colors.green.800)] hover:bg-green-700 active:translate-y-[3px] disabled:cursor-wait disabled:opacity-70"
+            : "animate-go-pulse bg-green-600 text-white shadow-[0_4px_0_theme(colors.green.800)] hover:bg-green-700 active:translate-y-[3px] disabled:cursor-wait disabled:opacity-70"
         }`}
       >
         {submitting ? tWorkout("submitting") : answersLeft > 0 ? t("answersLeft", { count: answersLeft }) : t("submit")}

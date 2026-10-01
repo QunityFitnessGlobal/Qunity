@@ -328,7 +328,7 @@ export function WorkoutRunner({
   }
 
   if (stage === "power-reveal") {
-    return <PowerRevealScreen color={color} onContinue={handlePowerContinue} />;
+    return <PowerRevealScreen color={color} onContinue={handlePowerContinue} gender={gender} />;
   }
 
   if (stage === "result" && result) {
