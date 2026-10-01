@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { ChallengeUnlockedModal } from "@/components/child/ChallengeUnlockedModal";
 import { ChallengeRevealPopup } from "@/components/child/ChallengeRevealPopup";
+import { WorkoutCelebration } from "@/components/child/WorkoutCelebration";
 import { unlockPowerChallenge } from "@/services/challenge.service";
 import { calculateCompletionPercent, meetsCompletionThreshold } from "@/services/points.service";
 import type { ChallengeDefinition } from "@/data/challenges.data";
@@ -321,54 +322,42 @@ export function WorkoutRunner({
       : result.newChallenges;
     return (
       <div className="w-full max-w-sm space-y-4 text-center">
-        <h1 className="text-2xl font-bold">{t("resultTitle")}</h1>
-        <p className="text-zinc-600">{t("pointsAwarded", { points: result.pointsAwarded })}</p>
-        <p className="text-sm text-zinc-500">
-          {result.isReplay
-            ? result.pointsAwarded > 0
-              ? t("resultReplayPoints", { percent: result.completionPercent })
-              : t("resultReplayNoPoints", { percent: result.completionPercent })
-            : result.completionPercent >= 100
-              ? null
-              : meetsCompletionThreshold(result.completionPercent)
-                ? t("resultPartial", { percent: result.completionPercent })
-                : t("resultBelowThreshold", { percent: result.completionPercent })}
-        </p>
+        <WorkoutCelebration
+          result={result}
+          challenges={announcedChallenges}
+          stageColor={color}
+          requiredWorkouts={requiredWorkouts}
+          feeling={feelingAfter}
+          gender={gender}
+        />
 
         {result.didLevelUp && result.newColor && (
-          <div className="rounded-lg bg-yellow-50 p-4 text-lg font-bold text-yellow-800">
+          <div className="rounded-2xl bg-reward-gold-soft p-4 text-lg font-bold text-reward-gold-ink">
             {t("leveledUp", { color: tColors(result.newColor) })}
           </div>
         )}
 
-        {announcedChallenges.length > 0 && (
-          <div className="space-y-2 rounded-lg bg-blue-50 p-4 text-right">
-            {announcedChallenges.map((challenge) => (
-              <p key={challenge.id} className="text-sm font-medium text-blue-800">
-                {t("challengeUnlocked", {
-                  title: resolveLocalizedText(challenge.title, locale),
-                  points: challenge.bonusPoints,
-                })}
-              </p>
-            ))}
-          </div>
-        )}
-
         <div className="space-y-2">
-          <Button className="w-full" disabled={nextWorkoutLoading} onClick={handleNextWorkout}>
+          <button
+            type="button"
+            disabled={nextWorkoutLoading}
+            onClick={handleNextWorkout}
+            className="block min-h-[52px] w-full rounded-2xl bg-green-600 font-display text-lg font-semibold text-white shadow-[0_4px_0_theme(colors.green.800)] transition-[transform,box-shadow] hover:bg-green-700 active:translate-y-[3px] active:shadow-[0_1px_0_theme(colors.green.800)] disabled:cursor-not-allowed disabled:opacity-60"
+          >
             {nextWorkoutLoading ? t("loading") : t("nextWorkout")}
-          </Button>
+          </button>
           {result.unlockedChallenge && result.newColor && (
             <Button className="w-full" onClick={() => setShowChallengeModal(true)}>
               {t("advanceToChallenge", { color: tColors(result.newColor) })}
             </Button>
           )}
-          <Button
-            className="w-full bg-zinc-700 hover:bg-zinc-800"
+          <button
+            type="button"
             onClick={() => router.push("/dashboard/journey")}
+            className="block min-h-12 w-full rounded-2xl border border-zinc-200 bg-white font-display text-base font-semibold text-zinc-800 hover:bg-zinc-50"
           >
             {t("finishSession")}
-          </Button>
+          </button>
         </div>
 
         {!revealDismissed && result.newChallenges.length > 0 && (

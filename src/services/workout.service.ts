@@ -193,6 +193,11 @@ export interface CompleteWorkoutResult {
   // A still-open station that just passed (or failed again) reads false, and
   // gets the normal success / below-threshold messaging instead.
   isReplay: boolean;
+  // Workouts done in the workout's stage after this attempt, and whether this
+  // attempt is what moved that count up — the result screen animates the
+  // stage bar from one to the other.
+  workoutsCompletedInColor: number;
+  advancedStage: boolean;
   didLevelUp: boolean;
   newColor?: BraceletColor;
   newChallenges: ChallengeDefinition[];
@@ -371,6 +376,8 @@ export async function completeWorkout(params: {
       // already done before — a still-open station that just now passed (or
       // failed again) gets the normal success/below-threshold messaging.
       isReplay: stationAlreadyDone,
+      workoutsCompletedInColor: workoutsCompletedBefore,
+      advancedStage: false,
       didLevelUp: false,
       newChallenges,
       unlockedChallenge: null,
@@ -397,6 +404,8 @@ export async function completeWorkout(params: {
     pointsAwarded,
     completionPercent,
     isReplay: false,
+    workoutsCompletedInColor: workoutsCompletedBefore + 1,
+    advancedStage: true,
     didLevelUp: progression.didLevelUp,
     newColor: progression.newColor,
     newChallenges,
