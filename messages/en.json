@@ -414,7 +414,8 @@
   "checkin": {
     "title": "How was it?",
     "subtitle": "3 quick questions, then your points",
-    "trainedFor": "You trained {duration}",
+    "trainedFor": "You trained {duration} minutes",
+    "trainedForSeconds": "You trained {seconds} seconds",
     "belowThreshold": "Great effort! {unit, select, seconds {{count} more seconds} minute {1 more minute} other {{count} more minutes}} and you'll earn points.",
     "aboveRecommended": "You trained {minutes, plural, one {1 minute} other {# minutes}} more than recommended, well done!",
     "completed": "You finished the workout, well done.",

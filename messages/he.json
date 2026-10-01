@@ -414,7 +414,8 @@
   "checkin": {
     "title": "איך היה?",
     "subtitle": "3 שאלות קצרות, ואז הנקודות שלך",
-    "trainedFor": "התאמנת {duration}",
+    "trainedFor": "התאמנת {duration} דקות",
+    "trainedForSeconds": "התאמנת {seconds} שניות",
     "belowThreshold": "כל הכבוד על המאמץ, {unit, select, seconds {נשארו לך עוד {count} שניות} minute {נשארה לך עוד דקה} other {נשארו לך עוד {count} דקות}} כדי לקבל נקודות.",
     "aboveRecommended": "התאמנת {minutes, plural, one {דקה אחת} other {# דקות}} יותר מהמומלץ, כל הכבוד!",
     "completed": "סיימת את האימון, כל הכבוד.",

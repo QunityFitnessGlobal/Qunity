@@ -2,7 +2,6 @@
 
 import { useState, type CSSProperties } from "react";
 import { useTranslations } from "next-intl";
-import { formatDurationClock } from "@/lib/format";
 import { calculateCompletionPercent, COMPLETION_THRESHOLD_PERCENT } from "@/services/points.service";
 import {
   DIFFICULTY_VALUES,
@@ -31,6 +30,14 @@ interface WorkoutCheckinProps {
   submitting: boolean;
   error: string | null;
   onSubmit: (answers: CheckinAnswers) => void;
+}
+
+// "8:00" rather than the clock's "08:00" — reads as a time to a child, and
+// is followed by the word "minutes" in the copy.
+function formatMinutesForKids(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = (totalSeconds % 60).toString().padStart(2, "0");
+  return `${minutes}:${seconds}`;
 }
 
 interface FaceLook {
@@ -93,7 +100,9 @@ export function WorkoutCheckin({
         </svg>
         <div className="flex flex-col">
           <span className="text-sm">
-            {t("trainedFor", { duration: formatDurationClock(actualDurationSeconds) })}
+            {actualDurationSeconds < 60
+              ? t("trainedForSeconds", { seconds: actualDurationSeconds })
+              : t("trainedFor", { duration: formatMinutesForKids(actualDurationSeconds) })}
           </span>
           <TimeFeedback
             actualSeconds={actualDurationSeconds}
