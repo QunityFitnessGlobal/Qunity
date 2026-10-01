@@ -71,9 +71,15 @@ interface BraceletLevelRow {
 // On level-up we reset points_in_color and workouts_completed_in_color to 0
 // rather than carrying over any surplus into the new color — simplest rule
 // for the MVP, see the Prompt 3/7 summary for the rationale.
-export async function checkColorProgression(
-  childId: string,
-): Promise<{ didLevelUp: boolean; newColor?: BraceletColor; completedColor?: BraceletColor }> {
+export async function checkColorProgression(childId: string): Promise<{
+  didLevelUp: boolean;
+  newColor?: BraceletColor;
+  completedColor?: BraceletColor;
+  // What the child banked in the finished stage, read just before the reset
+  // to 0 — shown on the level-up screen.
+  completedStagePoints?: number;
+  completedStageWorkouts?: number;
+}> {
   const supabase = createClient();
 
   const { data: child } = await supabase
@@ -133,5 +139,7 @@ export async function checkColorProgression(
     didLevelUp: result.didLevelUp,
     newColor: result.nextColor ?? undefined,
     completedColor: result.didLevelUp ? child.current_color : undefined,
+    completedStagePoints: result.didLevelUp ? child.points_in_color : undefined,
+    completedStageWorkouts: result.didLevelUp ? child.workouts_completed_in_color : undefined,
   };
 }

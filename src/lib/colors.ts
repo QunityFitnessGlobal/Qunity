@@ -110,3 +110,28 @@ export const POWER_REVEAL_THEME: Record<BraceletColor, PowerRevealTheme> = {
     buttonText: "#7A1D6E",
   },
 };
+
+// Full-screen stage level-up celebration (LevelUpScreen), keyed by the stage
+// being entered. Deeper than POWER_REVEAL_THEME's gradients on purpose: this
+// screen puts white headline and body text straight on the background, and
+// the lighter power-screen shades (e.g. #22C55E green) are too pale for that.
+// White is never a stage you level up INTO; it only has an entry so the
+// record covers every color.
+export interface LevelUpTheme {
+  gradientFrom: string;
+  gradientTo: string;
+  // Secondary text and chip text on the gradient.
+  muted: string;
+  // The disc in the middle of the ring.
+  badge: string;
+  // Text on the white continue button.
+  buttonText: string;
+}
+
+export const LEVEL_UP_THEME: Record<BraceletColor, LevelUpTheme> = {
+  white: { gradientFrom: "#3f3f46", gradientTo: "#18181b", muted: "#f4f4f5", badge: "#18181b", buttonText: "#18181b" },
+  orange: { gradientFrom: "#c2410c", gradientTo: "#7c2d12", muted: "#fff7ed", badge: "#7c2d12", buttonText: "#9a3412" },
+  green: { gradientFrom: "#15803d", gradientTo: "#14532d", muted: "#f0fdf4", badge: "#14532d", buttonText: "#15803d" },
+  blue: { gradientFrom: "#1d4ed8", gradientTo: "#1e3a8a", muted: "#eff6ff", badge: "#1e3a8a", buttonText: "#1d4ed8" },
+  purple: { gradientFrom: "#a32894", gradientTo: "#5c1553", muted: "#fdf4ff", badge: "#5c1553", buttonText: "#a32894" },
+};

@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/Button";
 import { ChallengeUnlockedModal } from "@/components/child/ChallengeUnlockedModal";
 import { ChallengeRevealPopup } from "@/components/child/ChallengeRevealPopup";
 import { WorkoutCelebration } from "@/components/child/WorkoutCelebration";
+import { LevelUpScreen } from "@/components/child/LevelUpScreen";
+import { readQaTools } from "@/lib/qa-tools";
 import { unlockPowerChallenge } from "@/services/challenge.service";
 import { calculateCompletionPercent, meetsCompletionThreshold } from "@/services/points.service";
 import type { ChallengeDefinition } from "@/data/challenges.data";
@@ -108,6 +110,12 @@ export function WorkoutRunner({
   // timer stays paused while that question is open.
   const [stopConfirmOpen, setStopConfirmOpen] = useState(false);
   const [powerChallenge, setPowerChallenge] = useState<ChallengeDefinition | null>(null);
+  // A level-up takes over the result screen once its stage bar has filled
+  // ("open"); the challenge popups wait until it's closed ("done").
+  const [levelUpPhase, setLevelUpPhase] = useState<"pending" | "open" | "done">("pending");
+  // TEMP testing shortcuts (Settings › "כלי בדיקה באימון"), read when the
+  // workout starts.
+  const [qaTools, setQaTools] = useState(false);
 
   const recommendedDurationMinutes = workout.recommended_duration_minutes ?? 0;
   const extraMinutes = Math.round(actualDurationSeconds / 60) - recommendedDurationMinutes;
@@ -184,6 +192,15 @@ export function WorkoutRunner({
 
   useEffect(() => () => stopWorkoutSound(), []);
 
+  // Let the result screen's star, points and stage bar play out first (the
+  // bar finishes filling at about 2.3s), then bring in the level-up screen.
+  const leveledUp = stage === "result" && result?.didLevelUp === true;
+  useEffect(() => {
+    if (!leveledUp || levelUpPhase !== "pending") return;
+    const timer = setTimeout(() => setLevelUpPhase("open"), 2600);
+    return () => clearTimeout(timer);
+  }, [leveledUp, levelUpPhase]);
+
   // Time ran out on its own — finish automatically using the full duration,
   // as opposed to a manual mid-workout "Finish" tap (see handleManualFinish).
   useEffect(() => {
@@ -204,6 +221,7 @@ export function WorkoutRunner({
         isReplay: replayStation !== null,
       });
       setSessionId(id);
+      setQaTools(readQaTools());
       setElapsedSeconds(0);
       setTimer(
         hasIntervalStructure
@@ -331,12 +349,6 @@ export function WorkoutRunner({
           gender={gender}
         />
 
-        {result.didLevelUp && result.newColor && (
-          <div className="rounded-2xl bg-reward-gold-soft p-4 text-lg font-bold text-reward-gold-ink">
-            {t("leveledUp", { color: tColors(result.newColor) })}
-          </div>
-        )}
-
         <div className="space-y-2">
           <button
             type="button"
@@ -360,7 +372,17 @@ export function WorkoutRunner({
           </button>
         </div>
 
-        {!revealDismissed && result.newChallenges.length > 0 && (
+        {levelUpPhase === "open" && result.completedStage && result.newColor && (
+          <LevelUpScreen
+            fromColor={result.completedStage.color}
+            toColor={result.newColor}
+            workouts={result.completedStage.workouts}
+            points={result.completedStage.points}
+            onContinue={() => setLevelUpPhase("done")}
+          />
+        )}
+
+        {!revealDismissed && result.newChallenges.length > 0 && (!result.didLevelUp || levelUpPhase === "done") && (
           <ChallengeRevealPopup
             challenges={result.newChallenges}
             onDone={() => setRevealDismissed(true)}
@@ -566,6 +588,29 @@ export function WorkoutRunner({
           <Button className="w-full" onClick={handleManualFinish}>
             {t("finish")}
           </Button>
+        </div>
+      )}
+
+      {/* TEMP — testing shortcut: finishes as if exactly that share of the
+          planned time was done, so the whole points/star/level-up path can
+          be checked without exercising. Only shown when switched on in
+          Settings on this device (lib/qa-tools.ts). */}
+      {stage === "running" && qaTools && (
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => finishSession(plannedDurationSeconds)}
+            className="flex-1 rounded-md border border-dashed border-zinc-400 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
+          >
+            {t("qaFinish100")}
+          </button>
+          <button
+            type="button"
+            onClick={() => finishSession(Math.round(plannedDurationSeconds * 0.7))}
+            className="flex-1 rounded-md border border-dashed border-zinc-400 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
+          >
+            {t("qaFinish70")}
+          </button>
         </div>
       )}
 

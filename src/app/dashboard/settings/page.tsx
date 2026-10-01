@@ -7,6 +7,8 @@ import { getLinkedChildren } from "@/services/linking.service";
 import { LogoutButton } from "@/components/LogoutButton";
 import { WorkoutSoundMenuItem } from "@/components/WorkoutSoundMenuItem";
 import { PowerPreviewTester } from "@/components/child/PowerPreviewTester";
+import { LevelUpPreviewTester } from "@/components/child/LevelUpPreviewTester";
+import { QaToolsToggle } from "@/components/child/QaToolsToggle";
 import { ReturnToParentButton } from "@/components/child/ReturnToParentButton";
 import { ParentPinMenuItem } from "@/components/parent/ParentPinMenuItem";
 import { ChildModeSwitcher } from "@/components/parent/ChildModeSwitcher";
@@ -58,6 +60,8 @@ export default async function SettingsPage() {
       {isChild && <WorkoutSoundMenuItem />}
 
       {isChild && <PowerPreviewTester />}
+      {isChild && <LevelUpPreviewTester />}
+      {isChild && <QaToolsToggle />}
       {isChild && <ReturnToParentButton />}
 
       {!isChild && (

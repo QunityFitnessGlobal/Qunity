@@ -117,7 +117,6 @@
   },
   "workout": {
     "resultTitle": "כל הכבוד!",
-    "leveledUp": "כל הכבוד! עברת לשלב ה{color}! 🎉",
     "advanceToChallenge": "התקדם לשלב ה{color}",
     "nextWorkout": "אימון הבא",
     "finishSession": "סיום",
@@ -173,7 +172,9 @@
     "empowerFine": "{gender, select, female {עוד אימון בכיס. צעד אחרי צעד, את מתחזקת.} other {עוד אימון בכיס. צעד אחרי צעד, אתה מתחזק.}}",
     "empowerFrustrated": "{gender, select, female {גם כשהיה מתסכל, לא ויתרת. זה אומץ אמיתי.} other {גם כשהיה מתסכל, לא ויתרת. זה אומץ אמיתי.}}",
     "empowerTired": "{gender, select, female {סימנת שאת עייפה. זה סימן שהגוף שלך עבד קשה, והוא נהיה חזק יותר.} other {סימנת שאתה עייף. זה סימן שהגוף שלך עבד קשה, והוא נהיה חזק יותר.}}",
-    "empowerExhausted": "{gender, select, female {סימנת שאת מותשת. נתת את כל מה שיש לך, ועכשיו מגיע לך לנוח.} other {סימנת שאתה מותש. נתת את כל מה שיש לך, ועכשיו מגיע לך לנוח.}}"
+    "empowerExhausted": "{gender, select, female {סימנת שאת מותשת. נתת את כל מה שיש לך, ועכשיו מגיע לך לנוח.} other {סימנת שאתה מותש. נתת את כל מה שיש לך, ועכשיו מגיע לך לנוח.}}",
+    "qaFinish100": "סיום מהיר 100% (TEMP)",
+    "qaFinish70": "סיום מהיר 70% (TEMP)"
   },
   "dashboard": {
     "parentTitle": "לוח הורה",
@@ -255,6 +256,15 @@
       "label": "תצוגה מקדימה של מסך כוח (TEMP)",
       "placeholder": "1-5",
       "button": "הצג"
+    },
+    "levelUpPreview": {
+      "label": "תצוגה מקדימה של מסך עליית שלב (TEMP)",
+      "placeholder": "2-5",
+      "button": "הצג"
+    },
+    "qaTools": {
+      "label": "כלי בדיקה באימון (TEMP)",
+      "hint": "מוסיף בזמן אימון כפתורים לסיום מהיר עם 100% או 70%. נשמר רק במכשיר הזה."
     }
   },
   "addChildDirect": {
@@ -390,5 +400,15 @@
     "pointsAdded": "+{points} נק' נוספו לחשבון שלך",
     "progress": "{current} מתוך {total}",
     "continue": "המשך"
+  },
+  "levelUp": {
+    "completed": "סיימת את השלב ה{color}",
+    "title": "עלית לשלב ה{color}!",
+    "ringLabel": "שלב",
+    "workouts": "{count, plural, one {אימון אחד} other {# אימונים}}",
+    "points": "{points, number} נק' בשלב",
+    "teaserTitle": "כוח חדש מחכה לך",
+    "teaserHint": "הוא ייחשף באימון הראשון בשלב ה{color}",
+    "continue": "יאללה ממשיכים!"
   }
 }

@@ -117,7 +117,6 @@
   },
   "workout": {
     "resultTitle": "Well done!",
-    "leveledUp": "Well done! You moved up to the {color} level! 🎉",
     "advanceToChallenge": "Advance to the {color} level",
     "nextWorkout": "Next workout",
     "finishSession": "Done",
@@ -173,7 +172,9 @@
     "empowerFine": "Another workout done. Step by step, you're getting stronger.",
     "empowerFrustrated": "Even when it was frustrating, you didn't give up. That's real courage.",
     "empowerTired": "You said you're tired. That means your body worked hard, and it's getting stronger.",
-    "empowerExhausted": "You said you're exhausted. You gave it everything, and now you've earned a rest."
+    "empowerExhausted": "You said you're exhausted. You gave it everything, and now you've earned a rest.",
+    "qaFinish100": "Quick finish 100% (TEMP)",
+    "qaFinish70": "Quick finish 70% (TEMP)"
   },
   "dashboard": {
     "parentTitle": "Parent Dashboard",
@@ -255,6 +256,15 @@
       "label": "Power screen preview (TEMP)",
       "placeholder": "1-5",
       "button": "Show"
+    },
+    "levelUpPreview": {
+      "label": "Stage level-up screen preview (TEMP)",
+      "placeholder": "2-5",
+      "button": "Show"
+    },
+    "qaTools": {
+      "label": "Workout test tools (TEMP)",
+      "hint": "Adds quick-finish buttons at 100% or 70% during a workout. Saved on this device only."
     }
   },
   "addChildDirect": {
@@ -390,5 +400,15 @@
     "pointsAdded": "+{points} points added to your account",
     "progress": "{current} of {total}",
     "continue": "Continue"
+  },
+  "levelUp": {
+    "completed": "You finished the {color} stage",
+    "title": "You reached the {color} stage!",
+    "ringLabel": "Stage",
+    "workouts": "{count, plural, one {1 workout} other {# workouts}}",
+    "points": "{points, number} pts in the stage",
+    "teaserTitle": "A new power is waiting for you",
+    "teaserHint": "It will be revealed in your first {color} stage workout",
+    "continue": "Let's keep going!"
   }
 }
