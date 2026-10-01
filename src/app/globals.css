@@ -215,6 +215,31 @@ body {
   animation: result-grow 1s cubic-bezier(0.2, 0.8, 0.3, 1) 1.3s both;
 }
 
+/* Post-workout check-in (WorkoutCheckin): a chosen answer pops and stays a
+   little larger, and the submit button pulses a green ring once all three
+   questions are answered. */
+@keyframes checkin-pick {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.18); }
+  100% { transform: scale(1.08); }
+}
+@keyframes checkin-ready {
+  0% { box-shadow: 0 4px 0 #166534, 0 0 0 0 rgba(22, 163, 74, 0.5); }
+  100% { box-shadow: 0 4px 0 #166534, 0 0 0 16px rgba(22, 163, 74, 0); }
+}
+.animate-checkin-pick {
+  animation: checkin-pick 0.35s ease-out both;
+}
+.animate-checkin-ready {
+  animation: checkin-ready 1.8s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-checkin-pick,
+  .animate-checkin-ready {
+    animation: none;
+  }
+}
+
 /* Stage level-up screen (LevelUpScreen): the finished stage's ring empties
    while the new one sweeps in (a 528px circumference), and confetti falls
    the full height of the screen, each piece with its own --spin. */

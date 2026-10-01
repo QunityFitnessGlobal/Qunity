@@ -410,5 +410,20 @@
     "teaserTitle": "כוח חדש מחכה לך",
     "teaserHint": "הוא ייחשף באימון הראשון בשלב ה{color}",
     "continue": "יאללה ממשיכים!"
+  },
+  "checkin": {
+    "title": "איך היה?",
+    "subtitle": "3 שאלות קצרות, ואז הנקודות שלך",
+    "trainedFor": "התאמנת {duration}",
+    "belowThreshold": "כל הכבוד על המאמץ, {unit, select, seconds {נשארו לך עוד {count} שניות} minute {נשארה לך עוד דקה} other {נשארו לך עוד {count} דקות}} כדי לקבל נקודות.",
+    "aboveRecommended": "התאמנת {minutes, plural, one {דקה אחת} other {# דקות}} יותר מהמומלץ, כל הכבוד!",
+    "completed": "סיימת את האימון, כל הכבוד.",
+    "difficultyQuestion": "כמה היה קשה?",
+    "togetherQuestion": "ההורה התאמן איתך?",
+    "togetherYes": "כן, ביחד!",
+    "togetherNo": "לא הפעם",
+    "feelingQuestion": "איך הרגשת בסוף האימון?",
+    "answersLeft": "{count, plural, one {עוד תשובה אחת} other {עוד # תשובות}}",
+    "submit": "שליחה ואיסוף הנקודות"
   }
 }

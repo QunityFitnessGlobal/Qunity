@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/Button";
 import { ChallengeUnlockedModal } from "@/components/child/ChallengeUnlockedModal";
 import { ChallengeRevealPopup } from "@/components/child/ChallengeRevealPopup";
 import { WorkoutCelebration } from "@/components/child/WorkoutCelebration";
+import { WorkoutCheckin, type CheckinAnswers } from "@/components/child/WorkoutCheckin";
 import { LevelUpScreen } from "@/components/child/LevelUpScreen";
 import { readQaTools } from "@/lib/qa-tools";
 import { unlockPowerChallenge } from "@/services/challenge.service";
@@ -30,14 +31,7 @@ import {
   unlockWorkoutAudio,
 } from "@/lib/workout-sounds";
 import { resolveLocalizedText } from "@/lib/i18n-content";
-import {
-  DIFFICULTY_VALUES,
-  DIFFICULTY_LABEL_KEYS,
-  FEELING_CODES,
-  FEELING_LABEL_KEYS,
-  FEELING_ICONS,
-  type FeelingCode,
-} from "@/lib/workout-labels";
+import { FEELING_CODES, type FeelingCode } from "@/lib/workout-labels";
 import type { BraceletColor, Gender, Workout } from "@/lib/types";
 
 interface WorkoutRunnerProps {
@@ -100,8 +94,8 @@ export function WorkoutRunner({
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<CompleteWorkoutResult | null>(null);
 
-  const [difficultyReported, setDifficultyReported] = useState("2");
-  const [parentTrainedTogether, setParentTrainedTogether] = useState("no");
+  // What the child picked in the check-in; only read on the result screen,
+  // which is reached after it's been set.
   const [feelingAfter, setFeelingAfter] = useState<FeelingCode>(FEELING_CODES[0]);
   const [nextWorkoutLoading, setNextWorkoutLoading] = useState(false);
   const [showChallengeModal, setShowChallengeModal] = useState(false);
@@ -122,7 +116,6 @@ export function WorkoutRunner({
   const [qaTools, setQaTools] = useState(false);
 
   const recommendedDurationMinutes = workout.recommended_duration_minutes ?? 0;
-  const extraMinutes = Math.round(actualDurationSeconds / 60) - recommendedDurationMinutes;
 
   // Which exercise corresponds to "right now": set 1 before starting, then
   // cycling through the workout's exercise list as timer.currentSet
@@ -291,10 +284,11 @@ export function WorkoutRunner({
     finishSession(manualFinishSeconds());
   }
 
-  async function handleSubmitQuestionnaire() {
+  async function handleSubmitQuestionnaire(answers: CheckinAnswers) {
     if (!sessionId) return;
     setError(null);
     setSubmitting(true);
+    setFeelingAfter(answers.feeling);
     try {
       const outcome = await completeWorkout({
         childId,
@@ -305,11 +299,12 @@ export function WorkoutRunner({
         recommendedDurationMinutes,
         plannedDurationSeconds,
         actualDurationSeconds,
+        hasIntervalTimer: hasIntervalStructure,
         answers: {
           activityReported: "",
-          difficultyReported: Number(difficultyReported),
-          parentTrainedTogether: parentTrainedTogether === "yes",
-          feelingAfter,
+          difficultyReported: answers.difficulty,
+          parentTrainedTogether: answers.trainedTogether,
+          feelingAfter: answers.feeling,
         },
       });
       setResult(outcome);
@@ -407,72 +402,16 @@ export function WorkoutRunner({
 
   if (stage === "questionnaire") {
     return (
-      <div className="w-full max-w-sm space-y-4">
-        <h1 className="text-center text-2xl font-bold">{t("questionnaireTitle")}</h1>
-
-        <div className="rounded-md bg-zinc-50 p-3 text-sm text-zinc-700">
-          <p>
-            {t("actualDurationLabel", { duration: formatDurationClock(actualDurationSeconds) })}
-          </p>
-          {extraMinutes > 0 && (
-            <p className="mt-1 font-medium text-green-700">
-              {t("trainedLongerPraise", { minutes: extraMinutes })}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-zinc-700">
-            {t("difficultyLabel")}
-          </label>
-          <select
-            value={difficultyReported}
-            onChange={(e) => setDifficultyReported(e.target.value)}
-            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-          >
-            {DIFFICULTY_VALUES.map((n) => (
-              <option key={n} value={n}>
-                {t(DIFFICULTY_LABEL_KEYS[n])}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-zinc-700">
-            {t("parentTogetherLabel")}
-          </label>
-          <select
-            value={parentTrainedTogether}
-            onChange={(e) => setParentTrainedTogether(e.target.value)}
-            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-          >
-            <option value="no">{t("no")}</option>
-            <option value="yes">{t("yes")}</option>
-          </select>
-        </div>
-
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-zinc-700">{t("feelingLabel")}</label>
-          <select
-            value={feelingAfter}
-            onChange={(e) => setFeelingAfter(e.target.value as FeelingCode)}
-            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-          >
-            {FEELING_CODES.map((code) => (
-              <option key={code} value={code}>
-                {FEELING_ICONS[code]} {t(FEELING_LABEL_KEYS[code], { gender: gender ?? "male" })}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {error && <p className="text-sm text-red-600">{error}</p>}
-
-        <Button className="w-full" disabled={submitting} onClick={handleSubmitQuestionnaire}>
-          {submitting ? t("submitting") : t("submit")}
-        </Button>
-      </div>
+      <WorkoutCheckin
+        actualDurationSeconds={actualDurationSeconds}
+        plannedDurationSeconds={plannedDurationSeconds}
+        hasIntervalTimer={hasIntervalStructure}
+        recommendedDurationMinutes={recommendedDurationMinutes}
+        gender={gender}
+        submitting={submitting}
+        error={error}
+        onSubmit={handleSubmitQuestionnaire}
+      />
     );
   }
 

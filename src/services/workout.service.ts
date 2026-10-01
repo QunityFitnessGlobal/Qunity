@@ -244,6 +244,10 @@ export async function completeWorkout(params: {
   recommendedDurationMinutes: number;
   plannedDurationSeconds: number;
   actualDurationSeconds: number;
+  // True for the stage's fixed work/rest timer, which stops by itself — a
+  // child can't go past it, so there's no "trained longer" bonus there;
+  // points scale with the share of it done instead.
+  hasIntervalTimer: boolean;
   answers: WorkoutQuestionnaireAnswers;
 }): Promise<CompleteWorkoutResult> {
   const {
@@ -255,13 +259,15 @@ export async function completeWorkout(params: {
     recommendedDurationMinutes,
     plannedDurationSeconds,
     actualDurationSeconds,
+    hasIntervalTimer,
     answers,
   } = params;
   const supabase = createClient();
 
   const actualDurationMinutes = Math.round(actualDurationSeconds / 60);
   // Derived from the timer rather than asked, so it can't be misreported.
-  const trainedLonger = actualDurationMinutes > recommendedDurationMinutes;
+  // Only the open-ended count-up clock can run past the recommended time.
+  const trainedLonger = !hasIntervalTimer && actualDurationMinutes > recommendedDurationMinutes;
   const completionPercent = calculateCompletionPercent(actualDurationSeconds, plannedDurationSeconds);
   const passedThreshold = meetsCompletionThreshold(completionPercent);
 

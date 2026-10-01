@@ -410,5 +410,20 @@
     "teaserTitle": "A new power is waiting for you",
     "teaserHint": "It will be revealed in your first {color} stage workout",
     "continue": "Let's keep going!"
+  },
+  "checkin": {
+    "title": "How was it?",
+    "subtitle": "3 quick questions, then your points",
+    "trainedFor": "You trained {duration}",
+    "belowThreshold": "Great effort! {unit, select, seconds {{count} more seconds} minute {1 more minute} other {{count} more minutes}} and you'll earn points.",
+    "aboveRecommended": "You trained {minutes, plural, one {1 minute} other {# minutes}} more than recommended, well done!",
+    "completed": "You finished the workout, well done.",
+    "difficultyQuestion": "How hard was it?",
+    "togetherQuestion": "Did your parent train with you?",
+    "togetherYes": "Yes, together!",
+    "togetherNo": "Not this time",
+    "feelingQuestion": "How did you feel at the end?",
+    "answersLeft": "{count, plural, one {1 more answer} other {# more answers}}",
+    "submit": "Send and collect points"
   }
 }
