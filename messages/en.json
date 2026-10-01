@@ -330,7 +330,8 @@
     "challenges": "Challenges",
     "workouts": "Workouts",
     "empowerment": "Empowerment",
-    "settings": "Settings"
+    "settings": "Settings",
+    "newChallenges": "{count, plural, one {One new challenge is waiting} other {# new challenges are waiting}}"
   },
   "journey": {
     "stageTitle": "{color} stage · {power}",

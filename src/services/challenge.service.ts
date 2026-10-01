@@ -389,6 +389,29 @@ export async function getPendingChallenges(
   }));
 }
 
+// The count on the Challenges tab: what's waiting for the child there — an
+// unlocked repeatable challenge they haven't done even once, plus a one-time
+// challenge they earned whose mystery box hasn't been opened yet.
+export async function getNewChallengesCount(supabase: SupabaseClient, childId: string): Promise<number> {
+  const [{ data: challengeRows }, { data: unlockedRows }, { data: sessionRows }] = await Promise.all([
+    supabase.from("challenges").select("id, challenge_type"),
+    supabase.from("child_challenges").select("challenge_id, revealed_at").eq("child_id", childId),
+    supabase.from("challenge_sessions").select("challenge_id").eq("child_id", childId).eq("status", "completed"),
+  ]);
+
+  const typeById = new Map((challengeRows ?? []).map((row) => [row.id as string, row.challenge_type as ChallengeType]));
+  const doneIds = new Set((sessionRows ?? []).map((row) => row.challenge_id as string));
+
+  return (unlockedRows ?? []).filter((row) => {
+    const id = row.challenge_id as string;
+    const type = typeById.get(id);
+    if (type === "repeatable_workout") {
+      return !doneIds.has(id);
+    }
+    return type === "condition" && row.revealed_at == null;
+  }).length;
+}
+
 export interface CompleteChallengeAnswers {
   difficultyReported: number;
   parentTrainedTogether: boolean;
