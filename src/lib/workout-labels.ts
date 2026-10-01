@@ -1,6 +1,6 @@
 // Shared between the end-of-workout questionnaire (WorkoutRunner) and every
 // screen that displays a past session's answers (WorkoutSummaryModal,
-// RecentWorkoutsList), so the ordinal<->word and code<->label mappings only
+// WorkoutHistoryView), so the ordinal<->word and code<->label mappings only
 // live in one place.
 
 // difficulty_reported: 1-4 ordinal (קליל/בינוני/מאתגר/קשה מאוד). The

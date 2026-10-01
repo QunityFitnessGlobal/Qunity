@@ -379,3 +379,30 @@ body {
   animation: reveal-badge-pop 0.48s ease-out both;
   animation-delay: 0.3s;
 }
+
+/* Parent workouts screen (WorkoutHistoryView): each completion ring draws
+   from empty to its own --ring-off, and rows and faces arrive staggered by
+   --history-delay. */
+@keyframes history-ring-in {
+  from { stroke-dashoffset: 113.1; }
+  to { stroke-dashoffset: var(--ring-off); }
+}
+@keyframes history-face-pop {
+  0% { transform: scale(0.3); opacity: 0; }
+  70% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-history-ring-in {
+  animation: history-ring-in 0.9s ease-out both;
+  animation-delay: var(--history-delay, 0s);
+}
+.animate-history-face-pop {
+  animation: history-face-pop 0.4s ease-out both;
+  animation-delay: var(--history-delay, 0s);
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-history-ring-in,
+  .animate-history-face-pop {
+    animation: none;
+  }
+}

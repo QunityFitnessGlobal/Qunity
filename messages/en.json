@@ -3,6 +3,9 @@
     "description": "Qunity — your child's physical activity becomes a game"
   },
   "home": {
+    "tagline": "Your child's colorful journey to physical activity starts here.",
+    "login": "Log in",
+    "signup": "Sign up",
     "greeting": "Hi {name}!",
     "streak": "{count} days in a row",
     "myPoints": "My points",
@@ -100,16 +103,6 @@
     "low": "Already {count} workouts this month - great start, keep it up!",
     "mid": "Wow, {count} workouts this month! You are in great shape 🔥",
     "high": "{count} workouts this month - you are a real champion! 🏆"
-  },
-  "recentWorkouts": {
-    "empty": "No workouts completed yet.",
-    "date": "Date",
-    "workout": "Workout",
-    "duration": "Duration",
-    "difficulty": "Difficulty",
-    "unknownWorkout": "Workout",
-    "completion": "Completed",
-    "replay": "repeat"
   },
   "tips": {
     "heading": "Tips for parents",
@@ -248,6 +241,20 @@
     "body": "You finished the {color} level. Ready to try it?",
     "doNow": "Do it now",
     "postpone": "Do it later"
+  },
+  "workoutHistory": {
+    "feelingsHeading": "How {name} felt over the last two weeks",
+    "smilesSummary": "{smiles} of {total} workouts ended with a smile",
+    "groups": {
+      "thisWeek": "This week",
+      "lastWeek": "Last week",
+      "earlier": "Earlier"
+    },
+    "workoutTitle": "Workout {number} in the {color} stage",
+    "unknownWorkout": "Workout",
+    "replay": "Replay",
+    "together": "You trained together",
+    "empty": "No completed workouts yet."
   },
   "recentWorkoutsPage": {
     "title": "Recent workouts"

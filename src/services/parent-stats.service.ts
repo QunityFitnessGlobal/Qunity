@@ -2,19 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { calculateProgressPercent } from "@/services/progression.service";
 import { meetsCompletionThreshold } from "@/services/points.service";
 import { getCompletedChallengeHistory, type CompletedChallengeEntry } from "@/services/challenge.service";
-import type { LocalizedText } from "@/lib/i18n-content";
 import type { BraceletColor } from "@/lib/types";
-
-export interface RecentWorkoutEntry {
-  sessionId: string;
-  workoutTitle: LocalizedText | null;
-  date: string;
-  durationSeconds: number | null;
-  difficultyReported: number | null;
-  // Share of the planned time done; null for sessions from before it was tracked.
-  completionPercent: number | null;
-  isReplay: boolean;
-}
 
 export type { CompletedChallengeEntry };
 
@@ -34,7 +22,6 @@ export interface ParentChildStats {
   parentTogetherCount: number;
   progressPercent: number;
   completedChallenges: CompletedChallengeEntry[];
-  recentWorkouts: RecentWorkoutEntry[];
 }
 
 interface ChildRow {
@@ -46,8 +33,6 @@ interface ChildRow {
   total_workouts_completed: number;
 }
 
-const RECENT_WORKOUTS_LIMIT = 20;
-
 interface SessionAggregateRow {
   id: string;
   start_time: string;
@@ -56,27 +41,10 @@ interface SessionAggregateRow {
   completion_percent: number | null;
 }
 
-interface RecentSessionRow {
-  id: string;
-  start_time: string;
-  actual_duration_seconds: number | null;
-  completion_percent: number | null;
-  is_replay: boolean;
-  workouts: { title: LocalizedText } | { title: LocalizedText }[] | null;
-}
-
 interface ResultRow {
   session_id: string;
   difficulty_reported: number | null;
   parent_trained_together: boolean;
-}
-
-// Returns null when the workout relation is missing so the UI can supply a
-// translated fallback (see RecentWorkoutsList.tsx) instead of this service
-// embedding display text.
-function workoutTitle(workouts: RecentSessionRow["workouts"]): LocalizedText | null {
-  if (!workouts) return null;
-  return Array.isArray(workouts) ? (workouts[0]?.title ?? null) : workouts.title;
 }
 
 // Accepts either the browser or server Supabase client (see linking.service.ts).
@@ -122,7 +90,6 @@ export async function getChildStatsForParent(
     : { data: [] as ResultRow[] };
 
   const resultRows = (results ?? []) as ResultRow[];
-  const resultsBySession = new Map(resultRows.map((r) => [r.session_id, r]));
 
   const totalActiveSeconds = allSessionRows.reduce(
     (sum, s) => sum + (typeof s.actual_duration_seconds === "number" ? s.actual_duration_seconds : 0),
@@ -145,28 +112,6 @@ export async function getChildStatsForParent(
       s.completion_percent !== null &&
       !meetsCompletionThreshold(s.completion_percent),
   ).length;
-
-  // Bounded query for the "recent workouts" list — the DB applies the limit,
-  // rather than fetching everything and slicing it in JS.
-  const { data: recentSessions } = await supabase
-    .from("workout_sessions")
-    .select("id, start_time, actual_duration_seconds, completion_percent, is_replay, workouts(title)")
-    .eq("child_id", childId)
-    .eq("status", "completed")
-    .order("start_time", { ascending: false })
-    .limit(RECENT_WORKOUTS_LIMIT);
-
-  const recentWorkouts: RecentWorkoutEntry[] = ((recentSessions ?? []) as RecentSessionRow[]).map(
-    (s) => ({
-      sessionId: s.id,
-      workoutTitle: workoutTitle(s.workouts),
-      date: s.start_time,
-      durationSeconds: s.actual_duration_seconds,
-      difficultyReported: resultsBySession.get(s.id)?.difficulty_reported ?? null,
-      completionPercent: s.completion_percent,
-      isReplay: s.is_replay,
-    }),
-  );
 
   const completedChallenges = await getCompletedChallengeHistory(supabase, childId);
 
@@ -193,6 +138,5 @@ export async function getChildStatsForParent(
       requiredWorkouts,
     ),
     completedChallenges,
-    recentWorkouts,
   };
 }

@@ -3,6 +3,9 @@
     "description": "Qunity — הפעילות הגופנית של הילד שלך הופכת למשחק"
   },
   "home": {
+    "tagline": "המסע הצבעוני של הילד שלך לפעילות גופנית מתחיל כאן.",
+    "login": "התחברות",
+    "signup": "הרשמה",
     "greeting": "היי {name}!",
     "streak": "{count} ימים ברצף",
     "myPoints": "הנקודות שלי",
@@ -100,16 +103,6 @@
     "low": "{gender, select, female {{count, plural, one {כבר אימון אחד החודש} other {כבר # אימונים החודש}} - התחלה מצוינת, תמשיכי כך!} other {{count, plural, one {כבר אימון אחד החודש} other {כבר # אימונים החודש}} - התחלה מצוינת, תמשיך כך!}}",
     "mid": "{gender, select, female {וואו, {count} אימונים החודש! את בכושר מעולה 🔥} other {וואו, {count} אימונים החודש! אתה בכושר מעולה 🔥}}",
     "high": "{gender, select, female {{count} אימונים החודש - את ממש אלופה! 🏆} other {{count} אימונים החודש - אתה ממש אלוף! 🏆}}"
-  },
-  "recentWorkouts": {
-    "empty": "עדיין אין אימונים שהושלמו.",
-    "date": "תאריך",
-    "workout": "אימון",
-    "duration": "משך",
-    "difficulty": "קושי",
-    "unknownWorkout": "אימון",
-    "completion": "השלמה",
-    "replay": "חוזר"
   },
   "tips": {
     "heading": "טיפים להורה",
@@ -248,6 +241,20 @@
     "body": "סיימת את השלב ה{color}. מוכן לנסות?",
     "doNow": "בצע עכשיו",
     "postpone": "דחה לפעם אחרת"
+  },
+  "workoutHistory": {
+    "feelingsHeading": "{gender, select, female {איך {name} הרגישה בשבועיים האחרונים} other {איך {name} הרגיש בשבועיים האחרונים}}",
+    "smilesSummary": "{smiles} מתוך {total} אימונים הסתיימו בחיוך",
+    "groups": {
+      "thisWeek": "השבוע",
+      "lastWeek": "שבוע שעבר",
+      "earlier": "מוקדם יותר"
+    },
+    "workoutTitle": "אימון {number} בשלב ה{color}",
+    "unknownWorkout": "אימון",
+    "replay": "חזרה",
+    "together": "התאמנתם ביחד",
+    "empty": "עדיין אין אימונים שהושלמו."
   },
   "recentWorkoutsPage": {
     "title": "אימונים אחרונים"

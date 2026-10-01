@@ -20,19 +20,21 @@ export function resolveLocalizedText(value: LocalizedText | null | undefined, lo
 // parent_tip_rules.tip_text) written with grammatically correct Hebrew
 // phrasing per gender instead of a slash-form ("הילד/ה"). Plain strings
 // without gender syntax pass through IntlMessageFormat unchanged, so this
-// is safe to use even for content that hasn't been converted yet.
+// is safe to use even for content that hasn't been converted yet. `values`
+// fills any other placeholders, e.g. {name} in the workouts-screen tips.
 export function resolveGenderedText(
   value: LocalizedText | null | undefined,
   locale: string,
   gender: Gender | null,
+  values?: Record<string, string>,
 ): string {
   const raw = resolveLocalizedText(value, locale);
-  if (!raw.includes("{gender")) {
+  if (!raw.includes("{gender") && !values) {
     return raw;
   }
   try {
     const formatter = new IntlMessageFormat(raw, locale);
-    return String(formatter.format({ gender: gender ?? "other" }));
+    return String(formatter.format({ ...values, gender: gender ?? "other" }));
   } catch {
     return raw;
   }
