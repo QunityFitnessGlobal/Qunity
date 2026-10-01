@@ -200,9 +200,9 @@ export interface CompleteWorkoutResult {
   advancedStage: boolean;
   didLevelUp: boolean;
   newColor?: BraceletColor;
-  // Set only on a level-up: what the finished stage added up to, for the
-  // level-up screen.
-  completedStage?: { color: BraceletColor; points: number; workouts: number };
+  // Set only on a level-up: what the stage just entered asks for, shown on
+  // the level-up screen.
+  nextStage?: { workouts: number; points: number };
   newChallenges: ChallengeDefinition[];
   unlockedChallenge: ChallengeDefinition | null;
 }
@@ -411,14 +411,12 @@ export async function completeWorkout(params: {
     advancedStage: true,
     didLevelUp: progression.didLevelUp,
     newColor: progression.newColor,
-    completedStage:
-      progression.didLevelUp && progression.completedColor
-        ? {
-            color: progression.completedColor,
-            points: progression.completedStagePoints ?? 0,
-            workouts: progression.completedStageWorkouts ?? 0,
-          }
-        : undefined,
+    nextStage: progression.nextStageRequirement
+      ? {
+          workouts: progression.nextStageRequirement.requiredWorkouts,
+          points: progression.nextStageRequirement.requiredPoints,
+        }
+      : undefined,
     newChallenges,
     unlockedChallenge,
   };

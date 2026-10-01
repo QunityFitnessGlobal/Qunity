@@ -6,15 +6,18 @@ import { COLOR_ORDER } from "@/services/progression.service";
 import { LevelUpScreen } from "@/components/child/LevelUpScreen";
 import type { BraceletColor } from "@/lib/types";
 
-// Sample totals for the finished stage — the preview is display-only, so it
-// shows the screen with stand-in numbers rather than the child's real ones.
-const PREVIEW_WORKOUTS = 8;
-const PREVIEW_POINTS = 420;
+export type StageRequirements = Partial<Record<BraceletColor, { workouts: number; points: number }>>;
+
+interface LevelUpPreviewTesterProps {
+  // Each stage's real requirements (bracelet_levels), so the preview shows
+  // the same numbers a real level-up into that stage would.
+  stages: StageRequirements;
+}
 
 // TEMP — display-only preview so the LevelUpScreen can be checked for every
 // stage transition without actually finishing a stage. Never writes to the
 // DB. Remove once the real level-up flow has been verified end to end.
-export function LevelUpPreviewTester() {
+export function LevelUpPreviewTester({ stages }: LevelUpPreviewTesterProps) {
   const t = useTranslations("settings");
   const [stageInput, setStageInput] = useState("2");
   const [preview, setPreview] = useState<{ from: BraceletColor; to: BraceletColor } | null>(null);
@@ -54,8 +57,8 @@ export function LevelUpPreviewTester() {
         <LevelUpScreen
           fromColor={preview.from}
           toColor={preview.to}
-          workouts={PREVIEW_WORKOUTS}
-          points={PREVIEW_POINTS}
+          workouts={stages[preview.to]?.workouts ?? 0}
+          points={stages[preview.to]?.points ?? 0}
           onContinue={() => setPreview(null)}
         />
       )}

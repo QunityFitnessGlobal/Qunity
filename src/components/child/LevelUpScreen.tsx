@@ -9,7 +9,8 @@ interface LevelUpScreenProps {
   // The stage just finished and the one just entered.
   fromColor: BraceletColor;
   toColor: BraceletColor;
-  // What the finished stage added up to.
+  // What the stage just entered asks for (bracelet_levels), shown under its
+  // ring.
   workouts: number;
   points: number;
   onContinue: () => void;
@@ -117,7 +118,7 @@ export function LevelUpScreen({ fromColor, toColor, workouts, points, onContinue
           </svg>
           <div
             className="animate-power-badge-pop absolute inset-[34px] flex flex-col items-center justify-center rounded-full shadow-[inset_0_0_0_4px_rgba(255,255,255,0.25)]"
-            style={{ backgroundColor: theme.badge, animationDelay: "1.6s" }}
+            style={{ backgroundColor: theme.badge, animationDelay: "3.2s" }}
           >
             <span className="text-[13px]" style={{ color: theme.muted }}>
               {t("ringLabel")}
@@ -128,7 +129,7 @@ export function LevelUpScreen({ fromColor, toColor, workouts, points, onContinue
 
         <div
           className="animate-power-fade-up flex flex-wrap justify-center gap-2"
-          style={{ ["--power-fade-delay" as string]: "2s" } as CSSProperties}
+          style={{ ["--power-fade-delay" as string]: "3.5s" } as CSSProperties}
         >
           <span className="rounded-full bg-white/[0.18] px-3 py-1.5 text-sm font-semibold">{t("workouts", { count: workouts })}</span>
           <span className="rounded-full bg-white/[0.18] px-3 py-1.5 text-sm font-semibold">{t("points", { points })}</span>
@@ -136,7 +137,7 @@ export function LevelUpScreen({ fromColor, toColor, workouts, points, onContinue
 
         <div
           className="animate-power-fade-up flex w-full items-center gap-3 rounded-2xl border border-white/25 bg-white/[0.14] p-3"
-          style={{ ["--power-fade-delay" as string]: "2.2s" } as CSSProperties}
+          style={{ ["--power-fade-delay" as string]: "3.7s" } as CSSProperties}
         >
           <span className="relative flex h-[52px] w-[52px] flex-none items-center justify-center overflow-hidden rounded-[14px] bg-gradient-to-br from-box-a to-box-b shadow-[0_3px_0_var(--color-box-edge)]">
             <span
@@ -159,7 +160,7 @@ export function LevelUpScreen({ fromColor, toColor, workouts, points, onContinue
           type="button"
           onClick={onContinue}
           className="animate-power-fade-up block min-h-14 w-full rounded-2xl bg-white font-display text-[19px] font-bold shadow-[0_4px_0_rgba(0,0,0,0.28)] transition-[transform,box-shadow] active:translate-y-[3px] active:shadow-[0_1px_0_rgba(0,0,0,0.28)]"
-          style={{ color: theme.buttonText, ["--power-fade-delay" as string]: "2.4s" } as CSSProperties}
+          style={{ color: theme.buttonText, ["--power-fade-delay" as string]: "3.9s" } as CSSProperties}
         >
           {t("continue")}
         </button>

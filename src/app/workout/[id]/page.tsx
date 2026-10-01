@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getWorkoutExercises } from "@/services/workout.service";
 import { WorkoutRunner } from "@/components/WorkoutRunner";
+import { canUseQaTools } from "@/lib/admin-access";
 import type { BraceletColor, Gender, Role, Workout } from "@/lib/types";
 
 interface WorkoutPageProps {
@@ -124,7 +125,10 @@ export default async function WorkoutPage({ params, searchParams }: WorkoutPageP
     .maybeSingle();
   const showPowerReveal = replayStation === null && naturalStationNumber === 1 && !powerRow;
 
-  const exercises = await getWorkoutExercises(supabase, workout.id);
+  const [exercises, qaToolsAllowed] = await Promise.all([
+    getWorkoutExercises(supabase, workout.id),
+    canUseQaTools(user, profile?.role),
+  ]);
   const tColors = await getTranslations("colors");
 
   return (
@@ -143,6 +147,7 @@ export default async function WorkoutPage({ params, searchParams }: WorkoutPageP
         intervalRestSeconds={interval?.interval_rest_seconds ?? null}
         gender={profile?.gender ?? null}
         exercises={exercises}
+        qaToolsAllowed={qaToolsAllowed}
       />
     </div>
   );

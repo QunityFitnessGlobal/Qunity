@@ -4,17 +4,18 @@ import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getLinkedChildren } from "@/services/linking.service";
+import { canUseQaTools } from "@/lib/admin-access";
 import { LogoutButton } from "@/components/LogoutButton";
 import { WorkoutSoundMenuItem } from "@/components/WorkoutSoundMenuItem";
 import { PowerPreviewTester } from "@/components/child/PowerPreviewTester";
-import { LevelUpPreviewTester } from "@/components/child/LevelUpPreviewTester";
+import { LevelUpPreviewTester, type StageRequirements } from "@/components/child/LevelUpPreviewTester";
 import { QaToolsToggle } from "@/components/child/QaToolsToggle";
 import { ReturnToParentButton } from "@/components/child/ReturnToParentButton";
 import { ParentPinMenuItem } from "@/components/parent/ParentPinMenuItem";
 import { ChildModeSwitcher } from "@/components/parent/ChildModeSwitcher";
 import { ChildrenAccordion } from "@/components/parent/ChildrenAccordion";
 import { AccordionSection } from "@/components/ui/AccordionSection";
-import type { Role } from "@/lib/types";
+import type { BraceletColor, Role } from "@/lib/types";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -41,6 +42,17 @@ export default async function SettingsPage() {
     ? await supabase.from("parents").select("pin_hash").eq("id", user.id).single<{ pin_hash: string | null }>()
     : { data: null };
   const linkedChildren = !isChild ? await getLinkedChildren(supabase, user.id) : [];
+  // TEMP testing tools are for admins only (and children linked to them).
+  const qaAllowed = await canUseQaTools(user, profile?.role);
+
+  const { data: levelRows } = qaAllowed
+    ? await supabase.from("bracelet_levels").select("color, required_workouts, required_points")
+    : { data: null };
+  const stageRequirements: StageRequirements = Object.fromEntries(
+    ((levelRows ?? []) as { color: BraceletColor; required_workouts: number; required_points: number }[]).map(
+      (row) => [row.color, { workouts: row.required_workouts, points: row.required_points }],
+    ),
+  );
 
   return (
     <div className="flex flex-1 flex-col items-center gap-4 px-4 py-16">
@@ -59,9 +71,9 @@ export default async function SettingsPage() {
 
       {isChild && <WorkoutSoundMenuItem />}
 
-      {isChild && <PowerPreviewTester />}
-      {isChild && <LevelUpPreviewTester />}
-      {isChild && <QaToolsToggle />}
+      {qaAllowed && <PowerPreviewTester />}
+      {qaAllowed && <LevelUpPreviewTester stages={stageRequirements} />}
+      {qaAllowed && <QaToolsToggle />}
       {isChild && <ReturnToParentButton />}
 
       {!isChild && (

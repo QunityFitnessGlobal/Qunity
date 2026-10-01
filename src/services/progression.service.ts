@@ -75,10 +75,8 @@ export async function checkColorProgression(childId: string): Promise<{
   didLevelUp: boolean;
   newColor?: BraceletColor;
   completedColor?: BraceletColor;
-  // What the child banked in the finished stage, read just before the reset
-  // to 0 — shown on the level-up screen.
-  completedStagePoints?: number;
-  completedStageWorkouts?: number;
+  // What the stage just entered asks for — shown on the level-up screen.
+  nextStageRequirement?: BraceletLevelRequirement;
 }> {
   const supabase = createClient();
 
@@ -133,13 +131,22 @@ export async function checkColorProgression(childId: string): Promise<{
     if (!updated || updated.length === 0) {
       return { didLevelUp: false };
     }
+
+    const { data: nextLevel } = await supabase
+      .from("bracelet_levels")
+      .select("required_workouts, required_points")
+      .eq("color", result.nextColor)
+      .single<BraceletLevelRow>();
+
+    return {
+      didLevelUp: true,
+      newColor: result.nextColor,
+      completedColor: child.current_color,
+      nextStageRequirement: nextLevel
+        ? { requiredWorkouts: nextLevel.required_workouts, requiredPoints: nextLevel.required_points }
+        : undefined,
+    };
   }
 
-  return {
-    didLevelUp: result.didLevelUp,
-    newColor: result.nextColor ?? undefined,
-    completedColor: result.didLevelUp ? child.current_color : undefined,
-    completedStagePoints: result.didLevelUp ? child.points_in_color : undefined,
-    completedStageWorkouts: result.didLevelUp ? child.workouts_completed_in_color : undefined,
-  };
+  return { didLevelUp: false };
 }

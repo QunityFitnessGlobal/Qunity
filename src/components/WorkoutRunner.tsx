@@ -57,6 +57,9 @@ interface WorkoutRunnerProps {
   intervalRestSeconds: number | null;
   gender: Gender | null;
   exercises: WorkoutExerciseEntry[];
+  // TEMP: admins (and children linked to them) may use the quick-finish
+  // testing shortcuts, once also switched on in Settings on the device.
+  qaToolsAllowed: boolean;
 }
 
 type Stage = "idle" | "running" | "questionnaire" | "power-reveal" | "result";
@@ -82,6 +85,7 @@ export function WorkoutRunner({
   intervalRestSeconds,
   gender,
   exercises,
+  qaToolsAllowed,
 }: WorkoutRunnerProps) {
   const t = useTranslations("workout");
   const tColors = useTranslations("colors");
@@ -221,7 +225,7 @@ export function WorkoutRunner({
         isReplay: replayStation !== null,
       });
       setSessionId(id);
-      setQaTools(readQaTools());
+      setQaTools(qaToolsAllowed && readQaTools());
       setElapsedSeconds(0);
       setTimer(
         hasIntervalStructure
@@ -372,12 +376,12 @@ export function WorkoutRunner({
           </button>
         </div>
 
-        {levelUpPhase === "open" && result.completedStage && result.newColor && (
+        {levelUpPhase === "open" && result.nextStage && result.newColor && (
           <LevelUpScreen
-            fromColor={result.completedStage.color}
+            fromColor={color}
             toColor={result.newColor}
-            workouts={result.completedStage.workouts}
-            points={result.completedStage.points}
+            workouts={result.nextStage.workouts}
+            points={result.nextStage.points}
             onContinue={() => setLevelUpPhase("done")}
           />
         )}
