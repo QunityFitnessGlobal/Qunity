@@ -376,9 +376,16 @@
     }
   },
   "powers": {
-    "discoveredLabel": "גילית כוח חדש",
-    "unlockedAt": "התגלה בסיום השלב ה{color}",
-    "continue": "המשך",
+    "boxEyebrow": "האימון הראשון בשלב ה{color}",
+    "boxTitle": "כוח חדש מחכה לך",
+    "boxText": "לכל שלב יש כוח משלו. הכוח הזה ילווה אותך לאורך כל השלב ה{color}.",
+    "openBox": "לגלות את הכוח",
+    "tapHint": "{gender, select, female {הקישי על הקופסה כדי לגלות} other {הקש על הקופסה כדי לגלות}}",
+    "discoveredLabel": "גילית כוח חדש!",
+    "quoteLabel": "המשפט של הכוח",
+    "collection": "האוסף שלי · {count} מתוך {total} כוחות",
+    "bonus": "<num>+{points}</num> נק' על הכוח החדש",
+    "start": "{gender, select, female {יאללה, מתחילה את האימון!} other {יאללה, מתחיל את האימון!}}",
     "white": {
       "name": "כוח ההתחלה",
       "code": "GO NOW",

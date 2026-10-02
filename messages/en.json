@@ -376,9 +376,16 @@
     }
   },
   "powers": {
-    "discoveredLabel": "You discovered a new power",
-    "unlockedAt": "Unlocked at the end of the {color} stage",
-    "continue": "Continue",
+    "boxEyebrow": "First workout of the {color} stage",
+    "boxTitle": "A new power is waiting for you",
+    "boxText": "Every stage has its own power. This one will be with you through the whole {color} stage.",
+    "openBox": "Discover the power",
+    "tapHint": "Tap the box to find out",
+    "discoveredLabel": "You discovered a new power!",
+    "quoteLabel": "The power's sentence",
+    "collection": "My collection · {count} of {total} powers",
+    "bonus": "<num>+{points}</num> pts for the new power",
+    "start": "Let's start the workout!",
     "white": {
       "name": "The power of starting",
       "code": "GO NOW",

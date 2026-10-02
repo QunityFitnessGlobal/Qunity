@@ -124,6 +124,13 @@ export default async function WorkoutPage({ params, searchParams }: WorkoutPageP
     .eq("challenge_id", `power_${workoutColor}`)
     .maybeSingle();
   const showPowerReveal = replayStation === null && naturalStationNumber === 1 && !powerRow;
+  const { data: powerChallenge } = showPowerReveal
+    ? await supabase
+        .from("challenges")
+        .select("bonus_points")
+        .eq("id", `power_${workoutColor}`)
+        .maybeSingle<{ bonus_points: number }>()
+    : { data: null };
 
   const [exercises, qaToolsAllowed] = await Promise.all([
     getWorkoutExercises(supabase, workout.id),
@@ -139,6 +146,7 @@ export default async function WorkoutPage({ params, searchParams }: WorkoutPageP
         workoutIndex={replayStation ?? naturalStationNumber}
         replayStation={replayStation}
         showPowerReveal={showPowerReveal}
+        powerBonusPoints={powerChallenge?.bonus_points ?? null}
         requiredWorkouts={level?.required_workouts ?? 0}
         color={workoutColor}
         colorLabel={tColors(workoutColor)}

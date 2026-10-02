@@ -43,6 +43,8 @@ interface WorkoutRunnerProps {
   replayStation: number | null;
   // First workout of a color whose power has not been revealed yet.
   showPowerReveal: boolean;
+  // The power challenge's bonus, shown on the reveal; null when unknown.
+  powerBonusPoints: number | null;
   requiredWorkouts: number;
   color: BraceletColor;
   colorLabel: string;
@@ -71,6 +73,7 @@ export function WorkoutRunner({
   workoutIndex,
   replayStation,
   showPowerReveal,
+  powerBonusPoints,
   requiredWorkouts,
   color,
   colorLabel,
@@ -360,7 +363,14 @@ export function WorkoutRunner({
   }
 
   if (stage === "power-reveal") {
-    return <PowerRevealScreen color={color} onContinue={handlePowerContinue} gender={gender} />;
+    return (
+      <PowerRevealScreen
+        color={color}
+        onContinue={handlePowerContinue}
+        gender={gender}
+        bonusPoints={powerBonusPoints}
+      />
+    );
   }
 
   if (stage === "result" && result) {

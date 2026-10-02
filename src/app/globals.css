@@ -447,3 +447,47 @@ body {
     animation: none;
   }
 }
+
+/* Power reveal (PowerRevealScreen): the mystery box wiggles every few
+   seconds, the tapping hand nudges, the rays behind the revealed badge turn
+   slowly, and the new power's slot in the collection pops in and pulses. */
+@keyframes power-box-wiggle {
+  0%, 70%, 100% { transform: rotate(0); }
+  76% { transform: rotate(-7deg); }
+  82% { transform: rotate(7deg); }
+  88% { transform: rotate(-4deg); }
+  94% { transform: rotate(3deg); }
+}
+@keyframes power-tap {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes power-rays {
+  from { transform: rotate(0); }
+  to { transform: rotate(360deg); }
+}
+@keyframes power-slot-new {
+  0% { transform: scale(0.3); opacity: 0; box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+  20% { transform: scale(1.12); opacity: 1; }
+  30% { transform: scale(1); }
+  100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 12px rgba(255, 255, 255, 0); }
+}
+.animate-power-box-wiggle {
+  animation: power-box-wiggle 2.6s ease-in-out 1.2s infinite;
+}
+.animate-power-tap {
+  animation: power-tap 1.4s ease-in-out infinite;
+}
+.animate-power-rays {
+  animation: power-rays 18s linear infinite;
+}
+.animate-power-slot-new {
+  animation: power-slot-new 2s ease-out 1.45s both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-power-box-wiggle,
+  .animate-power-tap,
+  .animate-power-rays {
+    animation: none;
+  }
+}
