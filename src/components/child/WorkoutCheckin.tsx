@@ -32,6 +32,9 @@ interface WorkoutCheckinProps {
   submitting: boolean;
   error: string | null;
   onSubmit: (answers: CheckinAnswers) => void;
+  // A challenge has no planned time, so it skips the line about the 60%
+  // mark and asks how the challenge (not the workout) felt.
+  kind?: "workout" | "challenge";
 }
 
 // The questionnaire after a workout: three questions answered by tapping,
@@ -48,6 +51,7 @@ export function WorkoutCheckin({
   submitting,
   error,
   onSubmit,
+  kind = "workout",
 }: WorkoutCheckinProps) {
   const t = useTranslations("checkin");
   const tWorkout = useTranslations("workout");
@@ -81,12 +85,14 @@ export function WorkoutCheckin({
               ? t("trainedForSeconds", { seconds: actualDurationSeconds })
               : t("trainedFor", { duration: formatMinutesSeconds(actualDurationSeconds) })}
           </span>
-          <TimeFeedback
-            actualSeconds={actualDurationSeconds}
-            plannedSeconds={plannedDurationSeconds}
-            hasIntervalTimer={hasIntervalTimer}
-            recommendedMinutes={recommendedDurationMinutes}
-          />
+          {kind === "workout" && (
+            <TimeFeedback
+              actualSeconds={actualDurationSeconds}
+              plannedSeconds={plannedDurationSeconds}
+              hasIntervalTimer={hasIntervalTimer}
+              recommendedMinutes={recommendedDurationMinutes}
+            />
+          )}
         </div>
       </div>
 
@@ -163,7 +169,7 @@ export function WorkoutCheckin({
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-[15px] font-semibold">{t("feelingQuestion")}</h2>
+        <h2 className="text-[15px] font-semibold">{t(kind === "challenge" ? "feelingQuestionChallenge" : "feelingQuestion")}</h2>
         <div className="grid grid-cols-5 gap-1">
           {FEELING_CODES.map((code) => {
             const on = feeling === code;

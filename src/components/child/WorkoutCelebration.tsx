@@ -24,7 +24,7 @@ interface WorkoutCelebrationProps {
   gender: Gender | null;
 }
 
-const EMPOWER_KEYS: Record<FeelingCode, string> = {
+export const EMPOWER_KEYS: Record<FeelingCode, string> = {
   fun: "empowerFun",
   fine: "empowerFine",
   frustrated: "empowerFrustrated",
@@ -55,6 +55,66 @@ const PARTICLES = Array.from({ length: 18 }, (_, k) => {
   };
 });
 
+// The gold glow, ring and flying pieces behind a celebrated star or trophy.
+// Sits inside a relative box; the celebrated icon goes on top of it.
+export function CelebrationBurst() {
+  return (
+    <>
+      <span
+        aria-hidden
+        className="animate-result-glow absolute left-[calc(50%-72px)] top-[calc(50%-72px)] h-36 w-36 rounded-full bg-reward-gold opacity-60 blur-2xl"
+      />
+      <span
+        aria-hidden
+        className="animate-result-ringout absolute left-1/2 top-1/2 h-14 w-14 rounded-full border-[3px] border-reward-gold"
+      />
+      {PARTICLES.map((p, i) => (
+        <span
+          key={i}
+          aria-hidden
+          className="animate-result-burst absolute left-1/2 top-1/2"
+          style={{
+            ...p.style,
+            width: p.size,
+            height: p.size,
+            backgroundColor: p.color,
+            borderRadius: p.isStar ? 0 : 2,
+            clipPath: p.isStar ? STAR_CLIP : undefined,
+          }}
+        />
+      ))}
+    </>
+  );
+}
+
+// Counts up to `total` shortly after the screen appears. Decided once when
+// the screen appears, not in an effect, so a reduced-motion viewer sees the
+// final number straight away.
+export function useCountUp(total: number): number {
+  const [animate] = useState(() => !prefersReducedMotion());
+  const [shown, setShown] = useState(animate ? 0 : total);
+
+  useEffect(() => {
+    if (!animate || total <= 0) return;
+    let current = 0;
+    let tick: ReturnType<typeof setInterval> | undefined;
+    const step = Math.max(1, Math.ceil(total / 40));
+    const start = setTimeout(() => {
+      tick = setInterval(() => {
+        current = Math.min(total, current + step);
+        setShown(current);
+        if (current >= total && tick) clearInterval(tick);
+      }, 28);
+    }, 900);
+    return () => {
+      clearTimeout(start);
+      if (tick) clearInterval(tick);
+    };
+  }, [animate, total]);
+
+  return shown;
+}
+
 // The top of the workout result screen: the station's star (full at 100%,
 // half from the 60% pass mark, an empty outline below it) celebrated with a
 // burst, the points earned counting up, the stage bar moving forward, and a
@@ -76,28 +136,7 @@ export function WorkoutCelebration({
   const star = !passed ? "none" : result.completionPercent >= 100 ? "full" : "half";
   const totalPoints = result.pointsAwarded + challenges.reduce((sum, c) => sum + c.bonusPoints, 0);
 
-  // Decided once when the screen appears, not in an effect, so a
-  // reduced-motion viewer sees the final numbers straight away.
-  const [animate] = useState(() => !prefersReducedMotion());
-  const [shownPoints, setShownPoints] = useState(animate ? 0 : totalPoints);
-
-  useEffect(() => {
-    if (!animate || totalPoints <= 0) return;
-    let current = 0;
-    let tick: ReturnType<typeof setInterval> | undefined;
-    const step = Math.max(1, Math.ceil(totalPoints / 40));
-    const start = setTimeout(() => {
-      tick = setInterval(() => {
-        current = Math.min(totalPoints, current + step);
-        setShownPoints(current);
-        if (current >= totalPoints && tick) clearInterval(tick);
-      }, 28);
-    }, 900);
-    return () => {
-      clearTimeout(start);
-      if (tick) clearInterval(tick);
-    };
-  }, [animate, totalPoints]);
+  const shownPoints = useCountUp(totalPoints);
 
   const completionLine = result.isReplay
     ? result.pointsAwarded > 0
@@ -119,33 +158,7 @@ export function WorkoutCelebration({
       <h1 className="animate-power-badge-pop text-center font-display text-3xl font-bold">{t("resultTitle")}</h1>
 
       <div className="relative h-40">
-        {star !== "none" && (
-          <>
-            <span
-              aria-hidden
-              className="animate-result-glow absolute left-[calc(50%-72px)] top-[calc(50%-72px)] h-36 w-36 rounded-full bg-reward-gold opacity-60 blur-2xl"
-            />
-            <span
-              aria-hidden
-              className="animate-result-ringout absolute left-1/2 top-1/2 h-14 w-14 rounded-full border-[3px] border-reward-gold"
-            />
-            {PARTICLES.map((p, i) => (
-              <span
-                key={i}
-                aria-hidden
-                className="animate-result-burst absolute left-1/2 top-1/2"
-                style={{
-                  ...p.style,
-                  width: p.size,
-                  height: p.size,
-                  backgroundColor: p.color,
-                  borderRadius: p.isStar ? 0 : 2,
-                  clipPath: p.isStar ? STAR_CLIP : undefined,
-                }}
-              />
-            ))}
-          </>
-        )}
+        {star !== "none" && <CelebrationBurst />}
         <div className="absolute inset-0 flex items-center justify-center">
           <svg
             viewBox="0 0 20 20"

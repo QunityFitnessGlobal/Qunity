@@ -240,17 +240,31 @@
     "revealedPointsLine": "+{points} נק' · נשמר באתגרים שבוצעו"
   },
   "challengeRunner": {
-    "badge": "אתגר",
-    "bonusPoints": "בונוס: {points} נקודות",
-    "resultTitle": "כל הכבוד!",
-    "pointsAwarded": "קיבלת {points} נקודות על האתגר הזה.",
-    "backToJourney": "חזרה למסלול"
+    "eyebrow": "אתגר · שלב {color}",
+    "eyebrowPlain": "אתגר",
+    "repeatable": "אפשר לחזור שוב ושוב",
+    "missionLabel": "המשימה",
+    "bestLabel": "השיא שלך",
+    "timesLabel": "ביצעת",
+    "times": "{count, plural, one {פעם אחת} other {# פעמים}}",
+    "duration": "{unit, select, seconds {{value} שניות} other {{value} דקות}}",
+    "firstTime": "פעם ראשונה באתגר הזה. בהצלחה!",
+    "tip": "אפשר לעצור לנשום בכל רגע. הכפתור למעלה עוצר את השעון.",
+    "elapsedLabel": "זמן האתגר",
+    "finish": "סיימתי את האתגר",
+    "finishedIn": "סיימת את האתגר ב-{unit, select, seconds {{value} שניות} other {{value} דקות}}",
+    "newRecord": "שיא אישי חדש!",
+    "firstRecord": "זה השיא הראשון שלך!",
+    "previousBest": "השיא הקודם: {unit, select, seconds {{value} שניות} other {{value} דקות}}",
+    "pointsTitle": "נקודות מהאתגר",
+    "tryAgain": "לנסות שוב",
+    "backToChallenges": "חזרה לאתגרים"
   },
   "challengeUnlockedModal": {
     "title": "אתגר חדש נפתח!",
-    "body": "סיימת את השלב ה{color}. מוכן לנסות?",
-    "doNow": "בצע עכשיו",
-    "postpone": "דחה לפעם אחרת"
+    "body": "{gender, select, female {סיימת את השלב ה{color}. מוכנה לנסות?} other {סיימת את השלב ה{color}. מוכן לנסות?}}",
+    "doNow": "{gender, select, female {בואי ננסה עכשיו} other {בוא ננסה עכשיו}}",
+    "postpone": "בפעם אחרת"
   },
   "workoutHistory": {
     "feelingsHeading": "{gender, select, female {איך {name} הרגישה בשבועיים האחרונים} other {איך {name} הרגיש בשבועיים האחרונים}}",
@@ -458,6 +472,7 @@
     "togetherYes": "כן, ביחד!",
     "togetherNo": "לא הפעם",
     "feelingQuestion": "איך הרגשת בסוף האימון?",
+    "feelingQuestionChallenge": "איך הרגשת בסוף האתגר?",
     "answersLeft": "{count, plural, one {עוד תשובה אחת} other {עוד # תשובות}}",
     "submit": "שליחה ואיסוף הנקודות"
   }

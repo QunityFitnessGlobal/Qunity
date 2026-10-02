@@ -13,7 +13,8 @@ import {
   type WorkoutExerciseEntry,
 } from "@/services/workout.service";
 import { Button } from "@/components/ui/Button";
-import { WorkoutIntro, type CountdownStep } from "@/components/child/WorkoutIntro";
+import { WorkoutIntro } from "@/components/child/WorkoutIntro";
+import { useReadyCountdown } from "@/components/child/ReadyCountdown";
 import { WorkoutTimerView } from "@/components/child/WorkoutTimerView";
 import { ChallengeUnlockedModal } from "@/components/child/ChallengeUnlockedModal";
 import { ChallengeRevealPopup } from "@/components/child/ChallengeRevealPopup";
@@ -120,8 +121,8 @@ export function WorkoutRunner({
   const [qaTools, setQaTools] = useState(false);
   // The 3-2-1 before the timer starts. The session row is created as soon as
   // the child taps "ready", so it's usually there by the time the count ends.
-  const [countdown, setCountdown] = useState<CountdownStep | null>(null);
   const sessionStartRef = useRef<Promise<string> | null>(null);
+  const countdown = useReadyCountdown(launchWorkout);
 
   const recommendedDurationMinutes = workout.recommended_duration_minutes ?? 0;
 
@@ -228,7 +229,7 @@ export function WorkoutRunner({
     // surfacing as an unhandled rejection in the meantime.
     start.catch(() => {});
     sessionStartRef.current = start;
-    setCountdown(3);
+    countdown.start();
   }
 
   async function launchWorkout() {
@@ -245,25 +246,8 @@ export function WorkoutRunner({
       setStage("running");
     } catch {
       setError(t("startError"));
-    } finally {
-      setCountdown(null);
     }
   }
-
-  useEffect(() => {
-    if (countdown === null) return;
-    const timeout = setTimeout(
-      () => {
-        if (countdown === 3) setCountdown(2);
-        else if (countdown === 2) setCountdown(1);
-        else if (countdown === 1) setCountdown("go");
-        else launchWorkout();
-      },
-      countdown === "go" ? 700 : 900,
-    );
-    return () => clearTimeout(timeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [countdown]);
 
   // The power for a color is discovered at the START of that color first
   // workout (including white first workout ever) - not at the end of the
@@ -434,6 +418,7 @@ export function WorkoutRunner({
           <ChallengeUnlockedModal
             title={result.unlockedChallenge.title}
             colorLabel={tColors(result.newColor)}
+            gender={gender}
             onDoNow={() => router.push(`/challenge/${result.unlockedChallenge!.id}`)}
             onPostpone={() => router.push("/dashboard/journey")}
           />
@@ -543,7 +528,7 @@ export function WorkoutRunner({
       exercises={exercises}
       gender={gender}
       error={error}
-      countdown={countdown}
+      countdown={countdown.step}
       onReady={handleStart}
     />
   );

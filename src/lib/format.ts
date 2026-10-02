@@ -19,3 +19,12 @@ export function formatMinutesSeconds(totalSeconds: number): string {
 // Calendar days and weeks (e.g. "this week" on the parent's workouts
 // screen) are counted in the families' time zone, not the server's UTC.
 export const APP_TIME_ZONE = "Asia/Jerusalem";
+
+// A duration as words read it: whole seconds under a minute ("45 seconds"),
+// otherwise "3:20 minutes" — for a message with
+// {unit, select, seconds {...} other {...}} and {value}.
+export function durationParts(totalSeconds: number): { unit: "seconds" | "minutes"; value: string } {
+  return totalSeconds < 60
+    ? { unit: "seconds", value: String(totalSeconds) }
+    : { unit: "minutes", value: formatMinutesSeconds(totalSeconds) };
+}

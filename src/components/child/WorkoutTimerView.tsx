@@ -26,6 +26,11 @@ interface WorkoutTimerViewProps {
   exercise: Exercise | null;
   // What comes after this round's rest; null after the last round.
   nextExercise: Exercise | null;
+  // Shown instead of the exercise card (a challenge has no exercises).
+  card?: ReactNode;
+  // Override the count-up clock's label and the finish button's text.
+  elapsedLabel?: string;
+  finishLabel?: string;
   onFinish: () => void;
   paused: boolean;
   onPause: () => void;
@@ -44,6 +49,9 @@ export function WorkoutTimerView({
   elapsedSeconds,
   exercise,
   nextExercise,
+  card,
+  elapsedLabel,
+  finishLabel,
   onFinish,
   paused,
   onPause,
@@ -99,7 +107,9 @@ export function WorkoutTimerView({
       </header>
 
       <main className="mx-auto flex w-full max-w-sm flex-1 flex-col items-center gap-4 px-4 pt-2">
-        {!resting && exercise && (
+        {!resting && card}
+
+        {!resting && !card && exercise && (
           <div key={`work-${interval?.currentSet ?? 0}`} className="animate-power-fade-up w-full overflow-hidden rounded-[20px] border border-zinc-200 bg-white">
             <ExerciseImage
               imageUrl={exercise.image_url}
@@ -172,7 +182,7 @@ export function WorkoutTimerView({
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5" role="timer" aria-live="off">
             <span className={`text-[15px] font-bold tracking-wide ${resting ? "text-[#1d4ed8]" : "text-green-700"}`}>
-              {interval ? t(resting ? "phaseRest" : "phaseWork") : t("elapsedLabel")}
+              {interval ? t(resting ? "phaseRest" : "phaseWork") : (elapsedLabel ?? t("elapsedLabel"))}
             </span>
             <span
               dir="ltr"
@@ -191,7 +201,7 @@ export function WorkoutTimerView({
           onClick={onFinish}
           className="block min-h-[52px] w-full rounded-2xl bg-zinc-700 font-display text-lg font-semibold text-white shadow-[0_4px_0_theme(colors.zinc.900)] transition-transform hover:bg-zinc-800 active:translate-y-[3px]"
         >
-          {t("finishWorkout")}
+          {finishLabel ?? t("finishWorkout")}
         </button>
         {children}
       </footer>
@@ -227,7 +237,7 @@ export function WorkoutTimerView({
               onClick={onFinish}
               className="min-h-11 text-sm font-medium text-text-muted underline underline-offset-2"
             >
-              {t("finishWorkout")}
+              {finishLabel ?? t("finishWorkout")}
             </button>
           </div>
         </div>

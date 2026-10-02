@@ -4,10 +4,12 @@ import { useLocale, useTranslations } from "next-intl";
 import { resolveLocalizedText } from "@/lib/i18n-content";
 import { Button } from "@/components/ui/Button";
 import type { LocalizedText } from "@/lib/i18n-content";
+import type { Gender } from "@/lib/types";
 
 interface ChallengeUnlockedModalProps {
   title: LocalizedText;
   colorLabel: string;
+  gender: Gender | null;
   onDoNow: () => void;
   onPostpone: () => void;
 }
@@ -18,6 +20,7 @@ interface ChallengeUnlockedModalProps {
 export function ChallengeUnlockedModal({
   title,
   colorLabel,
+  gender,
   onDoNow,
   onPostpone,
 }: ChallengeUnlockedModalProps) {
@@ -29,10 +32,10 @@ export function ChallengeUnlockedModal({
       <div className="w-full max-w-sm space-y-2 rounded-lg bg-white p-5 text-center shadow-lg">
         <p className="text-sm font-semibold text-brand-purple">{t("title")}</p>
         <h2 className="text-lg font-bold">{resolveLocalizedText(title, locale)}</h2>
-        <p className="text-sm text-zinc-600">{t("body", { color: colorLabel })}</p>
+        <p className="text-sm text-zinc-600">{t("body", { color: colorLabel, gender: gender ?? "male" })}</p>
         <div className="space-y-2 pt-2">
           <Button className="w-full" onClick={onDoNow}>
-            {t("doNow")}
+            {t("doNow", { gender: gender ?? "male" })}
           </Button>
           <Button className="w-full bg-zinc-700 hover:bg-zinc-800" onClick={onPostpone}>
             {t("postpone")}

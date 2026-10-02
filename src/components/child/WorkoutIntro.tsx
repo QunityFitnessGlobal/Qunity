@@ -3,14 +3,13 @@
 import type { CSSProperties } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ExerciseImage } from "@/components/child/ExerciseImage";
+import { ReadyCountdownOverlay, type CountdownStep } from "@/components/child/ReadyCountdown";
 import { BRACELET_CSS_VAR } from "@/lib/colors";
 import { resolveLocalizedText } from "@/lib/i18n-content";
 import { difficultyLabelKey } from "@/lib/workout-labels";
 import { BASE_POINTS } from "@/services/points.service";
 import type { WorkoutExerciseEntry } from "@/services/workout.service";
 import type { BraceletColor, Gender, Workout } from "@/lib/types";
-
-export type CountdownStep = 3 | 2 | 1 | "go";
 
 interface WorkoutIntroProps {
   workout: Workout;
@@ -152,23 +151,7 @@ export function WorkoutIntro({
         </div>
       </footer>
 
-      {countdown !== null && (
-        <div className="fixed inset-0 z-20 flex items-center justify-center bg-[#221a33]/80" aria-live="assertive">
-          {countdown === "go" ? (
-            <span key="go" className="animate-workout-go font-display text-7xl font-bold text-white">
-              {t("countdownGo")}
-            </span>
-          ) : (
-            <span
-              key={countdown}
-              className="animate-workout-count font-display text-[150px] font-bold leading-none"
-              style={{ color: countdown === 3 ? "#ffffff" : countdown === 2 ? "var(--color-reward-gold)" : "var(--color-bracelet-orange)" }}
-            >
-              {countdown}
-            </span>
-          )}
-        </div>
-      )}
+      <ReadyCountdownOverlay step={countdown} />
     </div>
   );
 }

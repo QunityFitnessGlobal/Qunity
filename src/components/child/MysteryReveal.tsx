@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { resolveLocalizedText, type LocalizedText } from "@/lib/i18n-content";
+import { resolveGenderedText, resolveLocalizedText, type LocalizedText } from "@/lib/i18n-content";
 import { MysteryBoxContents } from "@/components/child/MysteryBoxContents";
 import { ChallengeIcon } from "@/components/child/challengeIcons";
 import type { ChallengeConditionType, ChallengeType } from "@/data/challenges.data";
@@ -217,7 +217,7 @@ export function MysteryReveal({
               <div className="min-w-0 flex-1">
                 <h3 className="font-display text-base font-bold">{resolveLocalizedText(challenge.title, locale)}</h3>
                 {challenge.description && (
-                  <p className="mt-0.5 text-sm text-zinc-600">{resolveLocalizedText(challenge.description, locale)}</p>
+                  <p className="mt-0.5 text-sm text-zinc-600">{resolveGenderedText(challenge.description, locale, null)}</p>
                 )}
               </div>
             </div>

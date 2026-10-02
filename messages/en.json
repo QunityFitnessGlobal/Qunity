@@ -240,11 +240,25 @@
     "revealedPointsLine": "+{points} pts · saved under Completed"
   },
   "challengeRunner": {
-    "badge": "Challenge",
-    "bonusPoints": "Bonus: {points} points",
-    "resultTitle": "Well done!",
-    "pointsAwarded": "You earned {points} points for this challenge.",
-    "backToJourney": "Back to journey"
+    "eyebrow": "Challenge · {color} stage",
+    "eyebrowPlain": "Challenge",
+    "repeatable": "Do it again and again",
+    "missionLabel": "The mission",
+    "bestLabel": "Your record",
+    "timesLabel": "Done",
+    "times": "{count, plural, one {once} other {# times}}",
+    "duration": "{unit, select, seconds {{value} seconds} other {{value} minutes}}",
+    "firstTime": "First time on this challenge. Good luck!",
+    "tip": "You can stop to breathe any time. The button on top pauses the clock.",
+    "elapsedLabel": "Challenge time",
+    "finish": "I finished the challenge",
+    "finishedIn": "You finished the challenge in {unit, select, seconds {{value} seconds} other {{value} minutes}}",
+    "newRecord": "New personal record!",
+    "firstRecord": "Your first record!",
+    "previousBest": "Previous record: {unit, select, seconds {{value} seconds} other {{value} minutes}}",
+    "pointsTitle": "Points from the challenge",
+    "tryAgain": "Try again",
+    "backToChallenges": "Back to challenges"
   },
   "challengeUnlockedModal": {
     "title": "New challenge unlocked!",
@@ -458,6 +472,7 @@
     "togetherYes": "Yes, together!",
     "togetherNo": "Not this time",
     "feelingQuestion": "How did you feel at the end?",
+    "feelingQuestionChallenge": "How did you feel at the end of the challenge?",
     "answersLeft": "{count, plural, one {1 more answer} other {# more answers}}",
     "submit": "Send and collect points"
   }

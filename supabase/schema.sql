@@ -1613,3 +1613,32 @@ insert into public.parent_tip_rules (principle, condition_type, condition_params
      'he', '{gender, select, female {רוב האימונים של {name} הסתיימו בחיוך - היא מצאה רגעים של הנאה וכיף בדרך. פרגנו לה ושאלו אותה מה הכי מדליק אותה באימונים.} other {רוב האימונים של {name} הסתיימו בחיוך - הוא מצא רגעים של הנאה וכיף בדרך. פרגנו לו ושאלו אותו מה הכי מדליק אותו באימונים.}}',
      'en', 'Most of {name}s workouts ended with a smile. Encourage {gender, select, female {her} other {him}} and ask what {gender, select, female {she} other {he}} enjoys most.'),
    10);
+
+-- ============================================================================
+-- ADDED FOR GENDERED CHALLENGE DESCRIPTIONS
+--
+-- The stair challenges' Hebrew descriptions were masculine only ("עלה 100
+-- מדרגות"). Rewritten as ICU gender-select like parent_tip_rules.tip_text;
+-- the app renders them with resolveGenderedText (masculine when the child's
+-- gender is unknown), and plain text still passes through unchanged.
+-- ============================================================================
+
+update public.challenges
+set description = jsonb_set(description, '{he}', to_jsonb('{gender, select, female {עלי 100 מדרגות ברצף, בקצב שנוח לך.} other {עלה 100 מדרגות ברצף, בקצב שנוח לך.}}'::text))
+where id = 'stairs_white';
+
+update public.challenges
+set description = jsonb_set(description, '{he}', to_jsonb('{gender, select, female {עלי 200 מדרגות ברצף, בקצב שנוח לך.} other {עלה 200 מדרגות ברצף, בקצב שנוח לך.}}'::text))
+where id = 'stairs_orange';
+
+update public.challenges
+set description = jsonb_set(description, '{he}', to_jsonb('{gender, select, female {עלי 300 מדרגות ברצף, בקצב שנוח לך.} other {עלה 300 מדרגות ברצף, בקצב שנוח לך.}}'::text))
+where id = 'stairs_green';
+
+update public.challenges
+set description = jsonb_set(description, '{he}', to_jsonb('{gender, select, female {עלי 400 מדרגות ברצף, בקצב שנוח לך.} other {עלה 400 מדרגות ברצף, בקצב שנוח לך.}}'::text))
+where id = 'stairs_blue';
+
+update public.challenges
+set description = jsonb_set(description, '{he}', to_jsonb('{gender, select, female {עלי 500 מדרגות ברצף, בקצב שנוח לך.} other {עלה 500 מדרגות ברצף, בקצב שנוח לך.}}'::text))
+where id = 'stairs_purple';
