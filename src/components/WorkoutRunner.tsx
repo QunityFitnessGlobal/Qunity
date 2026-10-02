@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import {
   startWorkoutSession,
@@ -13,6 +13,8 @@ import {
   type WorkoutExerciseEntry,
 } from "@/services/workout.service";
 import { Button } from "@/components/ui/Button";
+import { WorkoutIntro, type CountdownStep } from "@/components/child/WorkoutIntro";
+import { WorkoutTimerView } from "@/components/child/WorkoutTimerView";
 import { ChallengeUnlockedModal } from "@/components/child/ChallengeUnlockedModal";
 import { ChallengeRevealPopup } from "@/components/child/ChallengeRevealPopup";
 import { WorkoutCelebration } from "@/components/child/WorkoutCelebration";
@@ -23,14 +25,12 @@ import { unlockPowerChallenge } from "@/services/challenge.service";
 import { calculateCompletionPercent, meetsCompletionThreshold } from "@/services/points.service";
 import type { ChallengeDefinition } from "@/data/challenges.data";
 import { PowerRevealScreen } from "@/components/child/PowerRevealScreen";
-import { formatDurationClock } from "@/lib/format";
 import {
   getWorkoutSoundPreference,
   playWorkoutSound,
   stopWorkoutSound,
   unlockWorkoutAudio,
 } from "@/lib/workout-sounds";
-import { resolveLocalizedText } from "@/lib/i18n-content";
 import { FEELING_CODES, type FeelingCode } from "@/lib/workout-labels";
 import type { BraceletColor, Gender, Workout } from "@/lib/types";
 
@@ -83,7 +83,6 @@ export function WorkoutRunner({
 }: WorkoutRunnerProps) {
   const t = useTranslations("workout");
   const tColors = useTranslations("colors");
-  const locale = useLocale();
   const router = useRouter();
   const [stage, setStage] = useState<Stage>("idle");
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -107,6 +106,8 @@ export function WorkoutRunner({
   // Finishing below the points threshold asks for confirmation first; the
   // timer stays paused while that question is open.
   const [stopConfirmOpen, setStopConfirmOpen] = useState(false);
+  // The child paused from the timer screen; the clock waits until they resume.
+  const [paused, setPaused] = useState(false);
   const [powerChallenge, setPowerChallenge] = useState<ChallengeDefinition | null>(null);
   // A level-up takes over the result screen once its stage bar has filled
   // ("open"); the challenge popups wait until it's closed ("done").
@@ -114,6 +115,10 @@ export function WorkoutRunner({
   // TEMP testing shortcuts (Settings › "כלי בדיקה באימון"), read when the
   // workout starts.
   const [qaTools, setQaTools] = useState(false);
+  // The 3-2-1 before the timer starts. The session row is created as soon as
+  // the child taps "ready", so it's usually there by the time the count ends.
+  const [countdown, setCountdown] = useState<CountdownStep | null>(null);
+  const sessionStartRef = useRef<Promise<string> | null>(null);
 
   const recommendedDurationMinutes = workout.recommended_duration_minutes ?? 0;
 
@@ -143,15 +148,15 @@ export function WorkoutRunner({
     : recommendedDurationMinutes * 60;
 
   useEffect(() => {
-    if (stage !== "running" || hasIntervalStructure || stopConfirmOpen) {
+    if (stage !== "running" || hasIntervalStructure || stopConfirmOpen || paused) {
       return;
     }
     const interval = setInterval(() => setElapsedSeconds((s) => s + 1), 1000);
     return () => clearInterval(interval);
-  }, [stage, hasIntervalStructure, stopConfirmOpen]);
+  }, [stage, hasIntervalStructure, stopConfirmOpen, paused]);
 
   useEffect(() => {
-    if (stage !== "running" || !hasIntervalStructure || stopConfirmOpen) {
+    if (stage !== "running" || !hasIntervalStructure || stopConfirmOpen || paused) {
       return;
     }
     const interval = setInterval(() => {
@@ -171,7 +176,7 @@ export function WorkoutRunner({
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [stage, hasIntervalStructure, stopConfirmOpen, intervalWorkSeconds, intervalRestSeconds]);
+  }, [stage, hasIntervalStructure, stopConfirmOpen, paused, intervalWorkSeconds, intervalRestSeconds]);
 
   // Cue sound when the timer starts and on each work<->rest switch (chosen in
   // Settings -> "סוג צלצול לאימון"). Driven off the phase changing rather than
@@ -207,16 +212,25 @@ export function WorkoutRunner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timer?.totalRemaining]);
 
-  async function beginWorkoutSession() {
-    // Still inside the Start / Continue tap here, which is what lets the
-    // browser play the timer's later, gesture-less transition sounds.
+  // "I'm ready": still inside the tap here, which is what lets the browser
+  // play the timer's later, gesture-less transition sounds.
+  function startCountdown() {
     unlockWorkoutAudio();
     setError(null);
+    const start = startWorkoutSession(childId, workout.id, {
+      stationNumber: replayStation ?? workoutIndex,
+      isReplay: replayStation !== null,
+    });
+    // Awaited when the count ends; this only keeps an early failure from
+    // surfacing as an unhandled rejection in the meantime.
+    start.catch(() => {});
+    sessionStartRef.current = start;
+    setCountdown(3);
+  }
+
+  async function launchWorkout() {
     try {
-      const id = await startWorkoutSession(childId, workout.id, {
-        stationNumber: replayStation ?? workoutIndex,
-        isReplay: replayStation !== null,
-      });
+      const id = await sessionStartRef.current!;
       setSessionId(id);
       setQaTools(qaToolsAllowed && readQaTools());
       setElapsedSeconds(0);
@@ -228,8 +242,25 @@ export function WorkoutRunner({
       setStage("running");
     } catch {
       setError(t("startError"));
+    } finally {
+      setCountdown(null);
     }
   }
+
+  useEffect(() => {
+    if (countdown === null) return;
+    const timeout = setTimeout(
+      () => {
+        if (countdown === 3) setCountdown(2);
+        else if (countdown === 2) setCountdown(1);
+        else if (countdown === 1) setCountdown("go");
+        else launchWorkout();
+      },
+      countdown === "go" ? 700 : 900,
+    );
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countdown]);
 
   // The power for a color is discovered at the START of that color first
   // workout (including white first workout ever) - not at the end of the
@@ -240,16 +271,16 @@ export function WorkoutRunner({
       setStage("power-reveal");
       return;
     }
-    beginWorkoutSession();
+    startCountdown();
   }
 
-  async function handlePowerContinue() {
-    try {
-      setPowerChallenge(await unlockPowerChallenge(createClient(), childId, color));
-    } catch {
+  function handlePowerContinue() {
+    startCountdown();
+    setStage("idle");
+    unlockPowerChallenge(createClient(), childId, color)
+      .then(setPowerChallenge)
       // Not worth blocking the workout over; the reveal just shows again next time.
-    }
-    await beginWorkoutSession();
+      .catch(() => {});
   }
 
   async function finishSession(actualSeconds: number) {
@@ -257,6 +288,7 @@ export function WorkoutRunner({
     setError(null);
     try {
       await finishWorkoutSession(sessionId, actualSeconds);
+      setPaused(false);
       setActualDurationSeconds(actualSeconds);
       setStage("questionnaire");
     } catch {
@@ -415,163 +447,94 @@ export function WorkoutRunner({
     );
   }
 
-  return (
-    <div className="w-full max-w-sm space-y-4 text-center">
-      <p className="text-sm font-medium text-zinc-500">
-        {t("colorProgress", { color: colorLabel, index: workoutIndex, total: requiredWorkouts })}
-      </p>
-      {replayStation !== null && (
-        <p className="text-sm font-semibold text-brand-purple">{t("replayBadge")}</p>
-      )}
-      <h1 className="text-2xl font-bold">{resolveLocalizedText(workout.title, locale)}</h1>
-      <p className="text-sm text-zinc-500">
-        {t("recommended", {
-          minutes: workout.recommended_duration_minutes ?? "-",
-          difficulty: workout.recommended_difficulty ?? "-",
-        })}
-      </p>
-
-      {stage === "idle" && exercises.length > 0 && (
-        <div className="w-full space-y-2 text-right">
-          <h2 className="text-base font-semibold text-text-muted">{t("exercisesHeading")}</h2>
-          {exercises.map(({ slotNumber, exercise }) => (
-            <div key={exercise.id} className="rounded-md border border-zinc-200 bg-zinc-50 p-3">
-              {exercise.image_url && (
-                // eslint-disable-next-line @next/next/no-img-element -- external Storage URLs, no remotePatterns configured
-                <img
-                  src={exercise.image_url}
-                  alt={locale === "en" ? exercise.name_en : exercise.name_he}
-                  className="mb-2 h-40 w-full rounded-md object-cover"
-                />
-              )}
-              <p className="text-lg font-semibold">
-                {slotNumber}. {locale === "en" ? exercise.name_en : exercise.name_he}
-              </p>
-              {exercise.description_he && (
-                <p className="mt-1 text-base text-zinc-600">{exercise.description_he}</p>
-              )}
-              {exercise.difficulty_tip_he && (
-                <p className="mt-1 text-sm text-brand-purple">
-                  {t("difficultyTipLabel")}: {exercise.difficulty_tip_he}
-                </p>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {stage === "running" && currentExercise && (
-        <div className="w-full rounded-md border border-zinc-200 bg-zinc-50 p-3 text-right">
-          <p className="text-sm font-semibold text-text-muted">{t("currentExerciseLabel")}</p>
-          {currentExercise.image_url && (
-            // eslint-disable-next-line @next/next/no-img-element -- external Storage URLs, no remotePatterns configured
-            <img
-              src={currentExercise.image_url}
-              alt={locale === "en" ? currentExercise.name_en : currentExercise.name_he}
-              className="mt-1 h-40 w-full rounded-md object-cover"
-            />
-          )}
-          <p className="mt-0.5 text-lg font-semibold">
-            {locale === "en" ? currentExercise.name_en : currentExercise.name_he}
-          </p>
-          {currentExercise.description_he && (
-            <p className="mt-1 text-base text-zinc-600">{currentExercise.description_he}</p>
-          )}
-          {currentExercise.difficulty_tip_he && (
-            <p className="mt-1 text-sm text-brand-purple">
-              {t("difficultyTipLabel")}: {currentExercise.difficulty_tip_he}
-            </p>
-          )}
-        </div>
-      )}
-
-      {workout.description && (
-        <p className="text-zinc-600">{resolveLocalizedText(workout.description, locale)}</p>
-      )}
-
-      {error && <p className="text-sm text-red-600">{error}</p>}
-
-      {stage === "idle" && (
-        <Button className="w-full" onClick={handleStart}>
-          {t("start")}
-        </Button>
-      )}
-
-      {stage === "running" && hasIntervalStructure && timer && (
-        <div className="space-y-4">
-          <p className="text-sm font-semibold text-text-muted">
-            {t(timer.phase === "work" ? "phaseWork" : "phaseRest")}
-          </p>
-          <div className="flex items-center justify-center gap-6">
-            <p
-              className={`font-mono text-5xl font-bold ${
-                timer.phase === "work" ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {formatDurationClock(timer.phaseRemaining)}
-            </p>
-            <div className="rounded-lg bg-zinc-100 px-3 py-2 text-center">
-              <p className="text-xs text-text-muted">{t("setLabel")}</p>
-              <p className="text-lg font-bold">
-                {t("setProgress", { current: timer.currentSet, total: intervalRounds })}
-              </p>
-            </div>
-          </div>
-          <Button className="w-full" onClick={handleManualFinish}>
-            {t("finish")}
-          </Button>
-        </div>
-      )}
-
-      {stage === "running" && !hasIntervalStructure && (
-        <div className="space-y-4">
-          <p className="font-mono text-4xl font-bold text-blue-700">
-            {formatDurationClock(elapsedSeconds)}
-          </p>
-          <Button className="w-full" onClick={handleManualFinish}>
-            {t("finish")}
-          </Button>
-        </div>
-      )}
-
-      {/* TEMP — testing shortcut: finishes as if exactly that share of the
-          planned time was done, so the whole points/star/level-up path can
-          be checked without exercising. Only shown when switched on in
-          Settings on this device (lib/qa-tools.ts). */}
-      {stage === "running" && qaTools && (
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => finishSession(plannedDurationSeconds)}
-            className="flex-1 rounded-md border border-dashed border-zinc-400 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
-          >
-            {t("qaFinish100")}
-          </button>
-          <button
-            type="button"
-            onClick={() => finishSession(Math.round(plannedDurationSeconds * 0.7))}
-            className="flex-1 rounded-md border border-dashed border-zinc-400 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
-          >
-            {t("qaFinish70")}
-          </button>
-        </div>
-      )}
-
-      {stopConfirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-xs space-y-4 rounded-lg bg-white p-5 text-center">
-            <p className="text-base font-semibold">{t("stopConfirmMessage")}</p>
-            <div className="flex gap-2">
-              <Button className="flex-1" onClick={() => setStopConfirmOpen(false)}>
-                {t("stopConfirmContinue")}
-              </Button>
-              <Button className="flex-1 bg-zinc-700 hover:bg-zinc-800" onClick={handleConfirmStop}>
-                {t("stopConfirmStop")}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+  const qaButtons = qaTools && (
+    // TEMP — testing shortcut: finishes as if exactly that share of the
+    // planned time was done, so the whole points/star/level-up path can be
+    // checked without exercising. Only shown when switched on in Settings on
+    // this device (lib/qa-tools.ts).
+    <div className="flex gap-2">
+      <button
+        type="button"
+        onClick={() => finishSession(plannedDurationSeconds)}
+        className="flex-1 rounded-md border border-dashed border-zinc-400 bg-white/70 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
+      >
+        {t("qaFinish100")}
+      </button>
+      <button
+        type="button"
+        onClick={() => finishSession(Math.round(plannedDurationSeconds * 0.7))}
+        className="flex-1 rounded-md border border-dashed border-zinc-400 bg-white/70 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
+      >
+        {t("qaFinish70")}
+      </button>
     </div>
+  );
+
+  if (stage === "running") {
+    const nextSet = (timer?.currentSet ?? 1) + 1;
+    const nextExercise =
+      hasIntervalStructure && exercises.length > 0 && nextSet <= intervalRounds
+        ? exercises[(nextSet - 1) % exercises.length].exercise
+        : null;
+    return (
+      <>
+        <WorkoutTimerView
+          interval={
+            hasIntervalStructure && timer
+              ? {
+                  phase: timer.phase,
+                  currentSet: timer.currentSet,
+                  rounds: intervalRounds,
+                  phaseRemaining: timer.phaseRemaining,
+                  phaseLength: timer.phase === "work" ? intervalWorkSeconds : intervalRestSeconds,
+                }
+              : null
+          }
+          elapsedSeconds={elapsedSeconds}
+          exercise={currentExercise}
+          nextExercise={nextExercise}
+          onFinish={handleManualFinish}
+          paused={paused}
+          onPause={() => setPaused(true)}
+          onResume={() => setPaused(false)}
+          error={error}
+        >
+          {qaButtons}
+        </WorkoutTimerView>
+
+        {stopConfirmOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+            <div className="w-full max-w-xs space-y-4 rounded-2xl bg-white p-5 text-center">
+              <p className="text-base font-semibold">{t("stopConfirmMessage")}</p>
+              <div className="flex gap-2">
+                <Button className="flex-1" onClick={() => setStopConfirmOpen(false)}>
+                  {t("stopConfirmContinue")}
+                </Button>
+                <Button className="flex-1 bg-zinc-700 hover:bg-zinc-800" onClick={handleConfirmStop}>
+                  {t("stopConfirmStop")}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  }
+
+  return (
+    <WorkoutIntro
+      workout={workout}
+      color={color}
+      colorLabel={colorLabel}
+      workoutIndex={workoutIndex}
+      requiredWorkouts={requiredWorkouts}
+      isReplay={replayStation !== null}
+      minutes={Math.ceil(plannedDurationSeconds / 60)}
+      exercises={exercises}
+      gender={gender}
+      error={error}
+      countdown={countdown}
+      onReady={handleStart}
+    />
   );
 }
