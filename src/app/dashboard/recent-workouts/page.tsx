@@ -1,32 +1,24 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { getProfile, getSupabase, requireUser } from "@/lib/session";
 import { getLinkedChildren } from "@/services/linking.service";
 import { getWorkoutHistory } from "@/services/workout-history.service";
 import { WorkoutHistoryView } from "@/components/parent/WorkoutHistoryView";
 import { ChildSelector } from "@/components/parent/ChildSelector";
-import type { Role } from "@/lib/types";
 
 interface RecentWorkoutsPageProps {
   searchParams: Promise<{ childId?: string }>;
 }
 
 export default async function RecentWorkoutsPage({ searchParams }: RecentWorkoutsPageProps) {
-  const supabase = await createClient();
+  const user = await requireUser();
+  const supabase = await getSupabase();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user.id)
-    .single<{ role: Role }>();
+  const [profile, linkedChildren, { childId }] = await Promise.all([
+    getProfile(user.id),
+    getLinkedChildren(supabase, user.id),
+    searchParams,
+  ]);
 
   if (profile?.role === "child") {
     redirect("/dashboard");
@@ -35,8 +27,6 @@ export default async function RecentWorkoutsPage({ searchParams }: RecentWorkout
   const t = await getTranslations("recentWorkoutsPage");
   const tDashboard = await getTranslations("dashboard");
 
-  const linkedChildren = await getLinkedChildren(supabase, user.id);
-  const { childId } = await searchParams;
   const selectedChildId = childId ?? linkedChildren[0]?.id ?? null;
   const history = selectedChildId ? await getWorkoutHistory(supabase, selectedChildId) : null;
 

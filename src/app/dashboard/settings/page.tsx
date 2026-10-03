@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { getProfile, getSupabase, requireUser } from "@/lib/session";
 import { getLinkedChildren } from "@/services/linking.service";
 import { canUseQaTools } from "@/lib/admin-access";
 import { LogoutButton } from "@/components/LogoutButton";
@@ -15,39 +14,28 @@ import { ParentPinMenuItem } from "@/components/parent/ParentPinMenuItem";
 import { ChildModeSwitcher } from "@/components/parent/ChildModeSwitcher";
 import { ChildrenAccordion } from "@/components/parent/ChildrenAccordion";
 import { AccordionSection } from "@/components/ui/AccordionSection";
-import type { BraceletColor, Role } from "@/lib/types";
+import type { BraceletColor } from "@/lib/types";
 
 export default async function SettingsPage() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user.id)
-    .single<{ role: Role }>();
+  const user = await requireUser();
+  const supabase = await getSupabase();
+  const profile = await getProfile(user.id);
 
   const isChild = profile?.role === "child";
   const t = await getTranslations("settings");
   const tFamily = await getTranslations("familyMode");
 
-  const { data: parentRow } = !isChild
-    ? await supabase.from("parents").select("pin_hash").eq("id", user.id).single<{ pin_hash: string | null }>()
-    : { data: null };
-  const linkedChildren = !isChild ? await getLinkedChildren(supabase, user.id) : [];
-  // TEMP testing tools are for admins only (and children linked to them).
-  const qaAllowed = await canUseQaTools(user, profile?.role);
-
-  const { data: levelRows } = qaAllowed
-    ? await supabase.from("bracelet_levels").select("color, required_workouts, required_points")
-    : { data: null };
+  // Independent of each other, so fetched together. The stage table is only
+  // used by the TEMP testing tools, and it's tiny, so it's read either way.
+  const [{ data: parentRow }, linkedChildren, qaAllowed, { data: levelRows }] = await Promise.all([
+    !isChild
+      ? supabase.from("parents").select("pin_hash").eq("id", user.id).maybeSingle<{ pin_hash: string | null }>()
+      : Promise.resolve({ data: null }),
+    !isChild ? getLinkedChildren(supabase, user.id) : Promise.resolve([]),
+    // TEMP testing tools are for admins only (and children linked to them).
+    canUseQaTools(user, profile?.role),
+    supabase.from("bracelet_levels").select("color, required_workouts, required_points"),
+  ]);
   const stageRequirements: StageRequirements = Object.fromEntries(
     ((levelRows ?? []) as { color: BraceletColor; required_workouts: number; required_points: number }[]).map(
       (row) => [row.color, { workouts: row.required_workouts, points: row.required_points }],

@@ -1,5 +1,5 @@
-import type { User } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { SessionUser } from "@/lib/session";
 import type { Role } from "@/lib/types";
 
 // SERVER-ONLY (uses the admin client). Admins are listed by email in the
@@ -20,7 +20,7 @@ function isAdminEmail(email: string | null | undefined): boolean {
 // quick-finish) are shown: to an admin, and to any child linked to an admin
 // — which covers an admin switching into child mode (that swaps the session
 // to the child's own account) as well as a test child signed in by itself.
-export async function canUseQaTools(user: User, role: Role | null | undefined): Promise<boolean> {
+export async function canUseQaTools(user: SessionUser, role: Role | null | undefined): Promise<boolean> {
   if (isAdminEmail(user.email)) {
     return true;
   }

@@ -39,12 +39,18 @@ interface SessionAggregateRow {
   actual_duration_seconds: number | null;
   status: string;
   completion_percent: number | null;
+  workout_results: ResultRow[] | null;
 }
 
 interface ResultRow {
-  session_id: string;
   difficulty_reported: number | null;
   parent_trained_together: boolean;
+}
+
+interface LevelRow {
+  color: BraceletColor;
+  required_points: number;
+  required_workouts: number;
 }
 
 // Accepts either the browser or server Supabase client (see linking.service.ts).
@@ -52,44 +58,38 @@ export async function getChildStatsForParent(
   supabase: SupabaseClient,
   childId: string,
 ): Promise<ParentChildStats | null> {
-  const { data: child } = await supabase
-    .from("children")
-    .select(
-      "nickname, current_color, total_points, points_in_color, workouts_completed_in_color, total_workouts_completed",
-    )
-    .eq("id", childId)
-    .single<ChildRow>();
+  // Everything at once: the stage requirements are tiny, so all of them are
+  // read and the child's picked out, and each session's questionnaire answers
+  // come embedded with it instead of in a second round trip.
+  const [{ data: child }, { data: levels }, { data: allSessions }, completedChallenges] = await Promise.all([
+    supabase
+      .from("children")
+      .select(
+        "nickname, current_color, total_points, points_in_color, workouts_completed_in_color, total_workouts_completed",
+      )
+      .eq("id", childId)
+      .maybeSingle<ChildRow>(),
+    supabase.from("bracelet_levels").select("color, required_points, required_workouts"),
+    // Unbounded, but only fetches the columns aggregates need — used for
+    // totals across the child's entire history.
+    supabase
+      .from("workout_sessions")
+      .select(
+        "id, start_time, actual_duration_seconds, status, completion_percent, workout_results(difficulty_reported, parent_trained_together)",
+      )
+      .eq("child_id", childId),
+    getCompletedChallengeHistory(supabase, childId),
+  ]);
 
   if (!child) {
     return null;
   }
 
-  const { data: level } = await supabase
-    .from("bracelet_levels")
-    .select("required_points, required_workouts")
-    .eq("color", child.current_color)
-    .single<{ required_points: number; required_workouts: number }>();
-
-  // Unbounded, but only fetches the columns aggregates need — used for
-  // totals across the child's entire history.
-  const { data: allSessions } = await supabase
-    .from("workout_sessions")
-    .select("id, start_time, actual_duration_seconds, status, completion_percent")
-    .eq("child_id", childId);
-
+  const level = ((levels ?? []) as LevelRow[]).find((l) => l.color === child.current_color);
   const allSessionRows = (allSessions ?? []) as SessionAggregateRow[];
-  const completedSessionIds = allSessionRows
+  const resultRows = allSessionRows
     .filter((s) => s.status === "completed")
-    .map((s) => s.id);
-
-  const { data: results } = completedSessionIds.length
-    ? await supabase
-        .from("workout_results")
-        .select("session_id, difficulty_reported, parent_trained_together")
-        .in("session_id", completedSessionIds)
-    : { data: [] as ResultRow[] };
-
-  const resultRows = (results ?? []) as ResultRow[];
+    .flatMap((s) => s.workout_results ?? []);
 
   const totalActiveSeconds = allSessionRows.reduce(
     (sum, s) => sum + (typeof s.actual_duration_seconds === "number" ? s.actual_duration_seconds : 0),
@@ -112,8 +112,6 @@ export async function getChildStatsForParent(
       s.completion_percent !== null &&
       !meetsCompletionThreshold(s.completion_percent),
   ).length;
-
-  const completedChallenges = await getCompletedChallengeHistory(supabase, childId);
 
   const requiredPoints = level?.required_points ?? 0;
   const requiredWorkouts = level?.required_workouts ?? 0;

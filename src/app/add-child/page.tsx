@@ -1,24 +1,10 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getProfile, requireUser } from "@/lib/session";
 import { AddChildForm } from "@/components/AddChildForm";
-import type { Role } from "@/lib/types";
 
 export default async function AddChildPage() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user.id)
-    .single<{ role: Role }>();
+  const user = await requireUser();
+  const profile = await getProfile(user.id);
 
   if (profile?.role !== "parent") {
     redirect("/dashboard");

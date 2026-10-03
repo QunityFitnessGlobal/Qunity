@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -14,8 +14,8 @@ import type { Role } from "@/lib/types";
 interface BottomTabBarProps {
   role: Role;
   userId: string;
-  // Server-rendered count for the child's Challenges tab, refreshed here on
-  // every navigation since the layout itself doesn't re-render between tabs.
+  // Server-rendered count for the child's Challenges tab, re-read here after
+  // leaving that tab since the layout itself doesn't re-render between tabs.
   initialNewChallenges: number;
 }
 
@@ -54,9 +54,16 @@ export function BottomTabBar({ role, userId, initialNewChallenges }: BottomTabBa
   const childId = searchParams.get("childId");
   const suffix = role !== "child" && childId ? `?childId=${childId}` : "";
   const [newChallenges, setNewChallenges] = useState(initialNewChallenges);
+  const previousPathRef = useRef(pathname);
 
+  // Inside the dashboard the count can only change on the challenges tab
+  // (opening a box there), so it's re-read when the child leaves that tab —
+  // not on every tab change. Coming back from a workout or a challenge
+  // re-renders the layout, which brings a fresh count from the server.
   useEffect(() => {
-    if (role !== "child") {
+    const leftChallenges = previousPathRef.current === CHALLENGES_HREF && pathname !== CHALLENGES_HREF;
+    previousPathRef.current = pathname;
+    if (role !== "child" || !leftChallenges) {
       return;
     }
     let cancelled = false;

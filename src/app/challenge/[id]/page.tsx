@@ -1,8 +1,8 @@
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { getProfile, getSupabase, requireUser } from "@/lib/session";
 import { ChallengeRunner } from "@/components/child/ChallengeRunner";
-import type { BraceletColor, Gender, Role } from "@/lib/types";
+import type { BraceletColor } from "@/lib/types";
 import type { LocalizedText } from "@/lib/i18n-content";
 
 interface ChallengePageProps {
@@ -20,32 +20,16 @@ interface ChallengeRow {
 
 export default async function ChallengePage({ params }: ChallengePageProps) {
   const { id } = await params;
-  const supabase = await createClient();
+  const user = await requireUser();
+  const supabase = await getSupabase();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role, gender")
-    .eq("id", user.id)
-    .single<{ role: Role; gender: Gender | null }>();
-
-  if (profile?.role !== "child") {
-    redirect("/dashboard");
-  }
-
-  const [{ data: challenge }, { data: attempts }] = await Promise.all([
+  const [profile, { data: challenge }, { data: attempts }] = await Promise.all([
+    getProfile(user.id),
     supabase
       .from("challenges")
       .select("id, title, description, bonus_points, challenge_type, unlock_color")
       .eq("id", id)
-      .single<ChallengeRow>(),
+      .maybeSingle<ChallengeRow>(),
     supabase
       .from("challenge_sessions")
       .select("actual_duration_seconds")
@@ -53,6 +37,10 @@ export default async function ChallengePage({ params }: ChallengePageProps) {
       .eq("challenge_id", id)
       .eq("status", "completed"),
   ]);
+
+  if (profile?.role !== "child") {
+    redirect("/dashboard");
+  }
 
   if (!challenge || challenge.challenge_type !== "repeatable_workout") {
     notFound();

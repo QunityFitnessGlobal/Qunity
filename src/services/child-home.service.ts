@@ -25,13 +25,23 @@ export async function getChildHomeStats(
   childId: string,
   currentColor: BraceletColor,
 ): Promise<ChildHomeStats> {
-  const [{ data: sessions }, { data: powerRow }] = await Promise.all([
+  // All three at once: the last workout's points come embedded with it,
+  // rather than waiting for its id before asking for them.
+  const [{ data: sessions }, { data: lastSession }, { data: powerRow }] = await Promise.all([
     supabase
       .from("workout_sessions")
-      .select("id, start_time")
+      .select("start_time")
       .eq("child_id", childId)
       .eq("status", "completed")
       .order("start_time", { ascending: false }),
+    supabase
+      .from("workout_sessions")
+      .select("id, points_transactions(points)")
+      .eq("child_id", childId)
+      .eq("status", "completed")
+      .order("start_time", { ascending: false })
+      .limit(1)
+      .maybeSingle<{ id: string; points_transactions: { points: number }[] | null }>(),
     supabase
       .from("child_challenges")
       .select("challenge_id")
@@ -40,22 +50,17 @@ export async function getChildHomeStats(
       .maybeSingle(),
   ]);
 
-  const rows = (sessions ?? []) as { id: string; start_time: string }[];
+  const rows = (sessions ?? []) as { start_time: string }[];
   const dates = rows.map((row) => new Date(row.start_time));
   const lastDay = dates.length > 0 ? utcDay(dates[0]) : null;
   // Same day rule (UTC calendar days) as the streak challenges use.
   const stillGoing = lastDay !== null && utcDay(new Date()) - lastDay <= DAY_MS;
   const streakDays = stillGoing ? calculateStreakDays(dates) : 0;
 
-  let lastWorkoutPoints = 0;
-  if (rows.length > 0) {
-    const { data: points } = await supabase
-      .from("points_transactions")
-      .select("points")
-      .eq("child_id", childId)
-      .eq("session_id", rows[0].id);
-    lastWorkoutPoints = (points ?? []).reduce((sum, row) => sum + ((row.points as number) ?? 0), 0);
-  }
+  const lastWorkoutPoints = (lastSession?.points_transactions ?? []).reduce(
+    (sum, row) => sum + (row.points ?? 0),
+    0,
+  );
 
   return { streakDays, lastWorkoutPoints, powerRevealed: Boolean(powerRow) };
 }

@@ -1,39 +1,29 @@
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { BottomTabBar } from "@/components/BottomTabBar";
 import { getNewChallengesCount } from "@/services/challenge.service";
-import type { Role } from "@/lib/types";
+import { getProfile, getSupabase, requireUser } from "@/lib/session";
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
+  const user = await requireUser();
+  const supabase = await getSupabase();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user.id)
-    .single<{ role: Role }>();
-
+  // The count is only shown to a child; for a parent it simply comes back 0,
+  // and asking alongside the profile saves waiting for one before the other.
+  const [profile, newChallenges] = await Promise.all([
+    getProfile(user.id),
+    getNewChallengesCount(supabase, user.id),
+  ]);
   const role = profile?.role ?? "parent";
-  const newChallenges = role === "child" ? await getNewChallengesCount(supabase, user.id) : 0;
 
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex-1 pb-16">{children}</div>
       <Suspense fallback={null}>
-        <BottomTabBar role={role} userId={user.id} initialNewChallenges={newChallenges} />
+        <BottomTabBar role={role} userId={user.id} initialNewChallenges={role === "child" ? newChallenges : 0} />
       </Suspense>
     </div>
   );

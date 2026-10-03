@@ -1,9 +1,8 @@
 import Image from "next/image";
-import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { getProfile, getSupabase, requireUser } from "@/lib/session";
 import { getLinkedChildren } from "@/services/linking.service";
-import { getNextWorkout, getWorkoutsCompletedThisMonth } from "@/services/workout.service";
+import { getStageWorkouts, getWorkoutsCompletedThisMonth, pickNextWorkout } from "@/services/workout.service";
 import { calculateProgressPercent } from "@/services/progression.service";
 import { getEncouragementKey } from "@/services/encouragement.service";
 import { getChildStatsForParent } from "@/services/parent-stats.service";
@@ -17,57 +16,62 @@ import { StatsGrid } from "@/components/parent/StatsGrid";
 import { TipsPanel } from "@/components/parent/TipsPanel";
 import { ChildHomeView } from "@/components/child/ChildHomeView";
 import { getChildHomeStats } from "@/services/child-home.service";
-import type { BraceletColor, Gender, Role } from "@/lib/types";
+import type { BraceletColor, Gender } from "@/lib/types";
 
 interface DashboardPageProps {
   searchParams: Promise<{ childId?: string }>;
 }
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role, full_name, gender")
-    .eq("id", user.id)
-    .single<{ role: Role; full_name: string; gender: Gender | null }>();
+  const user = await requireUser();
+  const supabase = await getSupabase();
+  // A child's own row and a parent's linked children are asked for alongside
+  // the profile — whichever doesn't apply simply comes back empty — so
+  // neither waits for the role before starting.
+  const [profile, { data: child }, linkedChildren] = await Promise.all([
+    getProfile(user.id),
+    supabase
+      .from("children")
+      .select(
+        "child_code, current_color, total_points, points_in_color, workouts_completed_in_color, code_shown_at",
+      )
+      .eq("id", user.id)
+      .maybeSingle<{
+        child_code: string;
+        current_color: BraceletColor;
+        total_points: number;
+        points_in_color: number;
+        workouts_completed_in_color: number;
+        code_shown_at: string | null;
+      }>(),
+    getLinkedChildren(supabase, user.id),
+  ]);
 
   if (profile?.role !== "child") {
     const t = await getTranslations("dashboard");
     const tWorkout = await getTranslations("workout");
-    const linkedChildren = await getLinkedChildren(supabase, user.id);
     const { childId } = await searchParams;
     const selectedChildId = childId ?? linkedChildren[0]?.id ?? null;
 
-    const stats = selectedChildId
-      ? await getChildStatsForParent(supabase, selectedChildId)
-      : null;
-    const initialTips = selectedChildId ? await getRelevantTips(supabase, selectedChildId) : [];
-    if (selectedChildId && initialTips.length > 0) {
-      await logShownTips(
-        supabase,
-        user.id,
-        selectedChildId,
-        initialTips.map((tip) => tip.ruleId),
-        "auto",
-      );
-    }
-    const { data: childUser } = selectedChildId
-      ? await supabase
-          .from("users")
-          .select("gender")
-          .eq("id", selectedChildId)
-          .single<{ gender: Gender | null }>()
-      : { data: null };
-    const childGender = childUser?.gender ?? null;
+    // The stats, the tips (and recording which were shown) and the child's
+    // gender don't depend on each other, so they're fetched together.
+    const [stats, initialTips, childGender] = selectedChildId
+      ? await Promise.all([
+          getChildStatsForParent(supabase, selectedChildId),
+          getRelevantTips(supabase, selectedChildId).then(async (tips) => {
+            if (tips.length > 0) {
+              await logShownTips(supabase, user.id, selectedChildId, tips.map((tip) => tip.ruleId), "auto");
+            }
+            return tips;
+          }),
+          supabase
+            .from("users")
+            .select("gender")
+            .eq("id", selectedChildId)
+            .maybeSingle<{ gender: Gender | null }>()
+            .then(({ data }) => data?.gender ?? null),
+        ])
+      : [null, [], null];
 
     return (
       <div className="flex flex-1 flex-col items-center gap-6 pb-12">
@@ -139,42 +143,25 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     );
   }
 
-  const { data: child } = await supabase
-    .from("children")
-    .select(
-      "child_code, current_color, total_points, points_in_color, workouts_completed_in_color, code_shown_at",
-    )
-    .eq("id", user.id)
-    .single<{
-      child_code: string;
-      current_color: BraceletColor;
-      total_points: number;
-      points_in_color: number;
-      workouts_completed_in_color: number;
-      code_shown_at: string | null;
-    }>();
 
   const currentColor = child?.current_color ?? "white";
   const showCodeInline = child != null && child.code_shown_at === null;
 
-  if (showCodeInline) {
-    await supabase
-      .from("children")
-      .update({ code_shown_at: new Date().toISOString() })
-      .eq("id", user.id);
-  }
-
-  const { data: level } = await supabase
-    .from("bracelet_levels")
-    .select("required_points, required_workouts")
-    .eq("color", currentColor)
-    .single<{ required_points: number; required_workouts: number }>();
-
-  const [nextWorkout, workoutsThisMonth, homeStats] = await Promise.all([
-    getNextWorkout(supabase, user.id),
+  // Everything else only needs the child's row, so it all goes out at once.
+  const [{ data: level }, stageWorkouts, workoutsThisMonth, homeStats] = await Promise.all([
+    supabase
+      .from("bracelet_levels")
+      .select("required_points, required_workouts")
+      .eq("color", currentColor)
+      .single<{ required_points: number; required_workouts: number }>(),
+    getStageWorkouts(supabase, currentColor),
     getWorkoutsCompletedThisMonth(supabase, user.id),
     getChildHomeStats(supabase, user.id, currentColor),
+    showCodeInline
+      ? supabase.from("children").update({ code_shown_at: new Date().toISOString() }).eq("id", user.id)
+      : null,
   ]);
+  const nextWorkout = pickNextWorkout(stageWorkouts, child?.workouts_completed_in_color ?? 0);
 
   const requiredPoints = level?.required_points ?? 0;
   const requiredWorkouts = level?.required_workouts ?? 0;
@@ -220,7 +207,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           pointsLeft={pointsToNextColor}
           progressPercent={progressPercent}
           powerRevealed={homeStats.powerRevealed}
-          nextWorkout={nextWorkout ? { id: nextWorkout.workout.id, number: nextWorkout.workoutIndex } : null}
+          nextWorkout={nextWorkout ? { id: nextWorkout.id, number: workoutsCompletedInColor + 1 } : null}
           childCode={showCodeInline ? (child?.child_code ?? null) : null}
         />
       </div>

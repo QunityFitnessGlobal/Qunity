@@ -34,6 +34,7 @@ interface CompletedSessionRow {
   start_time: string;
   actual_duration_seconds: number | null;
   completion_percent: number | null;
+  workout_results: WorkoutResultRow[] | null;
 }
 
 interface WorkoutResultRow {
@@ -79,7 +80,9 @@ export async function buildChildTipSnapshot(
         .single<{ total_workouts_completed: number }>(),
       supabase
         .from("workout_sessions")
-        .select("id, start_time, actual_duration_seconds, completion_percent")
+        .select(
+          "id, start_time, actual_duration_seconds, completion_percent, workout_results(session_id, difficulty_reported, feeling_after, parent_trained_together)",
+        )
         .eq("child_id", childId)
         .eq("status", "completed")
         .order("start_time", { ascending: true }),
@@ -93,16 +96,8 @@ export async function buildChildTipSnapshot(
     ]);
 
   const sessionRows = (sessions ?? []) as CompletedSessionRow[];
-  const sessionIds = sessionRows.map((s) => s.id);
-
-  const { data: results } = sessionIds.length
-    ? await supabase
-        .from("workout_results")
-        .select("session_id, difficulty_reported, feeling_after, parent_trained_together")
-        .in("session_id", sessionIds)
-    : { data: [] as WorkoutResultRow[] };
-
-  const resultRows = (results ?? []) as WorkoutResultRow[];
+  // Each session's questionnaire answers arrive embedded with it.
+  const resultRows = sessionRows.flatMap((s) => s.workout_results ?? []);
   const resultBySessionId = new Map(resultRows.map((r) => [r.session_id, r]));
 
   const now = new Date();
@@ -175,11 +170,10 @@ export async function getRelevantTips(
   childId: string,
   manualTestIndex?: number,
 ): Promise<RelevantTip[]> {
-  const snapshot = await buildChildTipSnapshot(supabase, childId);
-
-  const { data: rules } = await supabase
-    .from("parent_tip_rules")
-    .select("id, principle, condition_type, condition_params, tip_text, priority");
+  const [snapshot, { data: rules }] = await Promise.all([
+    buildChildTipSnapshot(supabase, childId),
+    supabase.from("parent_tip_rules").select("id, principle, condition_type, condition_params, tip_text, priority"),
+  ]);
 
   const ruleRows = (rules ?? []) as TipRuleRow[];
 

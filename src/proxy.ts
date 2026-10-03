@@ -24,9 +24,12 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getClaims refreshes an expired session (writing the new cookies above)
+  // and verifies the token. With Supabase's asymmetric signing keys that's
+  // done locally against cached keys — no round trip to the Auth server on
+  // every request, as getUser() needed.
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims ?? null;
 
   const { pathname } = request.nextUrl;
   const publicRoutes = ["/", "/login", "/signup"];

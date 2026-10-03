@@ -214,6 +214,7 @@ interface SessionRow {
     | { title: LocalizedText; color: BraceletColor | null; order_in_color: number | null }
     | { title: LocalizedText; color: BraceletColor | null; order_in_color: number | null }[]
     | null;
+  workout_results: ResultRow[] | null;
 }
 
 interface ResultRow {
@@ -230,7 +231,7 @@ interface TipRuleRow {
 }
 
 const SESSION_COLUMNS =
-  "id, workout_id, start_time, actual_duration_seconds, completion_percent, is_replay, workouts(title, color, order_in_color)";
+  "id, workout_id, start_time, actual_duration_seconds, completion_percent, is_replay, workouts(title, color, order_in_color), workout_results(session_id, difficulty_reported, feeling_after, parent_trained_together)";
 
 function toFeeling(value: string | null): FeelingCode | null {
   return value && (FEELING_CODES as readonly string[]).includes(value) ? (value as FeelingCode) : null;
@@ -284,15 +285,10 @@ export async function getWorkoutHistory(
 
   const recentRows = (recent ?? []) as SessionRow[];
   const windowSessionRows = (windowRows ?? []) as SessionRow[];
-  const sessionIds = Array.from(new Set([...recentRows, ...windowSessionRows].map((s) => s.id)));
-
-  const { data: results } = sessionIds.length
-    ? await supabase
-        .from("workout_results")
-        .select("session_id, difficulty_reported, feeling_after, parent_trained_together")
-        .in("session_id", sessionIds)
-    : { data: [] as ResultRow[] };
-  const resultBySession = new Map(((results ?? []) as ResultRow[]).map((r) => [r.session_id, r]));
+  // Each session's questionnaire answers arrive embedded with it.
+  const resultBySession = new Map(
+    [...recentRows, ...windowSessionRows].flatMap((s) => (s.workout_results ?? []).map((r) => [r.session_id, r] as const)),
+  );
 
   const toSession = (row: SessionRow): HistorySession => {
     const result = resultBySession.get(row.id);

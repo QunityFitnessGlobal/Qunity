@@ -39,26 +39,19 @@ export async function getNextWorkout(
     return null;
   }
 
-  const { data: level } = await supabase
-    .from("bracelet_levels")
-    .select("required_workouts")
-    .eq("color", child.current_color)
-    .single<{ required_workouts: number }>();
+  const [{ data: level }, workouts] = await Promise.all([
+    supabase
+      .from("bracelet_levels")
+      .select("required_workouts")
+      .eq("color", child.current_color)
+      .single<{ required_workouts: number }>(),
+    getStageWorkouts(supabase, child.current_color),
+  ]);
 
-  const { data: workouts } = await supabase
-    .from("workouts")
-    .select("*")
-    .eq("color", child.current_color)
-    .order("order_in_color", { ascending: true });
-
-  if (!workouts || workouts.length === 0) {
+  const workout = pickNextWorkout(workouts, child.workouts_completed_in_color);
+  if (!workout) {
     return null;
   }
-
-  // Only a handful of sample workouts exist per color while required_workouts
-  // is much larger, so the same workouts repeat in order until the child has
-  // completed enough of them to level up.
-  const workout = workouts[child.workouts_completed_in_color % workouts.length] as Workout;
 
   return {
     workout,
@@ -66,6 +59,24 @@ export async function getNextWorkout(
     requiredWorkouts: level?.required_workouts ?? 0,
     currentColor: child.current_color,
   };
+}
+
+// A stage's workouts in order — split out so a screen that already knows the
+// child's progress can fetch it alongside its other queries.
+export async function getStageWorkouts(supabase: SupabaseClient, color: BraceletColor): Promise<Workout[]> {
+  const { data } = await supabase
+    .from("workouts")
+    .select("*")
+    .eq("color", color)
+    .order("order_in_color", { ascending: true });
+  return (data ?? []) as Workout[];
+}
+
+// Only a handful of sample workouts exist per color while required_workouts
+// is much larger, so the same workouts repeat in order until the child has
+// completed enough of them to level up.
+export function pickNextWorkout(workouts: Workout[], completedInColor: number): Workout | null {
+  return workouts.length > 0 ? workouts[completedInColor % workouts.length] : null;
 }
 
 export interface WorkoutExerciseEntry {

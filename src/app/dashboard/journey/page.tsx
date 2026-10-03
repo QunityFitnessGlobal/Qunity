@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { getProfile, getSupabase, requireUser } from "@/lib/session";
 import { getJourneyStations } from "@/services/journey.service";
 import { COLOR_ORDER } from "@/services/progression.service";
 import { BRACELET_CSS_VAR } from "@/lib/colors";
 import { JourneyPath, type JourneyRenderItem } from "@/components/child/JourneyPath";
-import type { BraceletColor, Gender, Role } from "@/lib/types";
+import type { BraceletColor } from "@/lib/types";
 
 // Purely presentational layout constants — not business data, so these are
 // fine to hardcode. Every count that actually matters (how many stations,
@@ -17,34 +17,26 @@ const STATION_SPACING_PX = 96;
 const ZIGZAG_AMPLITUDE_PX = 70;
 
 export default async function JourneyPage() {
-  const supabase = await createClient();
+  const user = await requireUser();
+  const supabase = await getSupabase();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role, gender, full_name")
-    .eq("id", user.id)
-    .single<{ role: Role; gender: Gender | null; full_name: string | null }>();
+  // The child's row and the stations don't need the role, so they're fetched
+  // alongside the profile rather than after it.
+  const [profile, { data: child }, { stations }] = await Promise.all([
+    getProfile(user.id),
+    supabase
+      .from("children")
+      .select("current_color")
+      .eq("id", user.id)
+      .maybeSingle<{ current_color: BraceletColor }>(),
+    getJourneyStations(supabase, user.id),
+  ]);
 
   if (profile?.role !== "child") {
     redirect("/dashboard");
   }
-
-  const { data: child } = await supabase
-    .from("children")
-    .select("current_color")
-    .eq("id", user.id)
-    .single<{ current_color: BraceletColor }>();
   const currentColor = child?.current_color ?? "white";
 
-  const { stations } = await getJourneyStations(supabase, user.id);
   const t = await getTranslations("journey");
   const tColors = await getTranslations("colors");
   const tPowers = await getTranslations("powers");

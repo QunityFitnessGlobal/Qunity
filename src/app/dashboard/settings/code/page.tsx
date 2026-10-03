@@ -1,35 +1,20 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { getProfile, getSupabase, requireUser } from "@/lib/session";
 import { ChildCodeCard } from "@/components/ChildCodeCard";
-import type { Role } from "@/lib/types";
 
 export default async function MyCodePage() {
-  const supabase = await createClient();
+  const user = await requireUser();
+  const supabase = await getSupabase();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user.id)
-    .single<{ role: Role }>();
+  const [profile, { data: child }] = await Promise.all([
+    getProfile(user.id),
+    supabase.from("children").select("child_code").eq("id", user.id).maybeSingle<{ child_code: string }>(),
+  ]);
 
   if (profile?.role !== "child") {
     redirect("/dashboard");
   }
-
-  const { data: child } = await supabase
-    .from("children")
-    .select("child_code")
-    .eq("id", user.id)
-    .single<{ child_code: string }>();
 
   const t = await getTranslations("settings");
 

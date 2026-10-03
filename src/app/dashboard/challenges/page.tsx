@@ -1,33 +1,24 @@
-import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { getProfile, getSupabase, requireUser } from "@/lib/session";
 import { getLinkedChildren } from "@/services/linking.service";
 import { getChildStatsForParent } from "@/services/parent-stats.service";
 import { getCompletedChallengeHistory, getPendingChallenges } from "@/services/challenge.service";
 import { ChallengesTabs } from "@/components/child/ChallengesTabs";
 import { ChildSelector } from "@/components/parent/ChildSelector";
-import type { Role } from "@/lib/types";
 
 interface ChallengesPageProps {
   searchParams: Promise<{ childId?: string }>;
 }
 
 export default async function ChallengesPage({ searchParams }: ChallengesPageProps) {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user.id)
-    .single<{ role: Role }>();
+  const user = await requireUser();
+  const supabase = await getSupabase();
+  // A parent's linked children are asked for alongside the profile; for a
+  // child the list simply comes back empty.
+  const [profile, linkedChildren] = await Promise.all([
+    getProfile(user.id),
+    getLinkedChildren(supabase, user.id),
+  ]);
 
   const t = await getTranslations("challengesPage");
   const tDashboard = await getTranslations("dashboard");
@@ -46,7 +37,6 @@ export default async function ChallengesPage({ searchParams }: ChallengesPagePro
     );
   }
 
-  const linkedChildren = await getLinkedChildren(supabase, user.id);
   const { childId } = await searchParams;
   const selectedChildId = childId ?? linkedChildren[0]?.id ?? null;
 
