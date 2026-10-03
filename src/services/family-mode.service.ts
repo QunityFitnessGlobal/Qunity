@@ -170,6 +170,33 @@ interface IssueSessionResult {
 
 async function issueSessionForChild(childId: string): Promise<IssueSessionResult> {
   const admin = createAdminClient();
+  const anon = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } },
+  );
+
+  // Preferred: a one-time sign-in token minted here and redeemed right away
+  // (generateLink sends no email). It needs no stored password, so it keeps
+  // working after a child with a real email resets their own password.
+  const { data: account } = await admin.auth.admin.getUserById(childId);
+  const email = account.user?.email;
+  if (email) {
+    const { data: link } = await admin.auth.admin.generateLink({ type: "magiclink", email });
+    const tokenHash = link?.properties?.hashed_token;
+    if (tokenHash) {
+      const { data: verified } = await anon.auth.verifyOtp({ type: "magiclink", token_hash: tokenHash });
+      if (verified.session) {
+        return {
+          success: true,
+          accessToken: verified.session.access_token,
+          refreshToken: verified.session.refresh_token,
+        };
+      }
+    }
+  }
+
+  // Fallback: the hidden password stored when the child was created.
   const { data: creds } = await admin
     .from("child_credentials")
     .select("hidden_email, hidden_password")
@@ -179,11 +206,6 @@ async function issueSessionForChild(childId: string): Promise<IssueSessionResult
     return { success: false, error: "NO_HIDDEN_ACCOUNT" };
   }
 
-  const anon = createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } },
-  );
   const { data: signIn, error: signInError } = await anon.auth.signInWithPassword({
     email: creds.hidden_email,
     password: creds.hidden_password,

@@ -514,3 +514,79 @@ body {
     animation: none;
   }
 }
+
+/* Entry screens (EntryShell, login, signup, pair, password reset): the sheet
+   rises over the brand bar, the stage beads bob one after another
+   (--bead-delay), the purple glow breathes, a failed try shakes, the key
+   wiggles, the envelope flies in, and the success tick draws itself. */
+@keyframes entry-sheet {
+  from { transform: translateY(60px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes entry-bead {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+@keyframes entry-glow {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.7; }
+}
+@keyframes entry-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(3px); }
+}
+@keyframes entry-wiggle {
+  0%, 70%, 100% { transform: rotate(0); }
+  78% { transform: rotate(-10deg); }
+  86% { transform: rotate(9deg); }
+  94% { transform: rotate(-4deg); }
+}
+@keyframes entry-fly {
+  0% { transform: translate(-40px, 30px) rotate(-14deg) scale(0.6); opacity: 0; }
+  60% { transform: translate(6px, -6px) rotate(4deg) scale(1.05); opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+@keyframes entry-draw {
+  from { stroke-dashoffset: 60; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes entry-ringout {
+  from { transform: scale(0.5); opacity: 0.9; }
+  to { transform: scale(1.9); opacity: 0; }
+}
+.animate-entry-sheet {
+  animation: entry-sheet 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+.animate-entry-bead {
+  animation: entry-bead 2.4s ease-in-out infinite;
+  animation-delay: var(--bead-delay, 0s);
+}
+.animate-entry-glow {
+  animation: entry-glow 4s ease-in-out infinite;
+}
+.animate-entry-shake {
+  animation: entry-shake 0.4s ease-in-out both;
+}
+.animate-entry-wiggle {
+  animation: entry-wiggle 2.8s ease-in-out 1s infinite;
+}
+.animate-entry-fly {
+  animation: entry-fly 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+.animate-entry-draw {
+  animation: entry-draw 0.5s ease-out 0.45s both;
+}
+.animate-entry-ringout {
+  animation: entry-ringout 0.9s ease-out 0.2s both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-entry-bead,
+  .animate-entry-glow,
+  .animate-entry-wiggle,
+  .animate-entry-shake {
+    animation: none;
+  }
+}

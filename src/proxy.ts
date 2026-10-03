@@ -32,17 +32,26 @@ export async function proxy(request: NextRequest) {
   const user = data?.claims ?? null;
 
   const { pathname } = request.nextUrl;
-  const publicRoutes = ["/", "/login", "/signup"];
+  const publicRoutes = ["/", "/login", "/signup", "/forgot-password"];
   // /pair (manual code entry) and /pair/<token> (QR link target) both need
   // to work for a child who has no session at all yet — that's the whole
   // point of device pairing (see family-mode.service.ts's redeemPairingCode).
-  const isPublicRoute = publicRoutes.includes(pathname) || pathname.startsWith("/pair");
+  // /auth/confirm is where the password-reset email's link lands.
+  const isPublicRoute =
+    publicRoutes.includes(pathname) || pathname.startsWith("/pair") || pathname.startsWith("/auth/");
+
+  // The new-password screen only works with the session the reset link
+  // opened; without one, the link expired or was already used.
+  if (!user && pathname === "/reset-password") {
+    return NextResponse.redirect(new URL("/forgot-password?error=expired", request.url));
+  }
 
   if (!user && !isPublicRoute) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (user && (pathname === "/login" || pathname === "/signup")) {
+  // Someone already signed in skips the welcome and sign-in screens.
+  if (user && (pathname === "/" || pathname === "/login" || pathname === "/signup")) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 

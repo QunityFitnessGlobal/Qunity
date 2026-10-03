@@ -27,7 +27,7 @@
   },
   "auth": {
     "login": {
-      "title": "Log in to Qunity",
+      "title": "Good to see you again",
       "email": "Email",
       "password": "Password",
       "submit": "Log in",
@@ -35,32 +35,77 @@
       "noAccount": "Don't have an account yet?",
       "signupLink": "Sign up",
       "genericError": "Login error, please try again",
-      "invalidCredentials": "Incorrect email or password",
+      "invalidCredentials": "The email or password isn't right.",
       "emailNotConfirmed": "Please confirm your email before logging in",
       "rateLimited": "Too many attempts, please try again shortly",
-      "havePairingCode": "Have a code from your parent?"
+      "havePairingCode": "Have a code from your parent?",
+      "subtitle": "Log in with your email and password",
+      "forgot": "Forgot password?",
+      "resetHint": "You can reset your password easily"
     },
     "signup": {
-      "title": "Sign up for Qunity",
-      "fullName": "Full name",
+      "title": "Join Qunity",
+      "fullName": "Name",
       "email": "Email",
       "password": "Password",
-      "roleLabel": "I am signing up as...",
+      "roleLabel": "Who is signing up?",
       "roleParent": "Parent",
-      "roleChild": "Child",
+      "roleChild": "Kid",
       "genderLabel": "Gender",
       "genderFemaleParent": "Mom",
       "genderMaleParent": "Dad",
       "genderFemaleChild": "Female",
       "genderMaleChild": "Male",
-      "submit": "Sign up",
-      "submitting": "Signing up...",
+      "submit": "Create account",
+      "submitting": "Creating account...",
       "haveAccount": "Already have an account?",
       "loginLink": "Log in",
       "genericError": "Signup error, please try again",
       "emailTaken": "This email address is already registered",
       "weakPassword": "Password must be at least 6 characters",
-      "rateLimited": "Too many attempts, please try again shortly"
+      "rateLimited": "Too many attempts, please try again shortly",
+      "roleParentSub": "Guides and empowers",
+      "roleChildSub": "Trains and collects powers",
+      "passwordHint": "At least {count} characters"
+    },
+    "forgot": {
+      "title": "Forgot your password?",
+      "description": "It happens. We'll email a reset link to the account's address.",
+      "email": "Email",
+      "submit": "Send reset link",
+      "sending": "Sending...",
+      "backToLogin": "Back to log in",
+      "childNote": "Kids who enter with a code from a parent don't need a password. The parent can create a new code in Settings.",
+      "sentTitle": "Check your email",
+      "sentTo": "We sent a password reset link to",
+      "tipExpiry": "The link is valid for an hour",
+      "tipSpam": "Can't find it? Check the spam folder too",
+      "resendIn": "Didn't get it? You can resend in",
+      "resend": "Didn't get it? Send again",
+      "otherAddress": "Send to a different address",
+      "expired": "The link expired or was already used. You can send a new one.",
+      "rateLimited": "Several requests were sent in a row. Try again in a minute.",
+      "genericError": "Something went wrong sending it. Please try again."
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "strength1": "Too short",
+      "strength2": "Good password",
+      "strength3": "Strong password",
+      "ruleLength": "At least {count} characters",
+      "ruleMatch": "Both passwords match",
+      "submit": "Save password",
+      "saving": "Saving...",
+      "samePassword": "That's your current password. Choose a different one.",
+      "weakPassword": "The password is too short.",
+      "expired": "The link expired.",
+      "newLink": "Send a new link",
+      "genericError": "Something went wrong saving it. Please try again.",
+      "doneTitle": "Password updated!",
+      "doneText": "From now on, log in with the new password.",
+      "enter": "Enter Qunity"
     }
   },
   "linking": {
@@ -373,11 +418,16 @@
     "pairSuccess": "The child's device was connected successfully"
   },
   "pair": {
-    "title": "Connect device",
-    "description": "Enter the 6-digit code you got from your parent",
+    "title": "Enter with a code",
+    "description": "A parent creates a 6-digit code in Settings. Type it here and you're in.",
     "checking": "Checking...",
-    "submit": "Connect",
-    "invalidOrExpired": "That code is wrong or has expired"
+    "submit": "Let's go in!",
+    "invalidOrExpired": "That code is wrong or has expired",
+    "codeLabel": "The code from a parent",
+    "digitsLeft": "{count, plural, one {One more digit} other {# more digits}}",
+    "ready": "Ready! You can go in",
+    "delete": "Delete",
+    "scanHint": "You can also scan the code on the parent's phone with the camera"
   },
   "nav": {
     "home": "Home",
@@ -500,5 +550,15 @@
     "feelingQuestionChallenge": "How did you feel at the end of the challenge?",
     "answersLeft": "{count, plural, one {1 more answer} other {# more answers}}",
     "submit": "Send and collect points"
+  },
+  "entry": {
+    "back": "Back",
+    "welcomeTitle": "Welcome",
+    "welcomeSub": "Parents and kids train, grow and celebrate together.",
+    "signupFamily": "Sign up a new family",
+    "or": "or",
+    "childCode": "Got a code from a parent? Enter with it",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   }
 }

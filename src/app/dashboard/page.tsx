@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { getProfile, getSupabase, requireUser } from "@/lib/session";
 import { getLinkedChildren } from "@/services/linking.service";
@@ -74,16 +73,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       : [null, [], null];
 
     return (
-      <div className="flex flex-1 flex-col items-center gap-6 pb-12">
-        <header className="flex w-full items-center justify-center bg-brand-background py-4">
-          <Image
-            src="/logo/qunity-logo-transparent.png"
-            alt="Qunity"
-            width={160}
-            height={72}
-            priority
-          />
-        </header>
+      <div className="flex flex-1 flex-col items-center gap-6 pb-12 pt-6">
 
         <div className="flex w-full flex-col items-center gap-6 px-4">
           <h1 className="text-2xl font-bold">{t("parentTitle")}</h1>
@@ -182,16 +172,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   });
 
   return (
-    <div className="flex flex-1 flex-col items-center gap-6 pb-12">
-      <header className="flex w-full items-center justify-center bg-brand-background py-4">
-        <Image
-          src="/logo/qunity-logo-transparent.png"
-          alt="Qunity"
-          width={180}
-          height={80}
-          priority
-        />
-      </header>
+    <div className="flex flex-1 flex-col items-center gap-6 pb-12 pt-6">
 
       <div className="flex w-full flex-col items-center px-4">
         <ChildHomeView
