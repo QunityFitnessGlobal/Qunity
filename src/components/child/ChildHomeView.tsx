@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { BRACELET_CSS_VAR, LEVEL_UP_THEME } from "@/lib/colors";
 import { POWER_ICON } from "@/lib/powers";
 import { COLOR_ORDER } from "@/services/progression.service";
+import { collectedCount, powerSlots } from "@/services/achievements.service";
 import { BASE_POINTS } from "@/services/points.service";
 import { EnergyMeter } from "@/components/child/EnergyMeter";
 import { PointsCounter } from "@/components/child/PointsCounter";
@@ -62,6 +63,9 @@ export async function ChildHomeView({
   const tNext = await getTranslations("nextWorkout");
 
   const PowerIcon = POWER_ICON[color];
+  // The powers collected so far — the badge under the avatar, which opens
+  // the achievements screen.
+  const collected = collectedCount(powerSlots(color, powerRevealed));
   const theme = LEVEL_UP_THEME[color];
   const nextColor = COLOR_ORDER[COLOR_ORDER.indexOf(color) + 1] ?? null;
   const workoutsLeft = Math.max(0, requiredWorkouts - workoutsDone);
@@ -88,7 +92,11 @@ export async function ChildHomeView({
       </div>
 
       <div className="flex items-center gap-3.5">
-        <div className="relative h-24 w-24 flex-none">
+        <Link
+          href="/dashboard/achievements"
+          aria-label={t("achievementsLink", { count: collected, total: COLOR_ORDER.length })}
+          className="relative block h-24 w-24 flex-none rounded-full"
+        >
           <div
             className="animate-power-glow-pulse absolute inset-0 rounded-full blur-md"
             style={{ backgroundColor: stageColor(color) }}
@@ -104,7 +112,20 @@ export async function ChildHomeView({
               <PowerIcon className="h-5 w-5" style={{ color: stageColor(color) }} />
             </div>
           )}
-        </div>
+          <span className="absolute inset-x-0 -bottom-2.5 flex justify-center" aria-hidden>
+          <span
+            className="animate-power-badge-pop flex items-center gap-1 whitespace-nowrap rounded-full bg-reward-gold px-2.5 py-0.5 font-display text-xs font-bold text-reward-gold-on shadow-[0_2px_6px_rgba(52,30,99,0.2)]"
+            style={{ animationDelay: "0.9s" }}
+          >
+            <svg viewBox="0 0 20 20" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 3.5h8V8a4 4 0 0 1-8 0zM6 5H3.5v1.5A2.5 2.5 0 0 0 6 9M14 5h2.5v1.5A2.5 2.5 0 0 1 14 9M10 12v3M7 17h6" />
+            </svg>
+            <bdi dir="ltr">
+              {collected}/{COLOR_ORDER.length}
+            </bdi>
+          </span>
+          </span>
+        </Link>
         <div
           className="animate-power-fade-up relative flex-1 rounded-2xl border border-zinc-200 bg-white px-3.5 py-3 text-sm leading-relaxed shadow-[0_4px_14px_rgba(52,30,99,0.07)]"
           style={{ ["--power-fade-delay" as string]: "0.4s" } as CSSProperties}

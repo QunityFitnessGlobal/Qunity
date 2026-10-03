@@ -22,7 +22,8 @@
     "nextMission": "המשימה הבאה",
     "missionTitle": "אימון {number} בשלב ה{color}",
     "missionPoints": "<num>+{points}</num> נק'",
-    "go": "יוצאים לדרך"
+    "go": "יוצאים לדרך",
+    "achievementsLink": "ההישגים שלי · {count} מתוך {total} כוחות"
   },
   "auth": {
     "login": {
@@ -265,6 +266,30 @@
     "body": "{gender, select, female {סיימת את השלב ה{color}. מוכנה לנסות?} other {סיימת את השלב ה{color}. מוכן לנסות?}}",
     "doNow": "{gender, select, female {בואי ננסה עכשיו} other {בוא ננסה עכשיו}}",
     "postpone": "בפעם אחרת"
+  },
+  "achievements": {
+    "title": "ההישגים שלי",
+    "back": "חזרה לבית",
+    "stateEarned": "נאסף",
+    "stateCurrent": "הכוח שלי עכשיו",
+    "stateWaiting": "מחכה לך",
+    "stateLocked": "כוח מסתורי",
+    "captionStage": "שלב {color} · {state}",
+    "mysteryTitle": "כוח מסתורי",
+    "lockedLine": "{gender, select, female {ייחשף כשתגיעי לשלב ה{color}} other {ייחשף כשתגיע לשלב ה{color}}}",
+    "waitingLine": "הוא ייחשף בתחילת האימון הבא",
+    "collection": "האוסף שלי · {count} מתוך {total} כוחות",
+    "stars": "כוכבים",
+    "challenges": "אתגרים",
+    "streak": "שיא ימים ברצף",
+    "waitingTitle": "הכוח של השלב ה{color} מחכה לך",
+    "nextTitle": "הכוח הבא מחכה בשלב ה{color}",
+    "nextBoth": "עוד {workouts, plural, one {אימון אחד} other {# אימונים}} ו-{points, number} נק'",
+    "nextWorkouts": "עוד {workouts, plural, one {אימון אחד} other {# אימונים}}",
+    "nextPoints": "עוד {points, number} נק'",
+    "nextAlmost": "כמעט שם!",
+    "allTitle": "אספת את כל 5 הכוחות!",
+    "allLine": "{gender, select, female {את אלופה אמיתית} other {אתה אלוף אמיתי}}"
   },
   "workoutHistory": {
     "feelingsHeading": "{gender, select, female {איך {name} הרגישה בשבועיים האחרונים} other {איך {name} הרגיש בשבועיים האחרונים}}",

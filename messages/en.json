@@ -22,7 +22,8 @@
     "nextMission": "Next mission",
     "missionTitle": "Workout {number} of the {color} stage",
     "missionPoints": "<num>+{points}</num> pts",
-    "go": "Let's go"
+    "go": "Let's go",
+    "achievementsLink": "My achievements · {count} of {total} powers"
   },
   "auth": {
     "login": {
@@ -265,6 +266,30 @@
     "body": "You finished the {color} level. Ready to try it?",
     "doNow": "Do it now",
     "postpone": "Do it later"
+  },
+  "achievements": {
+    "title": "My achievements",
+    "back": "Back home",
+    "stateEarned": "Collected",
+    "stateCurrent": "My power now",
+    "stateWaiting": "Waiting for you",
+    "stateLocked": "Mystery power",
+    "captionStage": "{color} stage · {state}",
+    "mysteryTitle": "Mystery power",
+    "lockedLine": "Revealed when you reach the {color} stage",
+    "waitingLine": "It's revealed at the start of your next workout",
+    "collection": "My collection · {count} of {total} powers",
+    "stars": "Stars",
+    "challenges": "Challenges",
+    "streak": "Best day streak",
+    "waitingTitle": "The {color} stage's power is waiting for you",
+    "nextTitle": "The next power waits in the {color} stage",
+    "nextBoth": "{workouts, plural, one {One more workout} other {# more workouts}} and {points, number} pts",
+    "nextWorkouts": "{workouts, plural, one {One more workout} other {# more workouts}}",
+    "nextPoints": "{points, number} more pts",
+    "nextAlmost": "Almost there!",
+    "allTitle": "You collected all 5 powers!",
+    "allLine": "You're a real champion"
   },
   "workoutHistory": {
     "feelingsHeading": "How {name} felt over the last two weeks",

@@ -491,3 +491,26 @@ body {
     animation: none;
   }
 }
+
+/* Achievements screen (AchievementsView): the medallion's dashed ring turns
+   very slowly, and the current stage's power pulses in purple. */
+@keyframes achieve-spin {
+  from { transform: rotate(0); }
+  to { transform: rotate(360deg); }
+}
+@keyframes achieve-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(163, 40, 148, 0.55); }
+  100% { box-shadow: 0 0 0 10px rgba(163, 40, 148, 0); }
+}
+.animate-achieve-spin {
+  animation: achieve-spin 60s linear infinite;
+}
+.animate-achieve-pulse {
+  animation: achieve-pulse 1.8s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-achieve-spin,
+  .animate-achieve-pulse {
+    animation: none;
+  }
+}
