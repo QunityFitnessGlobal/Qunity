@@ -21,7 +21,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="flex-1 pb-16">{children}</div>
+      <div className="flex-1 pb-20">{children}</div>
       <Suspense fallback={null}>
         <BottomTabBar role={role} userId={user.id} initialNewChallenges={role === "child" ? newChallenges : 0} />
       </Suspense>

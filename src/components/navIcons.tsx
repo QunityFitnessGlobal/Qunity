@@ -1,31 +1,61 @@
 // Small inline icons for BottomTabBar — no icon library dependency, kept
 // together here since they're only ever used as a set for the nav tabs.
+// Drawn on the mockup's 20-unit grid with a 1.8 stroke (SettingsIcon keeps
+// its original drawing).
 import type { SVGProps } from "react";
+
+const LINE = {
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.8,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+} as const;
 
 export function HomeIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} {...props}>
-      <path d="M3 11l9-7 9 7" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M5 10v9a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1v-9" strokeLinecap="round" strokeLinejoin="round" />
+    <svg viewBox="0 0 20 20" {...LINE} {...props}>
+      <path d="M3 9.5 10 4l7 5.5V16a1 1 0 0 1-1 1h-3.5v-4.5h-5V17H4a1 1 0 0 1-1-1z" />
     </svg>
   );
 }
 
 export function TrophyIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} {...props}>
-      <path d="M7 4h10v4a5 5 0 01-10 0V4z" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M7 5H4a3 3 0 003 3M17 5h3a3 3 0 01-3 3" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M12 13v3m-3 4h6m-3 0v-4" strokeLinecap="round" strokeLinejoin="round" />
+    <svg viewBox="0 0 20 20" {...LINE} {...props}>
+      <path d="M6 3.5h8V8a4 4 0 0 1-8 0zM6 5H3.5v1.5A2.5 2.5 0 0 0 6 9M14 5h2.5v1.5A2.5 2.5 0 0 1 14 9M10 12v3M7 17h6" />
+    </svg>
+  );
+}
+
+export function StarOutlineIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" {...LINE} {...props}>
+      <path d="M10 2.8l2.2 4.6 5 .6-3.7 3.4 1 5-4.5-2.5-4.5 2.5 1-5L2.8 8l5-.6z" />
     </svg>
   );
 }
 
 export function FlagIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} {...props}>
-      <path d="M5 3v18" strokeLinecap="round" />
-      <path d="M5 4h13l-3 4 3 4H5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg viewBox="0 0 20 20" {...LINE} {...props}>
+      <path d="M5 17.5V3M5 3.5h9l-2 3.5 2 3.5H5" />
+    </svg>
+  );
+}
+
+export function DumbbellIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" {...LINE} {...props}>
+      <path d="M3 8v4M5.5 6.5v7M14.5 6.5v7M17 8v4M5.5 10h9" />
+    </svg>
+  );
+}
+
+export function HeartIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" {...LINE} {...props}>
+      <path d="M10 16.5s-6-3.7-6-8.2A3.3 3.3 0 0 1 10 6a3.3 3.3 0 0 1 6 2.3c0 4.5-6 8.2-6 8.2z" />
     </svg>
   );
 }
@@ -39,30 +69,6 @@ export function SettingsIcon(props: SVGProps<SVGSVGElement>) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-    </svg>
-  );
-}
-
-export function DumbbellIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} {...props}>
-      <path d="M6 8v8M18 8v8" strokeLinecap="round" />
-      <path d="M2 10v4M22 10v4" strokeLinecap="round" />
-      <path d="M6 12h12" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-export function HeartHandIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} {...props}>
-      <path
-        d="M12 8.5c-1-2-3-2.8-4.5-1.6-1.5 1.2-1.6 3.3-.2 4.8L12 17l4.7-5.3c1.4-1.5 1.3-3.6-.2-4.8-1.5-1.2-3.5-.4-4.5 1.6z"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path d="M4 20c1.5-1.3 3.3-2 5-2h4.5c.8 0 1.5-.7 1.5-1.5S14.3 15 13.5 15H10" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M13 15l4.5-1.3c.8-.2 1.6.2 1.9 1 .3.8-.1 1.6-.9 1.9L14 18" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

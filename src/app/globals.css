@@ -63,6 +63,8 @@
      Fredoka ships a Hebrew subset, so this actually renders Hebrew text in
      the display face rather than silently falling back. */
   --font-display: var(--font-fredoka);
+  /* The mockups' text face — see layout.tsx. */
+  --font-ui: var(--font-rubik);
 }
 
 @media (prefers-color-scheme: dark) {
