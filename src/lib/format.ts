@@ -8,6 +8,12 @@ export function formatDurationClock(totalSeconds: number): string {
   return `${minutes}:${seconds}`;
 }
 
+// "3:25" — hours and minutes, for totals that run to hours.
+export function formatHoursMinutes(totalSeconds: number): string {
+  const totalMinutes = Math.floor(totalSeconds / 60);
+  return `${Math.floor(totalMinutes / 60)}:${(totalMinutes % 60).toString().padStart(2, "0")}`;
+}
+
 // "8:00" rather than "08:00" — reads as a time, and is followed by the word
 // "minutes" (or sits next to other words) wherever it's shown.
 export function formatMinutesSeconds(totalSeconds: number): string {

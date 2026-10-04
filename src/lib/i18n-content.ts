@@ -28,7 +28,7 @@ export function resolveGenderedText(
   value: LocalizedText | null | undefined,
   locale: string,
   gender: Gender | null,
-  values?: Record<string, string | null | undefined>,
+  values?: Record<string, string | number | null | undefined>,
 ): string {
   const raw = resolveLocalizedText(value, locale);
   if (!raw.includes("{")) {

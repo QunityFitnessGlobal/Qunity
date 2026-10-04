@@ -1,15 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { calculateStreakDays, getChallengeDefinitions } from "@/services/challenge.service";
 import { meetsCompletionThreshold } from "@/services/points.service";
-import { TIP_CONDITION_REGISTRY, type ChildTipSnapshot } from "@/services/tip-conditions";
+import type { ChildTipSnapshot } from "@/services/tip-conditions";
 import type { LocalizedText } from "@/lib/i18n-content";
-
-export interface RelevantTip {
-  ruleId: string;
-  principle: LocalizedText | null;
-  tipText: LocalizedText;
-  priority: number;
-}
 
 // A manual_selection row from the "What's happening now" accordion — see
 // getManualMenuTips() below. menuGroup/labelHe/labelEn live in
@@ -26,8 +19,6 @@ export interface ManualMenuTip {
 }
 
 type TriggerSource = "auto" | "manual" | "test";
-
-const MAX_RELEVANT_TIPS = 5;
 
 interface CompletedSessionRow {
   id: string;
@@ -47,15 +38,6 @@ interface WorkoutResultRow {
 interface InProgressSessionRow {
   start_time: string;
   workouts: { recommended_duration_minutes: number | null } | { recommended_duration_minutes: number | null }[] | null;
-}
-
-interface TipRuleRow {
-  id: string;
-  principle: LocalizedText | null;
-  condition_type: string;
-  condition_params: Record<string, unknown> | null;
-  tip_text: LocalizedText;
-  priority: number;
 }
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -163,43 +145,6 @@ export async function buildChildTipSnapshot(
     lastSessionDifficultyReported: lastResult?.difficulty_reported ?? null,
     lastSessionFeelingAfter: lastResult?.feeling_after ?? null,
   };
-}
-
-export async function getRelevantTips(
-  supabase: SupabaseClient,
-  childId: string,
-  manualTestIndex?: number,
-): Promise<RelevantTip[]> {
-  const [snapshot, { data: rules }] = await Promise.all([
-    buildChildTipSnapshot(supabase, childId),
-    supabase.from("parent_tip_rules").select("id, principle, condition_type, condition_params, tip_text, priority"),
-  ]);
-
-  const ruleRows = (rules ?? []) as TipRuleRow[];
-
-  const matching = ruleRows
-    .filter((rule) => {
-      const conditionFn = TIP_CONDITION_REGISTRY[rule.condition_type];
-      if (!conditionFn) {
-        // Also correctly excludes condition_type = 'manual_selection' rows,
-        // which have no registry entry on purpose — they're only ever
-        // surfaced through getManualMenuTips() below.
-        return false;
-      }
-      return conditionFn(snapshot, rule.condition_params ?? {}, manualTestIndex);
-    })
-    .sort((a, b) => b.priority - a.priority)
-    // Raised from 3: several cards intentionally share a condition_type
-    // (e.g. #31/#43, #11/#49/#33) so they're meant to appear together —
-    // see tip-conditions/questionnaire-single-session.ts.
-    .slice(0, MAX_RELEVANT_TIPS);
-
-  return matching.map((rule) => ({
-    ruleId: rule.id,
-    principle: rule.principle,
-    tipText: rule.tip_text,
-    priority: rule.priority,
-  }));
 }
 
 // The parent-initiated "What's happening now" accordion (category 3).

@@ -1,5 +1,5 @@
 // A single snapshot of everything the tip condition functions might need,
-// built once per getRelevantTips call (see tips.service.ts) so no condition
+// built once per evaluation (buildChildTipSnapshot in tips.service.ts) so no condition
 // function has to query the database itself.
 export interface ChildTipSnapshot {
   daysSinceLastWorkout: number | null;

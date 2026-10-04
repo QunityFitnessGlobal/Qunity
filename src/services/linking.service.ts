@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { BraceletColor } from "@/lib/types";
 
 export type LinkChildErrorCode =
   | "NOT_AUTHENTICATED"
@@ -64,6 +65,8 @@ export async function linkChildByCode(parentId: string, code: string): Promise<L
 export interface LinkedChild {
   id: string;
   nickname: string;
+  // The child's current stage, for the color dot next to their name.
+  color: BraceletColor;
 }
 
 // Accepts either the browser or server Supabase client so it can be called
@@ -74,7 +77,7 @@ export async function getLinkedChildren(
 ): Promise<LinkedChild[]> {
   const { data, error } = await supabase
     .from("parent_child_links")
-    .select("child_id, children(nickname)")
+    .select("child_id, children(nickname, current_color)")
     .eq("parent_id", parentId);
 
   if (error || !data) {
@@ -82,7 +85,7 @@ export async function getLinkedChildren(
   }
 
   return data.map((row) => {
-    const child = row.children as unknown as { nickname: string } | null;
-    return { id: row.child_id as string, nickname: child?.nickname ?? "" };
+    const child = row.children as unknown as { nickname: string; current_color: BraceletColor | null } | null;
+    return { id: row.child_id as string, nickname: child?.nickname ?? "", color: child?.current_color ?? "white" };
   });
 }

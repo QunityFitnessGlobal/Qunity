@@ -18,9 +18,9 @@ interface WhatsHappeningNowMenuProps {
 }
 
 // Category 3 ("What's happening now") — a parent-initiated accordion, as
-// opposed to TipsPanel's auto-evaluated category 1/2 tips. Every row here
-// has condition_type = 'manual_selection' (see tip-conditions/index.ts) and
-// is fetched via getManualMenuTips() rather than getRelevantTips(). Picking
+// opposed to the auto-evaluated tips on the home screen (today-tips.service).
+// Every row here has condition_type = 'manual_selection' (see
+// tip-conditions/index.ts) and is fetched via getManualMenuTips(). Picking
 // an item logs to parent_tips with trigger_source = 'manual'.
 const GROUP_ORDER = [1, 2, 3, 4, 5] as const;
 const GROUP_TITLE_KEYS: Record<(typeof GROUP_ORDER)[number], string> = {

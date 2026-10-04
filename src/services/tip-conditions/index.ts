@@ -35,8 +35,8 @@ export type { ChildTipSnapshot, TipConditionFn };
 // Maps parent_tip_rules.condition_type -> the function that evaluates it.
 // Several condition_types are intentionally referenced by more than one
 // parent_tip_rules row (e.g. difficulty_high_last_session by cards #11/#49/
-// #33) so those cards are evaluated identically and surface together — see
-// tips.service.ts's MAX_RELEVANT_TIPS.
+// #33) so those cards are evaluated identically; the home screen shows one
+// of them a day (see today-tips.service.ts's pickTodaysTips).
 //
 // condition_type = 'manual_selection' (the category-3 "What's happening
 // now" accordion) has no entry here on purpose: those rows are never

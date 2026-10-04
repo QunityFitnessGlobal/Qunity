@@ -10,9 +10,8 @@ interface TipLikeDismissButtonsProps {
   onDismiss: () => void;
 }
 
-// Shared by TipCard (main dashboard) and WhatsHappeningNowMenu (the
-// "What's happening now" accordion) — both use identical like/dismiss
-// behavior: liking fills the thumb icon in immediately (visible feedback
+// Used by WhatsHappeningNowMenu (the "What's happening now" accordion):
+// liking fills the thumb icon in immediately (visible feedback
 // during the caller's fade-out), increments parent_tip_rules.like_count
 // (one counter per tip overall, not per-child) via a security-definer RPC,
 // then dismisses the card same as the X would; the caller decides how

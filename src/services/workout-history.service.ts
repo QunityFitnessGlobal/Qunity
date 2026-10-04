@@ -164,7 +164,7 @@ export function toDayKey(date: Date): string {
   }).format(date);
 }
 
-function shiftDayKey(dayKey: string, days: number): string {
+export function shiftDayKey(dayKey: string, days: number): string {
   const [year, month, day] = dayKey.split("-").map(Number);
   return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
 }

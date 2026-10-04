@@ -12,8 +12,8 @@ interface EmpowermentPageProps {
 }
 
 // Category 3 ("What's happening now") gets its own bottom-nav tab
-// ("העצמה") rather than sitting inline under TipsPanel on the dashboard
-// home — same page-per-tab pattern as recent-workouts/challenges/settings.
+// ("העצמה") rather than sitting inline on the dashboard home — same
+// page-per-tab pattern as recent-workouts/challenges/settings.
 export default async function EmpowermentPage({ searchParams }: EmpowermentPageProps) {
   const user = await requireUser();
   const supabase = await getSupabase();

@@ -1,18 +1,20 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getProfile, getSupabase, requireUser } from "@/lib/session";
 import { getLinkedChildren } from "@/services/linking.service";
 import { getStageWorkouts, getWorkoutsCompletedThisMonth, pickNextWorkout } from "@/services/workout.service";
 import { calculateProgressPercent } from "@/services/progression.service";
 import { getEncouragementKey } from "@/services/encouragement.service";
 import { getChildStatsForParent } from "@/services/parent-stats.service";
-import { getRelevantTips, logShownTips } from "@/services/tips.service";
-import { formatDurationClock } from "@/lib/format";
+import { logShownTips } from "@/services/tips.service";
+import { getTodaysTips } from "@/services/today-tips.service";
+import { getChildWeek } from "@/services/child-week.service";
+import { formatHoursMinutes } from "@/lib/format";
+import { resolveGenderedText, resolveLocalizedText } from "@/lib/i18n-content";
 import { averageDifficultyLabelKey } from "@/lib/workout-labels";
-import { MinimalAvatar } from "@/components/child/MinimalAvatar";
-import { EnergyMeter } from "@/components/child/EnergyMeter";
-import { ChildSelector } from "@/components/parent/ChildSelector";
-import { StatsGrid } from "@/components/parent/StatsGrid";
-import { TipsPanel } from "@/components/parent/TipsPanel";
+import { ChildChips } from "@/components/parent/ChildChips";
+import { ChildWeekCard } from "@/components/parent/ChildWeekCard";
+import { ParentStatsStrip } from "@/components/parent/ParentStatsStrip";
+import { TodayTipsCard } from "@/components/parent/TodayTipsCard";
 import { ChildHomeView } from "@/components/child/ChildHomeView";
 import { getChildHomeStats } from "@/services/child-home.service";
 import type { BraceletColor, Gender } from "@/lib/types";
@@ -47,21 +49,26 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   ]);
 
   if (profile?.role !== "child") {
-    const t = await getTranslations("dashboard");
+    const t = await getTranslations("parentHome");
+    const tDashboard = await getTranslations("dashboard");
     const tWorkout = await getTranslations("workout");
+    const locale = await getLocale();
     const { childId } = await searchParams;
     const selectedChildId = childId ?? linkedChildren[0]?.id ?? null;
+    const parentGender = profile?.gender ?? null;
+    const firstName = profile?.full_name?.trim().split(/\s+/)[0] ?? "";
 
-    // The stats, the tips (and recording which were shown) and the child's
-    // gender don't depend on each other, so they're fetched together.
-    const [stats, initialTips, childGender] = selectedChildId
+    // The stats, the week, today's sentences (and recording which were
+    // shown) and the child's gender don't depend on each other, so they're
+    // fetched together.
+    const [stats, week, today, childGender] = selectedChildId
       ? await Promise.all([
           getChildStatsForParent(supabase, selectedChildId),
-          getRelevantTips(supabase, selectedChildId).then(async (tips) => {
-            if (tips.length > 0) {
-              await logShownTips(supabase, user.id, selectedChildId, tips.map((tip) => tip.ruleId), "auto");
-            }
-            return tips;
+          getChildWeek(supabase, selectedChildId),
+          getTodaysTips(supabase, user.id, selectedChildId).then(async (result) => {
+            const shown = result.tips.filter((tip) => !tip.saidToday).map((tip) => tip.ruleId);
+            await logShownTips(supabase, user.id, selectedChildId, shown, "auto");
+            return result;
           }),
           supabase
             .from("users")
@@ -70,63 +77,70 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             .maybeSingle<{ gender: Gender | null }>()
             .then(({ data }) => data?.gender ?? null),
         ])
-      : [null, [], null];
+      : [null, null, null, null];
+
+    const difficultyKey = stats ? averageDifficultyLabelKey(stats.averageDifficultyReported) : null;
 
     return (
-      <div className="flex flex-1 flex-col items-center gap-6 pb-12 pt-6">
+      <div className="flex flex-1 flex-col items-center px-4 pb-12 pt-5">
+        <div className="flex w-full max-w-md flex-col gap-3">
+          <div className="flex items-center justify-between gap-3">
+            <h1 className="font-display text-xl font-bold">
+              {firstName ? t("hello", { name: firstName }) : t("helloNoName")}
+            </h1>
+            {linkedChildren.length > 0 && selectedChildId && (
+              <ChildChips items={linkedChildren} selectedId={selectedChildId} />
+            )}
+          </div>
 
-        <div className="flex w-full flex-col items-center gap-6 px-4">
-          <h1 className="text-2xl font-bold">{t("parentTitle")}</h1>
-          {profile?.full_name && <p className="text-zinc-600">{t("hello", { name: profile.full_name })}</p>}
+          {linkedChildren.length === 0 && <p className="text-zinc-600">{tDashboard("noChildDefined")}</p>}
 
-          {linkedChildren.length === 0 && (
-            <p className="text-zinc-600">{t("noChildDefined")}</p>
-          )}
-
-          {linkedChildren.length > 0 && selectedChildId && (
-            <ChildSelector items={linkedChildren} selectedId={selectedChildId} />
+          {stats && week && (
+            <ChildWeekCard
+              name={stats.nickname}
+              week={week}
+              color={stats.currentColor}
+              workoutsInStage={stats.workoutsCompletedInColor}
+              requiredWorkouts={stats.requiredWorkouts}
+            />
           )}
 
           {stats && (
-            <>
-              <MinimalAvatar color={stats.currentColor} />
+            <ParentStatsStrip
+              stats={[
+                { label: t("stats.points"), value: stats.totalPoints.toLocaleString(locale), tone: "text-reward-gold-ink" },
+                { label: t("stats.activeTime"), value: formatHoursMinutes(stats.totalActiveSeconds) },
+                { label: t("stats.together"), value: String(stats.parentTogetherCount), tone: "text-[#c0306a]" },
+              ]}
+              moreStats={[
+                { label: t("stats.pointsInStage"), value: stats.pointsInColor.toLocaleString(locale) },
+                { label: t("stats.totalWorkouts"), value: String(stats.totalWorkoutsCompleted) },
+                { label: t("stats.stopped"), value: String(stats.cancelledWorkoutsCount) },
+                { label: t("stats.averageDifficulty"), value: difficultyKey ? tWorkout(difficultyKey) : "-" },
+              ]}
+              moreLabel={t("stats.more")}
+              lessLabel={t("stats.less")}
+            />
+          )}
 
-              <div className="w-full max-w-md space-y-2 text-center">
-                <p className="text-sm text-text-muted">
-                  {t("workoutsInColor", {
-                    count: stats.workoutsCompletedInColor,
-                    total: stats.requiredWorkouts,
-                  })}
-                </p>
-                <EnergyMeter percent={stats.progressPercent} color={stats.currentColor} />
-              </div>
-
-              <StatsGrid
-                stats={[
-                  { label: t("stats.totalPoints"), value: String(stats.totalPoints) },
-                  { label: t("stats.pointsInColor"), value: String(stats.pointsInColor) },
-                  { label: t("stats.totalWorkouts"), value: String(stats.totalWorkoutsCompleted) },
-                  { label: t("stats.cancelledWorkouts"), value: String(stats.cancelledWorkoutsCount) },
-                  {
-                    label: t("stats.totalActiveTime"),
-                    value: formatDurationClock(stats.totalActiveSeconds),
-                  },
-                  {
-                    label: t("stats.averageDifficulty"),
-                    value: (() => {
-                      const key = averageDifficultyLabelKey(stats.averageDifficultyReported);
-                      return key ? tWorkout(key) : "-";
-                    })(),
-                  },
-                  {
-                    label: t("stats.parentTogetherCount"),
-                    value: String(stats.parentTogetherCount),
-                  },
-                ]}
-              />
-
-              <TipsPanel tips={initialTips} childGender={childGender} parentGender={profile?.gender ?? null} />
-            </>
+          {stats && today && selectedChildId && (
+            <TodayTipsCard
+              // A fresh card (position, what's been said) for each child.
+              key={selectedChildId}
+              tips={today.tips.map((tip) => ({
+                ruleId: tip.ruleId,
+                principle: tip.principle ? resolveLocalizedText(tip.principle, locale) : null,
+                quote: resolveGenderedText(tip.shortText, locale, childGender, { parentGender }),
+                because: resolveGenderedText(tip.reasonText, locale, childGender, {
+                  name: stats.nickname,
+                  ...tip.reasonValues,
+                }),
+                saidToday: tip.saidToday,
+              }))}
+              momentsThisMonth={today.momentsThisMonth}
+              parentId={user.id}
+              childId={selectedChildId}
+            />
           )}
         </div>
       </div>

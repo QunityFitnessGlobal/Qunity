@@ -560,5 +560,43 @@
     "childCode": "יש לך קוד מההורה? כניסה עם קוד",
     "showPassword": "הצגת הסיסמה",
     "hidePassword": "הסתרת הסיסמה"
+  },
+  "parentHome": {
+    "hello": "שלום {name}",
+    "helloNoName": "שלום",
+    "weekTitle": "השבוע של {name}",
+    "weekNone": "עוד אין אימונים השבוע",
+    "weekPlain": "{count, plural, one {אימון אחד השבוע} other {# אימונים השבוע}}",
+    "weekMore": "{count, plural, one {אימון אחד השבוע} other {# אימונים השבוע}}, {diff, plural, one {אחד יותר} other {# יותר}} מהשבוע שעבר",
+    "weekSame": "{count, plural, one {אימון אחד השבוע} other {# אימונים השבוע}}, כמו בשבוע שעבר",
+    "weekDays": "א,ב,ג,ד,ה,ו,ש",
+    "trainedTogether": "התאמנתם יחד",
+    "stage": "שלב {color}",
+    "stats": {
+      "points": "נקודות",
+      "activeTime": "שעות פעילות",
+      "together": "אימונים ביחד",
+      "pointsInStage": "נקודות בשלב",
+      "totalWorkouts": "אימונים בסך הכל",
+      "stopped": "אימונים שהופסקו",
+      "averageDifficulty": "קושי ממוצע",
+      "more": "כל הנתונים",
+      "less": "פחות נתונים"
+    },
+    "tips": {
+      "title": "משפט להגיד היום",
+      "position": "{index} מתוך {total}",
+      "previous": "המשפט הקודם",
+      "next": "המשפט הבא",
+      "goTo": "משפט {index}",
+      "said": "אמרתי!",
+      "notNow": "לא עכשיו",
+      "collected": "נאסף לך רגע העצמה · {count} החודש",
+      "allDoneTitle": "כל הכבוד! אמרת את כל המשפטים של היום",
+      "allDoneSubtitle": "{count, plural, one {רגע העצמה אחד החודש} other {# רגעי העצמה החודש}} · משפטים חדשים יחכו מחר",
+      "allDoneLink": "למסך העצמה",
+      "empty": "היום אין משפט מיוחד. משפטים חדשים יופיעו לפי האימונים.",
+      "saveFailed": "לא הצלחנו לשמור. נסו שוב."
+    }
   }
 }

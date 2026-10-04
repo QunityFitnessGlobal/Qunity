@@ -560,5 +560,43 @@
     "childCode": "Got a code from a parent? Enter with it",
     "showPassword": "Show password",
     "hidePassword": "Hide password"
+  },
+  "parentHome": {
+    "hello": "Hi {name}",
+    "helloNoName": "Hi",
+    "weekTitle": "{name}'s week",
+    "weekNone": "No workouts yet this week",
+    "weekPlain": "{count, plural, one {One workout this week} other {# workouts this week}}",
+    "weekMore": "{count, plural, one {One workout this week} other {# workouts this week}}, {diff} more than last week",
+    "weekSame": "{count, plural, one {One workout this week} other {# workouts this week}}, same as last week",
+    "weekDays": "S,M,T,W,T,F,S",
+    "trainedTogether": "Trained together",
+    "stage": "{color} stage",
+    "stats": {
+      "points": "Points",
+      "activeTime": "Active hours",
+      "together": "Together",
+      "pointsInStage": "Points in stage",
+      "totalWorkouts": "Total workouts",
+      "stopped": "Stopped workouts",
+      "averageDifficulty": "Average difficulty",
+      "more": "All stats",
+      "less": "Fewer stats"
+    },
+    "tips": {
+      "title": "Something to say today",
+      "position": "{index} of {total}",
+      "previous": "Previous sentence",
+      "next": "Next sentence",
+      "goTo": "Sentence {index}",
+      "said": "I said it!",
+      "notNow": "Not now",
+      "collected": "Empowerment moment collected · {count} this month",
+      "allDoneTitle": "Well done! You said all of today's sentences",
+      "allDoneSubtitle": "{count, plural, one {One empowerment moment this month} other {# empowerment moments this month}} · New sentences tomorrow",
+      "allDoneLink": "To the empowerment screen",
+      "empty": "Nothing special to say today. New sentences show up as workouts come in.",
+      "saveFailed": "Couldn't save. Please try again."
+    }
   }
 }

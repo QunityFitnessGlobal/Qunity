@@ -22,7 +22,7 @@ export function difficultyLabelKey(value: number | null | undefined): string | n
   return DIFFICULTY_LABEL_KEYS[value as DifficultyValue];
 }
 
-// For an *average* (e.g. StatsGrid's "average difficulty reported" — a mean
+// For an *average* (e.g. the parent home's "average difficulty" — a mean
 // across many sessions, so it's rarely a whole number): round to the
 // nearest ordinal and clamp into the valid 1-4 range before mapping to a
 // word, rather than displaying the raw float.
