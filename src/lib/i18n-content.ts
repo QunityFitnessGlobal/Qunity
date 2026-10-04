@@ -21,20 +21,24 @@ export function resolveLocalizedText(value: LocalizedText | null | undefined, lo
 // phrasing per gender instead of a slash-form ("הילד/ה"). Plain strings
 // without gender syntax pass through IntlMessageFormat unchanged, so this
 // is safe to use even for content that hasn't been converted yet. `values`
-// fills any other placeholders, e.g. {name} in the workouts-screen tips.
+// fills any other placeholders, e.g. {name} in the workouts-screen tips or
+// {parentGender} — the parent's own words in a tip ("אני מאמין/מאמינה"),
+// masculine when not given.
 export function resolveGenderedText(
   value: LocalizedText | null | undefined,
   locale: string,
   gender: Gender | null,
-  values?: Record<string, string>,
+  values?: Record<string, string | null | undefined>,
 ): string {
   const raw = resolveLocalizedText(value, locale);
-  if (!raw.includes("{gender") && !values) {
+  if (!raw.includes("{")) {
     return raw;
   }
   try {
     const formatter = new IntlMessageFormat(raw, locale);
-    return String(formatter.format({ ...values, gender: gender ?? "other" }));
+    return String(
+      formatter.format({ ...values, parentGender: values?.parentGender ?? "other", gender: gender ?? "other" }),
+    );
   } catch {
     return raw;
   }

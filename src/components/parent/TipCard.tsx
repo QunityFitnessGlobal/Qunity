@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { resolveGenderedText, resolveLocalizedText } from "@/lib/i18n-content";
 import { TipLikeDismissButtons } from "@/components/parent/TipLikeDismissButtons";
+import { TipText } from "@/components/parent/TipText";
 import type { RelevantTip } from "@/services/tips.service";
 import type { Gender } from "@/lib/types";
 
@@ -10,11 +11,13 @@ interface TipCardProps {
   tip: RelevantTip;
   locale: string;
   gender: Gender | null;
+  // The parent reading it — for the parent's own words in the example.
+  parentGender: Gender | null;
 }
 
 const FADE_DURATION_MS = 600;
 
-export function TipCard({ tip, locale, gender }: TipCardProps) {
+export function TipCard({ tip, locale, gender, parentGender }: TipCardProps) {
   const [dismissed, setDismissed] = useState(false);
   const [fading, setFading] = useState(false);
 
@@ -39,7 +42,7 @@ export function TipCard({ tip, locale, gender }: TipCardProps) {
           {resolveLocalizedText(tip.principle, locale)}
         </p>
       )}
-      <p className="text-sm text-zinc-700">{resolveGenderedText(tip.tipText, locale, gender)}</p>
+      <TipText text={resolveGenderedText(tip.tipText, locale, gender, { parentGender })} />
     </div>
   );
 }

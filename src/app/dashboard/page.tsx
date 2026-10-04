@@ -125,7 +125,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                 ]}
               />
 
-              <TipsPanel tips={initialTips} childGender={childGender} />
+              <TipsPanel tips={initialTips} childGender={childGender} parentGender={profile?.gender ?? null} />
             </>
           )}
         </div>

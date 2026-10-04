@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { logShownTips, type ManualMenuTip } from "@/services/tips.service";
 import { resolveGenderedText, resolveLocalizedText } from "@/lib/i18n-content";
 import { TipLikeDismissButtons } from "@/components/parent/TipLikeDismissButtons";
+import { TipText } from "@/components/parent/TipText";
 import type { Gender } from "@/lib/types";
 
 interface WhatsHappeningNowMenuProps {
@@ -13,6 +14,7 @@ interface WhatsHappeningNowMenuProps {
   parentId: string;
   childId: string;
   childGender: Gender | null;
+  parentGender: Gender | null;
 }
 
 // Category 3 ("What's happening now") — a parent-initiated accordion, as
@@ -36,6 +38,7 @@ export function WhatsHappeningNowMenu({
   parentId,
   childId,
   childGender,
+  parentGender,
 }: WhatsHappeningNowMenuProps) {
   const t = useTranslations("whatsHappeningNow");
   const locale = useLocale();
@@ -117,9 +120,7 @@ export function WhatsHappeningNowMenu({
               {resolveLocalizedText(selectedTip.principle, locale)}
             </p>
           )}
-          <p className="whitespace-pre-line text-sm text-zinc-700">
-            {resolveGenderedText(selectedTip.tipText, locale, childGender)}
-          </p>
+          <TipText text={resolveGenderedText(selectedTip.tipText, locale, childGender, { parentGender })} />
           {logging && <p className="mt-1 text-xs text-text-muted">{t("saving")}</p>}
         </div>
       )}

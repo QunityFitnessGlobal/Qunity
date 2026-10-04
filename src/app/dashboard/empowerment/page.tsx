@@ -65,6 +65,7 @@ export default async function EmpowermentPage({ searchParams }: EmpowermentPageP
           parentId={user.id}
           childId={selectedChildId}
           childGender={childGender}
+          parentGender={profile?.gender ?? null}
         />
       )}
     </div>

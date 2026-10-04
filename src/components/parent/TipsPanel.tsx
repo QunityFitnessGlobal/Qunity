@@ -6,6 +6,7 @@ import type { Gender } from "@/lib/types";
 interface TipsPanelProps {
   tips: RelevantTip[];
   childGender: Gender | null;
+  parentGender: Gender | null;
 }
 
 // Read-only display of the tips getRelevantTips() already selected — the
@@ -13,7 +14,7 @@ interface TipsPanelProps {
 // every condition function now has a real implementation (see
 // tip-conditions/) instead of stubs. Prompt 8's parent-initiated equivalent
 // is the "What's happening now" accordion (WhatsHappeningNowMenu.tsx).
-export async function TipsPanel({ tips, childGender }: TipsPanelProps) {
+export async function TipsPanel({ tips, childGender, parentGender }: TipsPanelProps) {
   const t = await getTranslations("tips");
   const locale = await getLocale();
 
@@ -24,7 +25,7 @@ export async function TipsPanel({ tips, childGender }: TipsPanelProps) {
       {tips.length === 0 && <p className="text-sm text-text-muted">{t("empty")}</p>}
       <div className="space-y-2">
         {tips.map((tip) => (
-          <TipCard key={tip.ruleId} tip={tip} locale={locale} gender={childGender} />
+          <TipCard key={tip.ruleId} tip={tip} locale={locale} gender={childGender} parentGender={parentGender} />
         ))}
       </div>
     </div>
