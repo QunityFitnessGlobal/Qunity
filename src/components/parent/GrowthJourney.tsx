@@ -21,9 +21,10 @@ export interface PracticeTipView {
 interface GrowthJourneyProps {
   totalMoments: number;
   countsByPrinciple: Record<string, number>;
-  // Adds (or, when saving fails, takes back) a moment of a principle; the
-  // counts live with EmpowermentView so the chat's moments count too.
-  onCount: (principle: string, by: number) => void;
+  // Tips already marked today, and adding (or, when saving fails, taking
+  // back) a moment; they live with EmpowermentView so the chat's count too.
+  triedToday: string[];
+  onCount: (principle: string, by: number, ruleId: string) => void;
   practice: PracticeTipView[];
   parentGender: Gender | null;
   parentId: string;
@@ -48,6 +49,7 @@ const RING = 2 * Math.PI * 34;
 export function GrowthJourney({
   totalMoments,
   countsByPrinciple,
+  triedToday,
   onCount,
   practice,
   parentGender,
@@ -55,7 +57,6 @@ export function GrowthJourney({
   childId,
 }: GrowthJourneyProps) {
   const t = useTranslations("parentGrowth");
-  const [done, setDone] = useState(() => practice.map((tip) => tip.saidToday));
   const [index, setIndex] = useState(0);
   // Bumped on every move so the sentence slides in again.
   const [turn, setTurn] = useState(0);
@@ -69,17 +70,15 @@ export function GrowthJourney({
   const tip = practice[index];
 
   async function tried() {
-    const at = index;
-    const current = practice[at];
-    setDone((d) => d.map((x, i) => x || i === at));
-    onCount(current.principle, 1);
+    const current = practice[index];
+    if (triedToday.includes(current.ruleId)) return;
+    onCount(current.principle, 1, current.ruleId);
     setFailed(false);
     setSaving(true);
     const saved = await recordMoment(createClient(), parentId, childId, current.ruleId);
     setSaving(false);
     if (!saved) {
-      setDone((d) => d.map((x, i) => (i === at ? false : x)));
-      onCount(current.principle, -1);
+      onCount(current.principle, -1, current.ruleId);
       setFailed(true);
     }
   }
@@ -181,7 +180,7 @@ export function GrowthJourney({
             </p>
             {tip.why && <p className="text-[13px] leading-relaxed text-[#6c6580]">{tip.why}</p>}
           </div>
-          {done[index] ? (
+          {triedToday.includes(tip.ruleId) ? (
             <div className="animate-home-said flex min-h-[46px] items-center justify-center gap-2 rounded-[14px] bg-reward-gold-soft text-[15px] font-semibold text-[#5c4200]">
               <svg viewBox="0 0 20 20" className="h-[18px] w-[18px]" fill="#d99a0b" aria-hidden>
                 <path d="M10 1.5l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.6-4.1 6.1-.6z" />

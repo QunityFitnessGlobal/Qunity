@@ -5,7 +5,6 @@ import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { matchSituation, searchSituations, withoutNames, type ChatTip } from "@/lib/whats-now";
-import { logShownTips } from "@/services/tips.service";
 import { recordChatQuestion, recordMoment } from "@/services/moments.service";
 import {
   AllSituationsPanel,
@@ -23,10 +22,14 @@ interface WhatsNowProps {
   childName: string;
   childGender: Gender | null;
   parentName: string | null;
+  // Names to take out of what parents type: every child's and the parent's.
+  privateNames: string[];
   parentId: string;
   childId: string;
-  // Adds or takes back a moment of a principle (see EmpowermentView).
-  onCount: (principle: string, by: number) => void;
+  // Tips already marked today, and adding or taking back a moment (see
+  // EmpowermentView) — one moment per tip a day.
+  triedToday: string[];
+  onCount: (principle: string, by: number, ruleId: string) => void;
 }
 
 const GROUPS = [1, 2, 3, 4, 5];
@@ -43,7 +46,17 @@ type Step = Omit<Extract<ChatMessage, { kind: "bot" | "me" }>, "id"> | Omit<Extr
 // so the phone's back button closes them. Answers come from the tips;
 // typed text is matched by keywords (lib/whats-now.ts) and kept without
 // names to learn what's missing. "ניסיתי את זה" collects a moment.
-export function WhatsNow({ tips, childName, childGender, parentName, parentId, childId, onCount }: WhatsNowProps) {
+export function WhatsNow({
+  tips,
+  childName,
+  childGender,
+  parentName,
+  privateNames,
+  parentId,
+  childId,
+  triedToday,
+  onCount,
+}: WhatsNowProps) {
   const t = useTranslations("whatsNow");
   const searchParams = useSearchParams();
   const panel = searchParams.get("panel");
@@ -76,6 +89,8 @@ export function WhatsNow({ tips, childName, childGender, parentName, parentId, c
   // of leaving a stray entry; and where "כל המצבים" was opened from.
   const pushed = useRef(0);
   const allFrom = useRef<"home" | "chat">("home");
+  // The last typed text and what it matched, for "זה לא בדיוק זה".
+  const lastMatch = useRef<{ text: string; ruleId: string } | null>(null);
 
   const tipsById = useMemo(() => new Map(tips.map((tip) => [tip.ruleId, tip])), [tips]);
   const quick = useMemo(
@@ -153,13 +168,8 @@ export function WhatsNow({ tips, childName, childGender, parentName, parentId, c
     setMessages((current) => [...current.filter((m) => m.kind !== "chips"), withId({ kind: "me", text })]);
   }
 
-  function logShown(tip: ChatTip) {
-    void logShownTips(createClient(), parentId, childId, [tip.ruleId], "manual");
-  }
-
   function answer(tip: ChatTip, intro?: string): Step[] {
     const lead = intro ? `${intro} ` : "";
-    logShown(tip);
     if (tip.what) {
       return [
         { kind: "bot", text: lead + tip.what },
@@ -173,13 +183,15 @@ export function WhatsNow({ tips, childName, childGender, parentName, parentId, c
   }
 
   function notIt(): Step {
-    return { kind: "chips", chips: [{ label: t("notIt"), action: { type: "groups", text: t("narrowDown") } }] };
+    return { kind: "chips", chips: [{ label: t("notIt"), action: { type: "notIt" } }] };
   }
 
   // What the parent typed: an answer when a situation matches, else the groups.
   function reply(text: string): Step[] {
     const tip = matchSituation(text, tips);
-    void recordChatQuestion(createClient(), withoutNames(text, [childName, parentName]), tip?.ruleId ?? null);
+    const clean = withoutNames(text, privateNames);
+    lastMatch.current = tip ? { text: clean, ruleId: tip.ruleId } : null;
+    void recordChatQuestion(createClient(), clean, tip?.ruleId ?? null);
     return tip
       ? [...answer(tip, t("soundsLike", { label: tip.label.replace(/"/g, "") })), notIt()]
       : [{ kind: "bot", text: t("notUnderstood") }, groupChips()];
@@ -234,19 +246,26 @@ export function WhatsNow({ tips, childName, childGender, parentName, parentId, c
             .map((tip) => ({ label: tip.label, action: { type: "tip", ruleId: tip.ruleId } })),
         },
       ]);
+    } else if (action.type === "notIt") {
+      if (lastMatch.current) {
+        void recordChatQuestion(createClient(), lastMatch.current.text, lastMatch.current.ruleId, true);
+        lastMatch.current = null;
+      }
+      say([{ kind: "bot", text: t("narrowDown") }, groupChips()]);
     } else {
       say([{ kind: "bot", text: action.text }, groupChips()]);
     }
   }
 
   async function tryTip(messageId: number, tip: ChatTip) {
+    if (triedToday.includes(tip.ruleId)) return;
     setTried((current) => [...current, messageId]);
     setFailedId(null);
-    onCount(tip.principle, 1);
+    onCount(tip.principle, 1, tip.ruleId);
     const saved = await recordMoment(createClient(), parentId, childId, tip.ruleId);
     if (!saved) {
       setTried((current) => current.filter((id) => id !== messageId));
-      onCount(tip.principle, -1);
+      onCount(tip.principle, -1, tip.ruleId);
       setFailedId(messageId);
       return;
     }
@@ -351,6 +370,7 @@ export function WhatsNow({ tips, childName, childGender, parentName, parentId, c
           typing={typing}
           tipsById={tipsById}
           tried={tried}
+          triedToday={triedToday}
           failedId={failedId}
           childGender={gender}
           draft={chatDraft}

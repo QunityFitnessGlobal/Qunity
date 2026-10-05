@@ -1717,3 +1717,21 @@ alter table public.parent_chat_questions enable row level security;
 drop policy if exists "parent_chat_questions_insert" on public.parent_chat_questions;
 create policy "parent_chat_questions_insert" on public.parent_chat_questions
   for insert to authenticated with check (true);
+
+-- ============================================================================
+-- ADDED AFTER THE CHAT REVIEW
+--
+-- parent_chat_questions: only parents can add rows (a child's account
+-- could before), and a row with rejected = true records that the parent
+-- answered "זה לא בדיוק זה" to the situation the text was matched to — the
+-- signal for which keywords need fixing. Rows stay insert-only: there is
+-- still no select or update policy, so only the team reads them.
+-- ============================================================================
+
+alter table public.parent_chat_questions
+  add column if not exists rejected boolean not null default false;
+
+drop policy if exists "parent_chat_questions_insert" on public.parent_chat_questions;
+create policy "parent_chat_questions_insert" on public.parent_chat_questions
+  for insert to authenticated
+  with check (exists (select 1 from public.parents where id = auth.uid()));

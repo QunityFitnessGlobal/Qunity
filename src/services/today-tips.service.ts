@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { buildChildTipSnapshot } from "@/services/tips.service";
 import { TIP_CONDITION_REGISTRY, type ChildTipSnapshot } from "@/services/tip-conditions";
+import { loadTipRules } from "@/services/content-cache";
 import { shiftDayKey, toDayKey } from "@/services/workout-history.service";
 import type { LocalizedText } from "@/lib/i18n-content";
 
@@ -107,16 +108,6 @@ export function reasonValuesFor(conditionType: string, snapshot: ChildTipSnapsho
   }
 }
 
-interface RuleRow {
-  id: string;
-  principle: LocalizedText | null;
-  condition_type: string;
-  condition_params: Record<string, unknown> | null;
-  priority: number;
-  short_text: LocalizedText;
-  reason_text: LocalizedText;
-}
-
 interface MomentRow {
   child_id: string;
   rule_id: string | null;
@@ -129,12 +120,9 @@ export async function getTodaysTips(
   childId: string,
   now: Date = new Date(),
 ): Promise<TodayTips> {
-  const [snapshot, { data: rules }, { data: moments }] = await Promise.all([
+  const [snapshot, rules, { data: moments }] = await Promise.all([
     buildChildTipSnapshot(supabase, childId),
-    supabase
-      .from("parent_tip_rules")
-      .select("id, principle, condition_type, condition_params, priority, short_text, reason_text")
-      .not("short_text", "is", null),
+    loadTipRules(),
     supabase
       .from("parent_tip_moments")
       .select("child_id, rule_id, said_at")
@@ -152,15 +140,16 @@ export async function getTodaysTips(
     saidDays.set(moment.rule_id, [...(saidDays.get(moment.rule_id) ?? []), toDayKey(new Date(moment.said_at))]);
   }
 
-  const matching: ShortTipRule[] = ((rules ?? []) as RuleRow[])
+  const matching: ShortTipRule[] = rules
+    .filter((rule) => rule.short_text && rule.reason_text)
     .filter((rule) => TIP_CONDITION_REGISTRY[rule.condition_type]?.(snapshot, rule.condition_params ?? {}))
     .map((rule) => ({
       id: rule.id,
       conditionType: rule.condition_type,
       priority: rule.priority,
       principle: rule.principle,
-      shortText: rule.short_text,
-      reasonText: rule.reason_text,
+      shortText: rule.short_text!,
+      reasonText: rule.reason_text!,
     }));
 
   return {

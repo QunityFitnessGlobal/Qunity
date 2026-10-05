@@ -17,11 +17,16 @@ export async function recordMoment(
 
 // What a parent typed in the "מה קורה עכשיו?" chat, names already taken
 // out (see lib/whats-now.ts's withoutNames) and nothing tying it to who
-// wrote it. Best effort: a failure doesn't concern the parent.
+// wrote it. `rejected` marks the parent answering "זה לא בדיוק זה" to the
+// situation it was matched to — a row of its own, as rows are insert-only.
+// Best effort: a failure doesn't concern the parent.
 export async function recordChatQuestion(
   supabase: SupabaseClient,
   text: string,
   matchedRuleId: string | null,
+  rejected = false,
 ): Promise<void> {
-  await supabase.from("parent_chat_questions").insert({ text: text.slice(0, 500), matched_rule_id: matchedRuleId });
+  await supabase
+    .from("parent_chat_questions")
+    .insert({ text: text.slice(0, 500), matched_rule_id: matchedRuleId, rejected });
 }

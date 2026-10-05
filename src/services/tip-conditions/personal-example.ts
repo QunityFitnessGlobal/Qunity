@@ -25,7 +25,7 @@ export function parentParticipationBelowThreshold(
 
 // condition_type: zero_parent_participation
 export function parentNeverTrainedTogether(snapshot: ChildTipSnapshot): boolean {
-  return snapshot.totalSessions > 0 && snapshot.parentTogetherCount === 0;
+  return snapshot.totalSessions > 0 && !snapshot.everTrainedTogether;
 }
 
 // condition_type: weekly_summary (card #50 — Prompt 8)

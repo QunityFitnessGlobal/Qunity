@@ -5,14 +5,13 @@ import { getStageWorkouts, getWorkoutsCompletedThisMonth, pickNextWorkout } from
 import { calculateProgressPercent } from "@/services/progression.service";
 import { getEncouragementKey } from "@/services/encouragement.service";
 import { getChildStatsForParent } from "@/services/parent-stats.service";
-import { logShownTips } from "@/services/tips.service";
 import { getTodaysTips } from "@/services/today-tips.service";
 import { getChildWeek } from "@/services/child-week.service";
 import { getCelebration } from "@/services/celebration.service";
 import { formatHoursMinutes } from "@/lib/format";
 import { resolveGenderedText, resolveLocalizedText } from "@/lib/i18n-content";
 import { averageDifficultyLabelKey } from "@/lib/workout-labels";
-import { ChildChips } from "@/components/parent/ChildChips";
+import { ChildDropdown } from "@/components/parent/ChildDropdown";
 import { ChildWeekCard } from "@/components/parent/ChildWeekCard";
 import { CelebrationCard } from "@/components/parent/CelebrationCard";
 import { ParentStatsStrip } from "@/components/parent/ParentStatsStrip";
@@ -60,19 +59,15 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     const parentGender = profile?.gender ?? null;
     const firstName = profile?.full_name?.trim().split(/\s+/)[0] ?? "";
 
-    // The stats, the week, the moment to celebrate, today's sentences (and
-    // recording which were shown) and the child's gender don't depend on
-    // each other, so they're fetched together.
+    // The stats, the week, the moment to celebrate, today's sentences and
+    // the child's gender don't depend on each other, so they're fetched
+    // together.
     const [stats, week, celebration, today, childGender] = selectedChildId
       ? await Promise.all([
           getChildStatsForParent(supabase, selectedChildId),
           getChildWeek(supabase, selectedChildId),
           getCelebration(supabase, selectedChildId),
-          getTodaysTips(supabase, user.id, selectedChildId).then(async (result) => {
-            const shown = result.tips.filter((tip) => !tip.saidToday).map((tip) => tip.ruleId);
-            await logShownTips(supabase, user.id, selectedChildId, shown, "auto");
-            return result;
-          }),
+          getTodaysTips(supabase, user.id, selectedChildId),
           supabase
             .from("users")
             .select("gender")
@@ -92,7 +87,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               {firstName ? t("hello", { name: firstName }) : t("helloNoName")}
             </h1>
             {linkedChildren.length > 0 && selectedChildId && (
-              <ChildChips items={linkedChildren} selectedId={selectedChildId} />
+              <ChildDropdown items={linkedChildren} selectedId={selectedChildId} basePath="/dashboard" />
             )}
           </div>
 

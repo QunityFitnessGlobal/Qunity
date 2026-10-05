@@ -7,7 +7,7 @@ import { getParentGrowth } from "@/services/parent-growth.service";
 import { resolveGenderedText, resolveLocalizedText } from "@/lib/i18n-content";
 import { splitExample, splitTipParts } from "@/lib/tip-text";
 import { withChildName, type ChatTip } from "@/lib/whats-now";
-import { ChildChips } from "@/components/parent/ChildChips";
+import { ChildDropdown } from "@/components/parent/ChildDropdown";
 import { EmpowermentView } from "@/components/parent/EmpowermentView";
 import type { PracticeTipView } from "@/components/parent/GrowthJourney";
 import type { Gender } from "@/lib/types";
@@ -25,7 +25,7 @@ export default async function EmpowermentPage({ searchParams }: EmpowermentPageP
   const [profile, linkedChildren, manualMenuTips, { childId }] = await Promise.all([
     getProfile(user.id),
     getLinkedChildren(supabase, user.id),
-    getManualMenuTips(supabase),
+    getManualMenuTips(),
     searchParams,
   ]);
 
@@ -111,7 +111,7 @@ export default async function EmpowermentPage({ searchParams }: EmpowermentPageP
         <div className="flex items-center justify-between gap-3">
           <h1 className="font-display text-[26px] font-bold">{t("title")}</h1>
           {selectedChild && (
-            <ChildChips items={linkedChildren} selectedId={selectedChild.id} basePath="/dashboard/empowerment" />
+            <ChildDropdown items={linkedChildren} selectedId={selectedChild.id} basePath="/dashboard/empowerment" />
           )}
         </div>
 
@@ -125,6 +125,11 @@ export default async function EmpowermentPage({ searchParams }: EmpowermentPageP
             countsByPrinciple={growth.countsByPrinciple}
             practice={practice}
             chatTips={chatTips}
+            triedToday={growth.triedToday}
+            privateNames={[
+              ...linkedChildren.map((child) => child.nickname),
+              ...(profile?.full_name ?? "").split(/\s+/),
+            ]}
             childName={childName}
             childGender={childGender}
             parentName={profile?.full_name?.trim().split(/\s+/)[0] || null}

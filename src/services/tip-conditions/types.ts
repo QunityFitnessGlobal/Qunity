@@ -4,7 +4,10 @@
 export interface ChildTipSnapshot {
   daysSinceLastWorkout: number | null;
   totalSessions: number;
+  // Within the recent sessions (see tips.service.ts's RECENT_SESSIONS).
   parentTogetherCount: number;
+  // Ever, in the whole history.
+  everTrainedTogether: boolean;
   difficultyReportedHistory: number[];
   feelingHistory: string[];
   unlockedChallengeCount: number;

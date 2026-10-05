@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { calculateStreakDays, getChallengeDefinitions } from "@/services/challenge.service";
+import { calculateStreakDays } from "@/services/challenge.service";
+import { getCachedChallengeDefinitions, loadTipRules } from "@/services/content-cache";
 import { meetsCompletionThreshold } from "@/services/points.service";
 import type { ChildTipSnapshot } from "@/services/tip-conditions";
 import type { LocalizedText } from "@/lib/i18n-content";
@@ -22,8 +23,6 @@ export interface ManualMenuTip {
   chatQuick: number | null;
 }
 
-type TriggerSource = "auto" | "manual" | "test";
-
 interface CompletedSessionRow {
   id: string;
   start_time: string;
@@ -45,6 +44,10 @@ interface InProgressSessionRow {
 }
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
+// The conditions look at recent behaviour, so only the latest sessions are
+// read — the whole history grows without end. Totals come from the child's
+// own row (total_workouts_completed).
+export const RECENT_SESSIONS = 60;
 
 function recommendedDurationMinutes(workouts: InProgressSessionRow["workouts"]): number | null {
   if (!workouts) return null;
@@ -52,7 +55,7 @@ function recommendedDurationMinutes(workouts: InProgressSessionRow["workouts"]):
   return row?.recommended_duration_minutes ?? null;
 }
 
-// Accepts either the browser or server Supabase client (see linking.service.ts).
+// Server only (the challenge list comes from the content cache).
 export async function buildChildTipSnapshot(
   supabase: SupabaseClient,
   childId: string,
@@ -71,19 +74,35 @@ export async function buildChildTipSnapshot(
         )
         .eq("child_id", childId)
         .eq("status", "completed")
-        .order("start_time", { ascending: true }),
+        .order("start_time", { ascending: false })
+        .limit(RECENT_SESSIONS),
       supabase
         .from("workout_sessions")
         .select("start_time, workouts(recommended_duration_minutes)")
         .eq("child_id", childId)
         .eq("status", "in_progress"),
       supabase.from("child_challenges").select("challenge_id").eq("child_id", childId),
-      getChallengeDefinitions(supabase),
+      getCachedChallengeDefinitions(),
     ]);
 
-  const sessionRows = (sessions ?? []) as CompletedSessionRow[];
+  // Newest first from the database; the conditions read them oldest first.
+  const sessionRows = ((sessions ?? []) as CompletedSessionRow[]).reverse();
   // Each session's questionnaire answers arrive embedded with it.
   const resultRows = sessionRows.flatMap((s) => s.workout_results ?? []);
+  const togetherCount = resultRows.filter((r) => r.parent_trained_together).length;
+
+  // "Never trained together" is about the whole history: looked up only when
+  // the recent sessions don't already hold all of it.
+  let everTrainedTogether = togetherCount > 0;
+  if (!everTrainedTogether && sessionRows.length >= RECENT_SESSIONS) {
+    const { data: earlier } = await supabase
+      .from("workout_results")
+      .select("session_id, workout_sessions!inner(child_id)")
+      .eq("parent_trained_together", true)
+      .eq("workout_sessions.child_id", childId)
+      .limit(1);
+    everTrainedTogether = (earlier ?? []).length > 0;
+  }
   const resultBySessionId = new Map(resultRows.map((r) => [r.session_id, r]));
 
   const now = new Date();
@@ -131,7 +150,8 @@ export async function buildChildTipSnapshot(
   return {
     daysSinceLastWorkout,
     totalSessions: sessionRows.length,
-    parentTogetherCount: resultRows.filter((r) => r.parent_trained_together).length,
+    parentTogetherCount: togetherCount,
+    everTrainedTogether,
     difficultyReportedHistory: resultRows
       .map((r) => r.difficulty_reported)
       .filter((d): d is number => d !== null),
@@ -153,18 +173,8 @@ export async function buildChildTipSnapshot(
 
 // The parent-initiated "מה קורה עכשיו?" chat (category 3). These rows are
 // never auto-evaluated; the parent picks a situation or describes it.
-export async function getManualMenuTips(supabase: SupabaseClient): Promise<ManualMenuTip[]> {
-  const { data: rules } = await supabase
-    .from("parent_tip_rules")
-    .select("id, principle, condition_params, tip_text")
-    .not("condition_params->>menuGroup", "is", null);
-
-  const rows = (rules ?? []) as {
-    id: string;
-    principle: LocalizedText | null;
-    condition_params: Record<string, unknown> | null;
-    tip_text: LocalizedText;
-  }[];
+export async function getManualMenuTips(): Promise<ManualMenuTip[]> {
+  const rows = (await loadTipRules()).filter((rule) => rule.condition_params?.menuGroup != null);
 
   return rows
     .map((row) => {
@@ -188,26 +198,4 @@ export async function getManualMenuTips(supabase: SupabaseClient): Promise<Manua
       };
     })
     .filter((row): row is ManualMenuTip => row !== null);
-}
-
-export async function logShownTips(
-  supabase: SupabaseClient,
-  parentId: string,
-  childId: string,
-  ruleIds: string[],
-  triggerSource: TriggerSource,
-): Promise<void> {
-  if (ruleIds.length === 0) {
-    return;
-  }
-
-  const rows = ruleIds.map((ruleId) => ({
-    parent_id: parentId,
-    child_id: childId,
-    rule_id: ruleId,
-    shown_at: new Date().toISOString(),
-    trigger_source: triggerSource,
-  }));
-
-  await supabase.from("parent_tips").insert(rows);
 }

@@ -11,6 +11,7 @@ export type ChipAction =
   | { type: "tip"; ruleId: string }
   | { type: "group"; group: number }
   | { type: "groups"; text: string }
+  | { type: "notIt" }
   | { type: "home" };
 
 export type ChatMessage =
@@ -104,6 +105,8 @@ interface ChatPanelProps {
   typing: boolean;
   tipsById: Map<string, ChatTip>;
   tried: number[];
+  // Tips already marked today: one moment per tip a day.
+  triedToday: string[];
   failedId: number | null;
   childGender: string;
   draft: string;
@@ -122,6 +125,7 @@ export function ChatPanel({
   typing,
   tipsById,
   tried,
+  triedToday,
   failedId,
   childGender,
   draft,
@@ -221,6 +225,17 @@ export function ChatPanel({
                       <path d="M10 1.5l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.6-4.1 6.1-.6z" />
                     </svg>
                     {t("collected")}
+                  </div>
+                ) : triedToday.includes(tip.ruleId) ? (
+                  <div className="flex items-center gap-2">
+                    <span className="flex-1 text-sm text-[#6c6580]">{t("triedToday")}</span>
+                    <button
+                      type="button"
+                      onClick={() => onAnother(tip)}
+                      className="min-h-11 rounded-[14px] border border-[#ece6f2] bg-white px-3 text-sm font-semibold text-[#4f4960]"
+                    >
+                      {t("another")}
+                    </button>
                   </div>
                 ) : (
                   <div className="flex gap-2">

@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getTodaysTips } from "@/services/today-tips.service";
+import { loadTipRules } from "@/services/content-cache";
 import { shiftDayKey, toDayKey } from "@/services/workout-history.service";
 import { PRINCIPLE_BADGES } from "@/lib/parent-journey";
 import type { LocalizedText } from "@/lib/i18n-content";
@@ -87,6 +88,8 @@ export interface ParentGrowth {
   // All moments so far per principle, all children.
   countsByPrinciple: Record<string, number>;
   practice: PracticeChoice | null;
+  // Tips already marked today for this child — one moment per tip a day.
+  triedToday: string[];
 }
 
 interface MomentRow {
@@ -95,26 +98,19 @@ interface MomentRow {
   said_at: string;
 }
 
-interface RuleRow {
-  id: string;
-  principle: LocalizedText | null;
-  tip_text: LocalizedText;
-}
-
 export async function getParentGrowth(
   supabase: SupabaseClient,
   parentId: string,
   childId: string,
   now: Date = new Date(),
 ): Promise<ParentGrowth> {
-  const [{ data: moments }, { data: rules }, today] = await Promise.all([
+  const [{ data: moments }, ruleRows, today] = await Promise.all([
     supabase.from("parent_tip_moments").select("child_id, rule_id, said_at").eq("parent_id", parentId),
-    supabase.from("parent_tip_rules").select("id, principle, tip_text"),
+    loadTipRules(),
     getTodaysTips(supabase, parentId, childId, now),
   ]);
 
   const todayKey = toDayKey(now);
-  const ruleRows = (rules ?? []) as RuleRow[];
   const principleOf = new Map(ruleRows.map((rule) => [rule.id, rule.principle?.he ?? null]));
   const momentRows = (moments ?? []) as MomentRow[];
 
@@ -141,6 +137,7 @@ export async function getParentGrowth(
   return {
     totalMoments: momentRows.length,
     countsByPrinciple,
+    triedToday: [...saidDays].filter(([, days]) => days.includes(todayKey)).map(([ruleId]) => ruleId),
     practice: pickPractice({
       rules: practiceRules,
       countsBefore,

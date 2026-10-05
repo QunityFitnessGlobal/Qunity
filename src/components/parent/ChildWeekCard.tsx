@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { getTranslations } from "next-intl/server";
-import { STAGE_DOT_CLASS } from "@/components/parent/ChildChips";
+import { STAGE_DOT_CLASS } from "@/lib/stage-colors";
 import type { ChildWeek } from "@/services/child-week.service";
 import type { BraceletColor } from "@/lib/types";
 

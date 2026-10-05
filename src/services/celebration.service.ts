@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { COLOR_ORDER } from "@/services/progression.service";
+import { loadTipRules } from "@/services/content-cache";
 import { shiftDayKey, toDayKey } from "@/services/workout-history.service";
 import type { LocalizedText } from "@/lib/i18n-content";
 import type { BraceletColor } from "@/lib/types";
@@ -118,12 +119,6 @@ interface SessionRow {
   workouts: { color: BraceletColor | null } | { color: BraceletColor | null }[] | null;
 }
 
-interface TextRow {
-  condition_type: string;
-  short_text: LocalizedText | null;
-  tip_text: LocalizedText;
-}
-
 function colorOf(row: SessionRow): BraceletColor | null {
   const workout = Array.isArray(row.workouts) ? row.workouts[0] : row.workouts;
   return workout?.color ?? null;
@@ -136,7 +131,7 @@ export async function getCelebration(
   now: Date = new Date(),
 ): Promise<Celebration | null> {
   const since = new Date(now.getTime() - LOOKBACK_DAYS * MS_PER_DAY).toISOString();
-  const [{ data: child }, { data: sessions }, { data: unlocked }, { data: texts }] = await Promise.all([
+  const [{ data: child }, { data: sessions }, { data: unlocked }, rules] = await Promise.all([
     supabase.from("children").select("current_color").eq("id", childId).maybeSingle<{ current_color: BraceletColor }>(),
     supabase
       .from("workout_sessions")
@@ -145,10 +140,7 @@ export async function getCelebration(
       .eq("status", "completed")
       .gte("start_time", since),
     supabase.from("child_challenges").select("challenge_id, completed_at").eq("child_id", childId).gte("completed_at", since),
-    supabase
-      .from("parent_tip_rules")
-      .select("condition_type, short_text, tip_text")
-      .eq("condition_params->>screen", "celebrate"),
+    loadTipRules(),
   ]);
 
   const currentColor = child?.current_color ?? "white";
@@ -167,7 +159,9 @@ export async function getCelebration(
       todayKey,
     }),
   );
-  const text = event ? ((texts ?? []) as TextRow[]).find((row) => row.condition_type === `celebrate_${event.kind}`) : null;
+  const text = event
+    ? rules.find((row) => row.condition_params?.screen === "celebrate" && row.condition_type === `celebrate_${event.kind}`)
+    : null;
   if (!event || !text?.short_text) {
     return null;
   }
