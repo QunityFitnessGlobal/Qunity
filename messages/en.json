@@ -606,5 +606,38 @@
       "daysAgo": "{count} days ago",
       "ideaLabel": "An idea to celebrate together:"
     }
+  },
+  "parentGrowth": {
+    "title": "Empowerment",
+    "journeyLabel": "Your journey as a parent",
+    "stageTitle": "{name} · Stage {stage}",
+    "stageNames": {
+      "1": "Starting parent",
+      "2": "Empowering parent",
+      "3": "Supporting parent",
+      "4": "Leading parent",
+      "5": "Coaching parent"
+    },
+    "toNext": "{count, plural, one {One more empowerment moment to the next stage} other {# more empowerment moments to the next stage}}",
+    "toNextRound": "{count, plural, one {One more empowerment moment to the next round} other {# more empowerment moments to the next round}}",
+    "ringLabel": "{done} of {size} empowerment moments in this stage",
+    "badges": {
+      "listening": "Listener",
+      "encouraging": "Encourager",
+      "consistent": "Consistent",
+      "believing": "Believer",
+      "partner": "Partner",
+      "locked": "Soon",
+      "earnedLabel": "{name} badge earned",
+      "lockedLabel": "Badge not earned yet"
+    },
+    "practice": {
+      "title": "An empowering moment",
+      "tried": "I tried it",
+      "notNow": "Not right now",
+      "collected": "Well done! Another empowerment moment collected",
+      "saveFailed": "Couldn't save. Please try again."
+    },
+    "menuTitle": "What's happening now?"
   }
 }

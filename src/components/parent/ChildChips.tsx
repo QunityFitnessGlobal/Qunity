@@ -5,6 +5,8 @@ import type { BraceletColor } from "@/lib/types";
 interface ChildChipsProps {
   items: LinkedChild[];
   selectedId: string;
+  // The page the chips switch the child on.
+  basePath?: string;
 }
 
 export const STAGE_DOT_CLASS: Record<BraceletColor, string> = {
@@ -15,9 +17,9 @@ export const STAGE_DOT_CLASS: Record<BraceletColor, string> = {
   purple: "bg-bracelet-purple",
 };
 
-// The parent home screen's child switcher: one chip per child with their
-// stage color. Like ChildSelector, the choice lives in the URL (?childId=).
-export function ChildChips({ items, selectedId }: ChildChipsProps) {
+// The parent screens' child switcher: one chip per child with their stage
+// color. Like ChildSelector, the choice lives in the URL (?childId=).
+export function ChildChips({ items, selectedId, basePath = "/dashboard" }: ChildChipsProps) {
   return (
     <div className="flex flex-wrap justify-end gap-1.5">
       {items.map((child) => {
@@ -25,7 +27,7 @@ export function ChildChips({ items, selectedId }: ChildChipsProps) {
         return (
           <Link
             key={child.id}
-            href={{ pathname: "/dashboard", query: { childId: child.id } }}
+            href={{ pathname: basePath, query: { childId: child.id } }}
             aria-current={selected ? "true" : undefined}
             className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-sm ${
               selected

@@ -606,5 +606,38 @@
       "daysAgo": "לפני {count} ימים",
       "ideaLabel": "רעיון לחגוג יחד:"
     }
+  },
+  "parentGrowth": {
+    "title": "העצמה",
+    "journeyLabel": "המסע שלך כהורה",
+    "stageTitle": "{name} · שלב {stage}",
+    "stageNames": {
+      "1": "{parentGender, select, female {אמא מתחילה} male {אבא מתחיל} other {הורה מתחיל}}",
+      "2": "{parentGender, select, female {אמא מעצימה} male {אבא מעצים} other {הורה מעצים}}",
+      "3": "{parentGender, select, female {אמא מלווה} male {אבא מלווה} other {הורה מלווה}}",
+      "4": "{parentGender, select, female {אמא מובילה} male {אבא מוביל} other {הורה מוביל}}",
+      "5": "{parentGender, select, female {אמא מאמנת} male {אבא מאמן} other {הורה מאמן}}"
+    },
+    "toNext": "{count, plural, one {עוד רגע העצמה אחד לשלב הבא} other {עוד # רגעי העצמה לשלב הבא}}",
+    "toNextRound": "{count, plural, one {עוד רגע העצמה אחד לסבב הבא} other {עוד # רגעי העצמה לסבב הבא}}",
+    "ringLabel": "{done} מתוך {size} רגעי העצמה בשלב",
+    "badges": {
+      "listening": "{parentGender, select, female {מקשיבה} other {מקשיב}}",
+      "encouraging": "{parentGender, select, female {מעודדת} other {מעודד}}",
+      "consistent": "{parentGender, select, female {עקבית} other {עקבי}}",
+      "believing": "{parentGender, select, female {מאמינה} other {מאמין}}",
+      "partner": "{parentGender, select, female {שותפה} other {שותף}}",
+      "locked": "בקרוב",
+      "earnedLabel": "התג {name} נפתח",
+      "lockedLabel": "תג שעוד לא נפתח"
+    },
+    "practice": {
+      "title": "רגע של העצמה",
+      "tried": "ניסיתי את זה",
+      "notNow": "לא מתאים עכשיו",
+      "collected": "כל הכבוד! עוד רגע העצמה נאסף",
+      "saveFailed": "לא הצלחנו לשמור. נסו שוב."
+    },
+    "menuTitle": "מה קורה עכשיו?"
   }
 }
