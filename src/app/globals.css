@@ -594,10 +594,16 @@ body {
 }
 
 /* Parent home screen: the week's day dots pop in one after another
-   (--home-delay), the stage bar fills, each sentence in "משפט להגיד היום"
+   (--home-delay), the stage bar fills, the "רגע לחגוג" trophy wiggles,
+   each sentence in "משפט להגיד היום"
    slides in (remounted per change, so it replays), and "אמרתי!" pops. */
 @keyframes home-fill {
   from { width: 0; }
+}
+@keyframes home-wiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
 }
 @keyframes home-tip-in {
   from { opacity: 0; transform: translateX(-18px); }
@@ -610,6 +616,9 @@ body {
 .animate-home-fill {
   animation: home-fill 1s ease-out 0.5s both;
 }
+.animate-home-wiggle {
+  animation: home-wiggle 0.8s ease-in-out 1s 2;
+}
 .animate-home-tip-in {
   animation: home-tip-in 0.35s ease-out both;
 }
@@ -619,6 +628,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .animate-home-day-pop,
   .animate-home-fill,
+  .animate-home-wiggle,
   .animate-home-tip-in,
   .animate-home-said {
     animation: none;

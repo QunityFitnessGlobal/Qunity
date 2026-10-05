@@ -8,11 +8,13 @@ import { getChildStatsForParent } from "@/services/parent-stats.service";
 import { logShownTips } from "@/services/tips.service";
 import { getTodaysTips } from "@/services/today-tips.service";
 import { getChildWeek } from "@/services/child-week.service";
+import { getCelebration } from "@/services/celebration.service";
 import { formatHoursMinutes } from "@/lib/format";
 import { resolveGenderedText, resolveLocalizedText } from "@/lib/i18n-content";
 import { averageDifficultyLabelKey } from "@/lib/workout-labels";
 import { ChildChips } from "@/components/parent/ChildChips";
 import { ChildWeekCard } from "@/components/parent/ChildWeekCard";
+import { CelebrationCard } from "@/components/parent/CelebrationCard";
 import { ParentStatsStrip } from "@/components/parent/ParentStatsStrip";
 import { TodayTipsCard } from "@/components/parent/TodayTipsCard";
 import { ChildHomeView } from "@/components/child/ChildHomeView";
@@ -58,13 +60,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     const parentGender = profile?.gender ?? null;
     const firstName = profile?.full_name?.trim().split(/\s+/)[0] ?? "";
 
-    // The stats, the week, today's sentences (and recording which were
-    // shown) and the child's gender don't depend on each other, so they're
-    // fetched together.
-    const [stats, week, today, childGender] = selectedChildId
+    // The stats, the week, the moment to celebrate, today's sentences (and
+    // recording which were shown) and the child's gender don't depend on
+    // each other, so they're fetched together.
+    const [stats, week, celebration, today, childGender] = selectedChildId
       ? await Promise.all([
           getChildStatsForParent(supabase, selectedChildId),
           getChildWeek(supabase, selectedChildId),
+          getCelebration(supabase, selectedChildId),
           getTodaysTips(supabase, user.id, selectedChildId).then(async (result) => {
             const shown = result.tips.filter((tip) => !tip.saidToday).map((tip) => tip.ruleId);
             await logShownTips(supabase, user.id, selectedChildId, shown, "auto");
@@ -77,7 +80,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             .maybeSingle<{ gender: Gender | null }>()
             .then(({ data }) => data?.gender ?? null),
         ])
-      : [null, null, null, null];
+      : [null, null, null, null, null];
 
     const difficultyKey = stats ? averageDifficultyLabelKey(stats.averageDifficultyReported) : null;
 
@@ -103,6 +106,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               workoutsInStage={stats.workoutsCompletedInColor}
               requiredWorkouts={stats.requiredWorkouts}
             />
+          )}
+
+          {stats && celebration && (
+            <CelebrationCard celebration={celebration} name={stats.nickname} gender={childGender} />
           )}
 
           {stats && (

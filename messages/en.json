@@ -597,6 +597,14 @@
       "allDoneLink": "To the empowerment screen",
       "empty": "Nothing special to say today. New sentences show up as workouts come in.",
       "saveFailed": "Couldn't save. Please try again."
+    },
+    "celebrate": {
+      "eyebrow": "A moment to celebrate · {when}",
+      "today": "today",
+      "yesterday": "yesterday",
+      "twoDaysAgo": "2 days ago",
+      "daysAgo": "{count} days ago",
+      "ideaLabel": "An idea to celebrate together:"
     }
   }
 }
