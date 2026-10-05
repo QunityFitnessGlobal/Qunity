@@ -4,11 +4,12 @@ import { meetsCompletionThreshold } from "@/services/points.service";
 import type { ChildTipSnapshot } from "@/services/tip-conditions";
 import type { LocalizedText } from "@/lib/i18n-content";
 
-// A manual_selection row from the "What's happening now" accordion — see
-// getManualMenuTips() below. menuGroup/labelHe/labelEn live in
-// condition_params (see the Prompt 8 schema.sql seed) rather than new
-// columns, since they're only ever needed together with the row's own
-// tip_text/principle.
+// A tip of the "מה קורה עכשיו?" chat (the menu tips) — see
+// getManualMenuTips() below. Its menu fields live in condition_params (see
+// the Prompt 8 and guided-chat sections of schema.sql) rather than columns,
+// since they're only ever needed together with the row's own text:
+// menuGroup/labelHe/labelEn, and for the chat chatLabel (ICU, by the child's
+// and parent's gender), keywords and chatQuick.
 export interface ManualMenuTip {
   ruleId: string;
   principle: LocalizedText | null;
@@ -16,6 +17,9 @@ export interface ManualMenuTip {
   menuGroup: number;
   labelHe: string;
   labelEn: string;
+  chatLabel: string | null;
+  keywords: string[];
+  chatQuick: number | null;
 }
 
 type TriggerSource = "auto" | "manual" | "test";
@@ -147,9 +151,8 @@ export async function buildChildTipSnapshot(
   };
 }
 
-// The parent-initiated "What's happening now" accordion (category 3).
-// These rows are never auto-evaluated; the UI groups them by menuGroup and
-// the parent picks one directly.
+// The parent-initiated "מה קורה עכשיו?" chat (category 3). These rows are
+// never auto-evaluated; the parent picks a situation or describes it.
 export async function getManualMenuTips(supabase: SupabaseClient): Promise<ManualMenuTip[]> {
   const { data: rules } = await supabase
     .from("parent_tip_rules")
@@ -172,7 +175,17 @@ export async function getManualMenuTips(supabase: SupabaseClient): Promise<Manua
       if (!Number.isFinite(menuGroup) || !labelHe) {
         return null;
       }
-      return { ruleId: row.id, principle: row.principle, tipText: row.tip_text, menuGroup, labelHe, labelEn };
+      return {
+        ruleId: row.id,
+        principle: row.principle,
+        tipText: row.tip_text,
+        menuGroup,
+        labelHe,
+        labelEn,
+        chatLabel: typeof params.chatLabel === "string" ? params.chatLabel : null,
+        keywords: Array.isArray(params.keywords) ? params.keywords.filter((w): w is string => typeof w === "string") : [],
+        chatQuick: typeof params.chatQuick === "number" ? params.chatQuick : null,
+      };
     })
     .filter((row): row is ManualMenuTip => row !== null);
 }

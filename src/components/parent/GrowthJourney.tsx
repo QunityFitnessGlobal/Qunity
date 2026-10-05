@@ -3,6 +3,7 @@
 import { useState, type CSSProperties } from "react";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
+import { recordMoment } from "@/services/moments.service";
 import { badgeStates, parentStage, type BadgeKey } from "@/lib/parent-journey";
 import type { Gender } from "@/lib/types";
 
@@ -20,6 +21,9 @@ export interface PracticeTipView {
 interface GrowthJourneyProps {
   totalMoments: number;
   countsByPrinciple: Record<string, number>;
+  // Adds (or, when saving fails, takes back) a moment of a principle; the
+  // counts live with EmpowermentView so the chat's moments count too.
+  onCount: (principle: string, by: number) => void;
   practice: PracticeTipView[];
   parentGender: Gender | null;
   parentId: string;
@@ -44,14 +48,13 @@ const RING = 2 * Math.PI * 34;
 export function GrowthJourney({
   totalMoments,
   countsByPrinciple,
+  onCount,
   practice,
   parentGender,
   parentId,
   childId,
 }: GrowthJourneyProps) {
   const t = useTranslations("parentGrowth");
-  const [total, setTotal] = useState(totalMoments);
-  const [counts, setCounts] = useState(countsByPrinciple);
   const [done, setDone] = useState(() => practice.map((tip) => tip.saidToday));
   const [index, setIndex] = useState(0);
   // Bumped on every move so the sentence slides in again.
@@ -60,30 +63,23 @@ export function GrowthJourney({
   const [failed, setFailed] = useState(false);
 
   const gender = parentGender ?? "other";
-  const stage = parentStage(total);
+  const stage = parentStage(totalMoments);
   const left = stage.stageSize - stage.inStage;
-  const badges = badgeStates(counts);
+  const badges = badgeStates(countsByPrinciple);
   const tip = practice[index];
-
-  function count(principle: string, by: number) {
-    setTotal((n) => n + by);
-    setCounts((c) => ({ ...c, [principle]: (c[principle] ?? 0) + by }));
-  }
 
   async function tried() {
     const at = index;
     const current = practice[at];
     setDone((d) => d.map((x, i) => x || i === at));
-    count(current.principle, 1);
+    onCount(current.principle, 1);
     setFailed(false);
     setSaving(true);
-    const { error } = await createClient()
-      .from("parent_tip_moments")
-      .insert({ parent_id: parentId, child_id: childId, rule_id: current.ruleId });
+    const saved = await recordMoment(createClient(), parentId, childId, current.ruleId);
     setSaving(false);
-    if (error) {
+    if (!saved) {
       setDone((d) => d.map((x, i) => (i === at ? false : x)));
-      count(current.principle, -1);
+      onCount(current.principle, -1);
       setFailed(true);
     }
   }

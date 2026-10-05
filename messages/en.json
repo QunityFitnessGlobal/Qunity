@@ -154,15 +154,6 @@
     "heading": "Tips for parents",
     "empty": "No relevant tips right now."
   },
-  "whatsHappeningNow": {
-    "heading": "What's happening now?",
-    "group1": "He doesn't want to start / is arguing",
-    "group2": "He feels like he's not good enough",
-    "group3": "He's showing a strong emotion",
-    "group4": "He succeeded or made an effort",
-    "group5": "It's about me, as a parent",
-    "saving": "Saving..."
-  },
   "childSelector": {
     "label": "My child"
   },
@@ -637,7 +628,55 @@
       "notNow": "Not right now",
       "collected": "Well done! Another empowerment moment collected",
       "saveFailed": "Couldn't save. Please try again."
+    }
+  },
+  "whatsNow": {
+    "title": "What's happening now?",
+    "subtitle": "Tell us what's going on with {name}, and we'll suggest what to say",
+    "assistant": "Empowerment helper · answers from Qunity's tips",
+    "greeting": "Hi {parentName}, what is {name} saying or doing right now?",
+    "greetingNoName": "What is {name} saying or doing right now?",
+    "allSituations": "All situations",
+    "entryPlaceholder": "Or describe it in your own words…",
+    "chatPlaceholder": "Describe what's happening…",
+    "inputLabel": "Describe what's happening",
+    "send": "Send",
+    "back": "Back to empowerment",
+    "backToChat": "Back",
+    "typing": "The helper is typing",
+    "whatExactly": "What exactly is happening?",
+    "soundsLike": "Sounds like \"{label}\".",
+    "notIt": "That's not quite it",
+    "narrowDown": "Let's narrow it down. What's closest?",
+    "notUnderstood": "I didn't quite get that. Is it close to one of these?",
+    "howToRespond": "Here's a way to respond:",
+    "doLine": "Do: {doText}\nAvoid: {dontText}",
+    "sayToChild": "You could say:",
+    "tried": "I tried it",
+    "another": "Another idea",
+    "anotherIntro": "Another idea, for {label}:",
+    "collected": "Well done! Another empowerment moment collected",
+    "afterTried": "Well done. That moment is now part of your journey. I'm here if anything else comes up.",
+    "somethingElse": "Something else is happening",
+    "searchLabel": "Search situations",
+    "searchPlaceholder": "e.g. doesn't want to train, crying",
+    "all": "All",
+    "noResults": "No situation like that. Try another word, or describe it to the helper.",
+    "privacyNote": "What you write here is saved without names, to help us improve the answers.",
+    "saveFailed": "Couldn't save. Please try again.",
+    "groups": {
+      "1": "Doesn't want to start / argues",
+      "2": "Feels not good enough",
+      "3": "Shows a strong feeling",
+      "4": "Succeeded or made an effort",
+      "5": "It's about me, as a parent"
     },
-    "menuTitle": "What's happening now?"
+    "groupShort": {
+      "1": "Starting",
+      "2": "Confidence",
+      "3": "Feelings",
+      "4": "Success",
+      "5": "Me as a parent"
+    }
   }
 }
