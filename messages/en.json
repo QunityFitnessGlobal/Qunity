@@ -366,7 +366,8 @@
     "qaTools": {
       "label": "Workout test tools (TEMP)",
       "hint": "Adds quick-finish buttons at 100% or 70% during a workout. Saved on this device only."
-    }
+    },
+    "qaSection": "Testing tools (temporary)"
   },
   "addChildDirect": {
     "title": "Create a new child profile",
@@ -384,7 +385,7 @@
     "continue": "Continue"
   },
   "familyMode": {
-    "switchToChild": "Child Mode ⚡",
+    "switchToChild": "Child Mode",
     "goToChildMode": "Go to Child Mode",
     "switching": "Switching...",
     "pickChild": "Which child?",
@@ -395,7 +396,7 @@
     "saving": "Saving...",
     "pinSaved": "Saved!",
     "pinError": "Error saving the PIN",
-    "exitToParentMode": "🔒 Exit to parent mode",
+    "exitToParentMode": "Exit to parent mode",
     "enterPin": "Enter PIN",
     "wrongPin": "Wrong PIN, try again",
     "cancel": "Cancel",

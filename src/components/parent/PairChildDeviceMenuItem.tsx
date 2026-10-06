@@ -4,16 +4,14 @@ import { useState } from "react";
 import QRCode from "qrcode";
 import { useTranslations } from "next-intl";
 import { createPairingCode } from "@/services/family-mode.service";
-import { Button } from "@/components/ui/Button";
+import { PRIMARY_BUTTON } from "@/components/entry/EntryShell";
+import { DIALOG_CLOSE, SETTINGS_ROW, SettingsDialog, SettingsIcons, SettingsRowContent } from "@/components/ui/SettingsUI";
+import { STAGE_DOT_CLASS } from "@/lib/stage-colors";
 import type { LinkedChild } from "@/services/linking.service";
 
 interface PairChildDeviceMenuItemProps {
   label: string;
   linkedChildren: LinkedChild[];
-  // Called once the success popup is dismissed — lets a parent (the
-  // settings menu) close itself back up, per the parent/child hand-off
-  // being "done" from the settings screen's point of view.
-  onDone?: () => void;
 }
 
 interface ActivePairing {
@@ -28,7 +26,7 @@ interface ActivePairing {
 // its own success confirmation, separate from the QR/code screen itself,
 // since that's the actual useful content and shouldn't just vanish once
 // generated.
-export function PairChildDeviceMenuItem({ label, linkedChildren, onDone }: PairChildDeviceMenuItemProps) {
+export function PairChildDeviceMenuItem({ label, linkedChildren }: PairChildDeviceMenuItemProps) {
   const t = useTranslations("familyMode");
   const [open, setOpen] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
@@ -75,10 +73,6 @@ export function PairChildDeviceMenuItem({ label, linkedChildren, onDone }: PairC
     setError(null);
   }
 
-  function handleFinish() {
-    handleClose();
-    onDone?.();
-  }
 
   if (linkedChildren.length === 0) {
     return null;
@@ -86,78 +80,80 @@ export function PairChildDeviceMenuItem({ label, linkedChildren, onDone }: PairC
 
   return (
     <>
-      <button
-        type="button"
-        onClick={handleOpen}
-        className="block w-full px-4 py-3 text-right text-sm text-zinc-700 hover:bg-zinc-50"
-      >
-        {label}
+      <button type="button" onClick={handleOpen} className={SETTINGS_ROW}>
+        <SettingsRowContent icon={SettingsIcons.device} label={label} />
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-xs space-y-3 rounded-lg bg-white p-5 text-center">
-            {showPicker && (
-              <div className="space-y-2 text-right">
-                <p className="text-sm font-medium text-zinc-700">{t("pickChild")}</p>
-                {linkedChildren.map((child) => (
-                  <button
-                    key={child.id}
-                    type="button"
-                    disabled={loading}
-                    onClick={() => handleGenerate(child.id)}
-                    className="block w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-right text-sm hover:bg-zinc-50"
-                  >
-                    {child.nickname}
-                  </button>
-                ))}
+        <SettingsDialog title={showSuccess ? undefined : label} icon={showSuccess ? undefined : SettingsIcons.device}>
+          {showPicker && (
+            <div className="flex flex-col gap-2">
+              <p className="text-sm text-[#6c6580]">{t("pickChild")}</p>
+              {linkedChildren.map((child) => (
+                <button
+                  key={child.id}
+                  type="button"
+                  disabled={loading}
+                  onClick={() => handleGenerate(child.id)}
+                  className="flex min-h-12 items-center gap-2.5 rounded-2xl border border-[#ece6f2] bg-white px-4 text-start text-[15px] font-medium disabled:opacity-60"
+                >
+                  <span className={`h-2.5 w-2.5 flex-none rounded-full ${STAGE_DOT_CLASS[child.color]}`} aria-hidden />
+                  {child.nickname}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {loading && !pairing && <p className="text-sm text-[#6c6580]">{t("switching")}</p>}
+
+          {pairing && !showSuccess && (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element -- generated data: URL, not a Storage asset */}
+              <img src={pairing.qrDataUrl} alt="QR" className="mx-auto h-[200px] w-[200px] rounded-2xl border border-[#ece6f2] p-2" />
+
+              <div className="flex items-center gap-2">
+                <div className="h-px flex-1 bg-[#ece6f2]" />
+                <span className="text-xs text-[#8a8399]">{t("or")}</span>
+                <div className="h-px flex-1 bg-[#ece6f2]" />
               </div>
-            )}
 
-            {loading && !pairing && <p className="text-sm text-zinc-500">{t("switching")}</p>}
+              <p dir="ltr" className="font-display text-4xl font-bold tracking-[0.3em] text-[#221a33]">
+                {pairing.code}
+              </p>
+              <p className="text-xs text-[#6c6580]">{t("expiresIn10")}</p>
 
-            {pairing && !showSuccess && (
-              <>
-                {/* eslint-disable-next-line @next/next/no-img-element -- generated data: URL, not a Storage asset */}
-                <img src={pairing.qrDataUrl} alt="QR" className="mx-auto h-[200px] w-[200px]" />
-
-                <div className="flex items-center gap-2">
-                  <div className="h-px flex-1 bg-zinc-200" />
-                  <span className="text-xs text-zinc-400">{t("or")}</span>
-                  <div className="h-px flex-1 bg-zinc-200" />
-                </div>
-
-                <p className="text-3xl font-bold tracking-[0.3em]">{pairing.code}</p>
-                <p className="text-xs text-text-muted">{t("expiresIn10")}</p>
-
-                <Button className="w-full" onClick={() => setShowSuccess(true)}>
-                  {t("continue")}
-                </Button>
-              </>
-            )}
-
-            {showSuccess && (
-              <>
-                <p className="text-sm font-medium text-green-700">{t("pairSuccess")}</p>
-                <Button className="w-full" onClick={handleFinish}>
-                  {t("continue")}
-                </Button>
-              </>
-            )}
-
-            {error && <p className="text-sm text-red-600">{error}</p>}
-
-            {!pairing && (
-              <button
-                type="button"
-                onClick={handleClose}
-                className="block w-full text-center text-sm text-zinc-500 underline"
-              >
-                {t("close")}
+              <button type="button" className={PRIMARY_BUTTON} onClick={() => setShowSuccess(true)}>
+                {t("continue")}
               </button>
-            )}
-          </div>
-        </div>
+            </>
+          )}
+
+          {showSuccess && (
+            <>
+              <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#e3f8ea]" aria-hidden>
+                <svg viewBox="0 0 20 20" className="h-7 w-7" fill="none" stroke="#16a34a" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4.5 10.5 8.5 14.5 15.5 6" />
+                </svg>
+              </span>
+              <p className="font-display text-lg font-semibold">{t("pairSuccess")}</p>
+              <button type="button" className={PRIMARY_BUTTON} onClick={handleClose}>
+                {t("continue")}
+              </button>
+            </>
+          )}
+
+          {error && (
+            <p role="alert" className="text-sm text-red-600">
+              {error}
+            </p>
+          )}
+
+          {!pairing && (
+            <button type="button" onClick={handleClose} className={DIALOG_CLOSE}>
+              {t("close")}
+            </button>
+          )}
+        </SettingsDialog>
       )}
     </>
   );

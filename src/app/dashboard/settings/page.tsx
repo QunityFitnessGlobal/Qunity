@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { getProfile, getSupabase, requireUser } from "@/lib/session";
 import { getLinkedChildren } from "@/services/linking.service";
@@ -11,11 +10,14 @@ import { LevelUpPreviewTester, type StageRequirements } from "@/components/child
 import { QaToolsToggle } from "@/components/child/QaToolsToggle";
 import { ReturnToParentButton } from "@/components/child/ReturnToParentButton";
 import { ParentPinMenuItem } from "@/components/parent/ParentPinMenuItem";
+import { PairChildDeviceMenuItem } from "@/components/parent/PairChildDeviceMenuItem";
 import { ChildModeSwitcher } from "@/components/parent/ChildModeSwitcher";
-import { ChildrenAccordion } from "@/components/parent/ChildrenAccordion";
-import { AccordionSection } from "@/components/ui/AccordionSection";
+import { SETTINGS_ROW, SettingsIcons, SettingsRowContent, SettingsSection } from "@/components/ui/SettingsUI";
 import type { BraceletColor } from "@/lib/types";
 
+// Settings, for a parent (their children, the PIN, child mode) or a child
+// (their code, the workout sound, back to parent mode): grouped cards of
+// rows, each opening its own popup.
 export default async function SettingsPage() {
   const user = await requireUser();
   const supabase = await getSupabase();
@@ -41,50 +43,75 @@ export default async function SettingsPage() {
       (row) => [row.color, { workouts: row.required_workouts, points: row.required_points }],
     ),
   );
+  const name = profile?.full_name?.trim() ?? "";
 
   return (
-    <div className="flex flex-1 flex-col items-center gap-4 px-4 py-16">
-      <h1 className="text-2xl font-bold">{t("title")}</h1>
+    <div className="flex flex-1 flex-col items-center px-4 pb-12 pt-5">
+      <div className="flex w-full max-w-md flex-col gap-4">
+        <h1 className="font-display text-[26px] font-bold">{t("title")}</h1>
 
-      {isChild && (
-        <div className="w-full max-w-sm space-y-2">
-          <Link
-            href="/dashboard/settings/code"
-            className="block rounded-lg border border-zinc-200 bg-white px-4 py-3 text-right shadow-sm transition-colors hover:bg-zinc-50"
-          >
-            {t("myCode")}
-          </Link>
-        </div>
-      )}
+        {(name || (!isChild && user.email)) && (
+          <section className="flex items-center gap-3 rounded-[20px] border border-[#ece6f2] bg-white px-4 py-3.5">
+            <span
+              className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-brand-purple font-display text-xl font-bold text-white"
+              aria-hidden
+            >
+              {name ? name[0] : "?"}
+            </span>
+            <span className="flex min-w-0 flex-col">
+              {name && <span className="font-display text-lg font-semibold">{name}</span>}
+              {!isChild && user.email && (
+                <span dir="ltr" className="truncate text-start text-sm text-[#6c6580]">
+                  {user.email}
+                </span>
+              )}
+            </span>
+          </section>
+        )}
 
-      {isChild && <WorkoutSoundMenuItem />}
+        {!isChild && (
+          <SettingsSection title={t("sectionChildren")}>
+            <Link href="/add-child-direct" className={SETTINGS_ROW}>
+              <SettingsRowContent icon={SettingsIcons.addChild} label={t("addChildDirect")} />
+            </Link>
+            <PairChildDeviceMenuItem label={t("pairDevice")} linkedChildren={linkedChildren} />
+            <Link href="/add-child" className={SETTINGS_ROW}>
+              <SettingsRowContent icon={SettingsIcons.link} label={t("alreadyRegisteredLink")} quiet />
+            </Link>
+          </SettingsSection>
+        )}
 
-      {qaAllowed && <PowerPreviewTester />}
-      {qaAllowed && <LevelUpPreviewTester stages={stageRequirements} />}
-      {qaAllowed && <QaToolsToggle />}
-      {isChild && <ReturnToParentButton />}
+        {!isChild && (
+          <SettingsSection title={t("sectionSecurity")}>
+            <ParentPinMenuItem hasPinSet={Boolean(parentRow?.pin_hash)} />
+          </SettingsSection>
+        )}
 
-      {!isChild && (
-        <Suspense fallback={null}>
-          <ChildrenAccordion linkedChildren={linkedChildren} />
-        </Suspense>
-      )}
+        {isChild && (
+          <SettingsSection>
+            <Link href="/dashboard/settings/code" className={SETTINGS_ROW}>
+              <SettingsRowContent icon={SettingsIcons.code} label={t("myCode")} />
+            </Link>
+            <WorkoutSoundMenuItem />
+            <ReturnToParentButton />
+          </SettingsSection>
+        )}
 
-      {!isChild && (
-        <AccordionSection title={t("sectionSecurity")}>
-          <ParentPinMenuItem hasPinSet={Boolean(parentRow?.pin_hash)} />
-        </AccordionSection>
-      )}
+        {!isChild && (
+          <ChildModeSwitcher parentId={user.id} linkedChildren={linkedChildren} label={tFamily("goToChildMode")} />
+        )}
 
-      {!isChild && (
-        <ChildModeSwitcher
-          parentId={user.id}
-          linkedChildren={linkedChildren}
-          label={tFamily("goToChildMode")}
-        />
-      )}
+        {qaAllowed && (
+          <section className="flex flex-col gap-2 [&>*]:max-w-none">
+            <h2 className="px-1 text-[13px] font-semibold text-[#6c6580]">{t("qaSection")}</h2>
+            <PowerPreviewTester />
+            <LevelUpPreviewTester stages={stageRequirements} />
+            <QaToolsToggle />
+          </section>
+        )}
 
-      <LogoutButton />
+        <LogoutButton />
+      </div>
     </div>
   );
 }

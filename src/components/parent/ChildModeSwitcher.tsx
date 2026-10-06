@@ -6,7 +6,9 @@ import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { switchToChild } from "@/services/family-mode.service";
 import { cacheParentSession } from "@/lib/family-session";
-import { Button } from "@/components/ui/Button";
+import { PRIMARY_BUTTON } from "@/components/entry/EntryShell";
+import { DIALOG_CLOSE, SettingsDialog, SettingsIcons } from "@/components/ui/SettingsUI";
+import { STAGE_DOT_CLASS } from "@/lib/stage-colors";
 import type { LinkedChild } from "@/services/linking.service";
 
 interface ChildModeSwitcherProps {
@@ -83,35 +85,43 @@ export function ChildModeSwitcher({ parentId, linkedChildren, label }: ChildMode
   }
 
   return (
-    <div className="w-full max-w-sm space-y-2">
-      {!showPicker && (
-        <Button
-          className="w-full bg-brand-purple hover:opacity-90"
-          disabled={loading}
-          onClick={handleStart}
-        >
-          {loading ? t("switching") : (label ?? t("switchToChild"))}
-        </Button>
-      )}
+    <div className="flex w-full flex-col gap-2">
+      <button type="button" className={PRIMARY_BUTTON} disabled={loading} onClick={handleStart}>
+        {SettingsIcons.childMode}
+        {loading && !showPicker ? t("switching") : (label ?? t("switchToChild"))}
+      </button>
 
       {showPicker && (
-        <div className="space-y-2 rounded-lg border border-zinc-200 p-3">
-          <p className="text-sm font-medium text-zinc-700">{t("pickChild")}</p>
+        <SettingsDialog title={t("pickChild")} icon={SettingsIcons.childMode}>
           {linkedChildren.map((child) => (
             <button
               key={child.id}
               type="button"
               disabled={loading}
               onClick={() => handleSwitch(child.id)}
-              className="block w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-right text-sm hover:bg-zinc-50"
+              className="flex min-h-12 items-center gap-2.5 rounded-2xl border border-[#ece6f2] bg-white px-4 text-start text-[15px] font-medium disabled:opacity-60"
             >
+              <span className={`h-2.5 w-2.5 flex-none rounded-full ${STAGE_DOT_CLASS[child.color]}`} aria-hidden />
               {child.nickname}
             </button>
           ))}
-        </div>
+          {loading && <p className="text-sm text-[#6c6580]">{t("switching")}</p>}
+          {error && (
+            <p role="alert" className="text-sm text-red-600">
+              {error}
+            </p>
+          )}
+          <button type="button" onClick={() => setShowPicker(false)} className={DIALOG_CLOSE}>
+            {t("cancel")}
+          </button>
+        </SettingsDialog>
       )}
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && !showPicker && (
+        <p role="alert" className="text-center text-sm text-red-600">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

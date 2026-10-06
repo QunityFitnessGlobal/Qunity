@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/Button";
+import { PRIMARY_BUTTON } from "@/components/entry/EntryShell";
+import { DIALOG_CLOSE, SETTINGS_ROW, SettingsDialog, SettingsIcons, SettingsRowContent } from "@/components/ui/SettingsUI";
 import { SpeakerIcon } from "@/components/ui/SpeakerIcon";
 import {
   WORKOUT_SOUND_KINDS,
@@ -47,33 +48,30 @@ export function WorkoutSoundMenuItem() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={handleOpen}
-        className="flex w-full max-w-sm items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3 text-right text-sm font-semibold text-zinc-700"
-      >
-        <span>{t("menuLabel")}</span>
-        <span className="text-zinc-400">◂</span>
+      <button type="button" onClick={handleOpen} className={SETTINGS_ROW}>
+        <SettingsRowContent icon={SettingsIcons.sound} label={t("menuLabel")} />
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-xs space-y-3 rounded-lg bg-white p-5">
-            <p className="text-center text-base font-bold">{t("title")}</p>
-
-            <div className="space-y-1">
-              {WORKOUT_SOUND_KINDS.map((kind) => (
+        <SettingsDialog title={t("title")} icon={SettingsIcons.sound}>
+          <div className="flex flex-col gap-1.5 text-start">
+            {WORKOUT_SOUND_KINDS.map((kind) => {
+              const selected = draft === kind;
+              return (
                 <div
                   key={kind}
-                  className="flex items-center justify-between gap-2 rounded-md px-2 py-1 hover:bg-zinc-50"
+                  className={`flex items-center gap-2 rounded-2xl border-[1.5px] px-3 ${
+                    selected ? "border-brand-purple bg-brand-purple/[0.06]" : "border-[#ece6f2] bg-white"
+                  }`}
                 >
-                  <label className="flex flex-1 cursor-pointer items-center gap-2 py-1 text-sm text-zinc-700">
+                  <label className="flex min-h-12 flex-1 cursor-pointer items-center gap-2.5 text-[15px] font-medium">
                     <input
                       type="radio"
                       name="workout-sound"
                       value={kind}
-                      checked={draft === kind}
+                      checked={selected}
                       onChange={() => setDraft(kind)}
+                      className="h-4 w-4 accent-brand-purple"
                     />
                     {t(kind)}
                   </label>
@@ -82,25 +80,23 @@ export function WorkoutSoundMenuItem() {
                       type="button"
                       onClick={() => handlePreview(kind)}
                       aria-label={t("preview", { name: t(kind) })}
-                      className="rounded-full p-2 text-brand-purple hover:bg-brand-purple/10"
+                      className="flex h-10 w-10 items-center justify-center rounded-full text-brand-purple hover:bg-brand-purple/10"
                     >
                       <SpeakerIcon className="h-5 w-5" />
                     </button>
                   )}
                 </div>
-              ))}
-            </div>
-
-            <div className="flex gap-2">
-              <Button className="flex-1" onClick={handleSave}>
-                {t("save")}
-              </Button>
-              <Button className="flex-1 bg-zinc-700 hover:bg-zinc-800" onClick={handleClose}>
-                {t("cancel")}
-              </Button>
-            </div>
+              );
+            })}
           </div>
-        </div>
+
+          <button type="button" className={PRIMARY_BUTTON} onClick={handleSave}>
+            {t("save")}
+          </button>
+          <button type="button" className={DIALOG_CLOSE} onClick={handleClose}>
+            {t("cancel")}
+          </button>
+        </SettingsDialog>
       )}
     </>
   );

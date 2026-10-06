@@ -7,6 +7,7 @@ interface ChildCodeCardProps {
   code: string;
 }
 
+// The child's own code, for a parent to link to them, with a copy button.
 export function ChildCodeCard({ code }: ChildCodeCardProps) {
   const t = useTranslations("childCode");
   const [copied, setCopied] = useState(false);
@@ -18,12 +19,17 @@ export function ChildCodeCard({ code }: ChildCodeCardProps) {
   }
 
   return (
-    <div className="w-full max-w-xs rounded-lg border border-zinc-200 bg-white p-4 text-center shadow-sm">
-      <p className="text-sm font-medium text-zinc-600">{t("label")}</p>
-      <p className="mt-1 font-mono text-2xl font-bold tracking-wider text-blue-700">{code}</p>
+    <div className="flex w-full flex-col items-center gap-2 rounded-[20px] border border-[#ece6f2] bg-white px-4 py-5 text-center">
+      <p className="text-sm font-semibold text-[#6c6580]">{t("label")}</p>
+      <p dir="ltr" className="font-display text-4xl font-bold tracking-[0.2em] text-brand-purple">
+        {code}
+      </p>
       <button
+        type="button"
         onClick={handleCopy}
-        className="mt-3 rounded-md bg-zinc-100 px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-200"
+        className={`mt-1 inline-flex min-h-10 items-center gap-1.5 rounded-full border-[1.5px] px-4 text-sm font-semibold transition-colors ${
+          copied ? "border-[#22c55e] bg-[#e3f8ea] text-[#15803d]" : "border-[#e4d3e1] bg-white text-[#7d1f72]"
+        }`}
       >
         {copied ? t("copied") : t("copy")}
       </button>

@@ -6,7 +6,8 @@ import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { verifyParentPin } from "@/services/family-mode.service";
 import { getCachedParentSession, clearCachedParentSession } from "@/lib/family-session";
-import { Button } from "@/components/ui/Button";
+import { PRIMARY_BUTTON } from "@/components/entry/EntryShell";
+import { DIALOG_CLOSE, PIN_INPUT, SETTINGS_ROW, SettingsDialog, SettingsIcons, SettingsRowContent } from "@/components/ui/SettingsUI";
 
 // "יציאה למצב הורה" — the child-side counterpart of ChildModeSwitcher. A
 // correct PIN restores the parent's own session from what was cached at
@@ -71,19 +72,18 @@ export function ReturnToParentButton() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="text-sm font-medium text-zinc-500 underline"
-      >
-        {t("exitToParentMode")}
+      <button type="button" onClick={() => setOpen(true)} className={SETTINGS_ROW}>
+        <SettingsRowContent icon={SettingsIcons.lock} label={t("exitToParentMode")} />
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-xs space-y-3 rounded-lg bg-white p-5 text-center">
-            <p className="text-lg font-bold">🔒 {t("enterPin")}</p>
+        <SettingsDialog title={t("enterPin")} icon={SettingsIcons.lock}>
+            <label htmlFor="return-pin" className="sr-only">
+              {t("enterPin")}
+            </label>
             <input
+              id="return-pin"
+              placeholder="••••"
               type="password"
               inputMode="numeric"
               pattern="\d{4}"
@@ -91,23 +91,20 @@ export function ReturnToParentButton() {
               value={pin}
               onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
               autoFocus
-              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-center text-2xl tracking-widest focus:border-blue-500 focus:outline-none"
+              className={PIN_INPUT}
             />
-            {error && <p className="text-sm text-red-600">{error}</p>}
-            <div className="flex gap-2">
-              <Button
-                className="flex-1"
-                disabled={pin.length !== 4 || loading}
-                onClick={handleSubmit}
-              >
-                {loading ? t("checking") : t("confirm")}
-              </Button>
-              <Button className="flex-1 bg-zinc-700 hover:bg-zinc-800" onClick={closeModal}>
-                {t("cancel")}
-              </Button>
-            </div>
-          </div>
-        </div>
+            {error && (
+              <p role="alert" className="text-sm text-red-600">
+                {error}
+              </p>
+            )}
+            <button type="button" className={PRIMARY_BUTTON} disabled={pin.length !== 4 || loading} onClick={handleSubmit}>
+              {loading ? t("checking") : t("confirm")}
+            </button>
+            <button type="button" className={DIALOG_CLOSE} onClick={closeModal}>
+              {t("cancel")}
+            </button>
+        </SettingsDialog>
       )}
     </>
   );

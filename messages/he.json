@@ -366,7 +366,8 @@
     "qaTools": {
       "label": "כלי בדיקה באימון (TEMP)",
       "hint": "מוסיף בזמן אימון כפתורים לסיום מהיר עם 100% או 70%. נשמר רק במכשיר הזה."
-    }
+    },
+    "qaSection": "כלי בדיקה (זמני)"
   },
   "addChildDirect": {
     "title": "יצירת פרופיל ילד חדש",
@@ -384,7 +385,7 @@
     "continue": "המשך"
   },
   "familyMode": {
-    "switchToChild": "מצב ילד ⚡",
+    "switchToChild": "מצב ילד",
     "goToChildMode": "עבור למצב ילד",
     "switching": "עובר...",
     "pickChild": "איזה ילד?",
@@ -395,7 +396,7 @@
     "saving": "שומר...",
     "pinSaved": "נשמר!",
     "pinError": "שגיאה בשמירת ה-PIN",
-    "exitToParentMode": "🔒 יציאה למצב הורה",
+    "exitToParentMode": "יציאה למצב הורה",
     "enterPin": "הזן קוד PIN",
     "wrongPin": "קוד שגוי, נסה שוב",
     "cancel": "ביטול",

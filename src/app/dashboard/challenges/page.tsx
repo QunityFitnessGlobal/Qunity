@@ -4,7 +4,7 @@ import { getLinkedChildren } from "@/services/linking.service";
 import { getChildStatsForParent } from "@/services/parent-stats.service";
 import { getCompletedChallengeHistory, getPendingChallenges } from "@/services/challenge.service";
 import { ChallengesTabs } from "@/components/child/ChallengesTabs";
-import { ChildSelector } from "@/components/parent/ChildSelector";
+import { ChildDropdown } from "@/components/parent/ChildDropdown";
 
 interface ChallengesPageProps {
   searchParams: Promise<{ childId?: string }>;
@@ -46,18 +46,19 @@ export default async function ChallengesPage({ searchParams }: ChallengesPagePro
   ]);
 
   return (
-    <div className="flex flex-1 flex-col items-center gap-4 px-4 py-16">
-      <h1 className="font-display text-2xl font-bold">{t("completedTitle")}</h1>
+    <div className="flex flex-1 flex-col items-center px-4 pb-12 pt-5">
+      <div className="flex w-full max-w-md flex-col items-center gap-4">
+        <div className="flex w-full items-center justify-between gap-3">
+          <h1 className="font-display text-[26px] font-bold">{t("completedTitle")}</h1>
+          {linkedChildren.length > 0 && selectedChildId && (
+            <ChildDropdown items={linkedChildren} selectedId={selectedChildId} basePath="/dashboard/challenges" />
+          )}
+        </div>
 
-      {linkedChildren.length === 0 && (
-        <p className="text-zinc-600">{tDashboard("noChildDefined")}</p>
-      )}
+        {linkedChildren.length === 0 && <p className="text-zinc-600">{tDashboard("noChildDefined")}</p>}
 
-      {linkedChildren.length > 0 && selectedChildId && (
-        <ChildSelector items={linkedChildren} selectedId={selectedChildId} />
-      )}
-
-      {stats && <ChallengesTabs completed={stats.completedChallenges} pending={pending} />}
+        {stats && <ChallengesTabs completed={stats.completedChallenges} pending={pending} />}
+      </div>
     </div>
   );
 }

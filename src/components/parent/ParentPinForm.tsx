@@ -3,13 +3,12 @@
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import { setParentPin } from "@/services/family-mode.service";
-import { Button } from "@/components/ui/Button";
+import { PRIMARY_BUTTON } from "@/components/entry/EntryShell";
+import { PIN_INPUT } from "@/components/ui/SettingsUI";
 
-interface ParentPinFormProps {
-  hasPinSet: boolean;
-}
-
-export function ParentPinForm({ hasPinSet }: ParentPinFormProps) {
+// The 4-digit code for getting back from child mode (the popup's title says
+// whether it's set or changed — see ParentPinMenuItem).
+export function ParentPinForm() {
   const t = useTranslations("familyMode");
   const [pin, setPin] = useState("");
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -27,11 +26,12 @@ export function ParentPinForm({ hasPinSet }: ParentPinFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full space-y-2">
-      <label className="block text-sm font-medium text-zinc-700">
-        {hasPinSet ? t("pinLabelChange") : t("pinLabelSet")}
+    <form onSubmit={handleSubmit} className="flex w-full flex-col gap-3">
+      <label htmlFor="parent-pin" className="sr-only">
+        {t("pinLabelSet")}
       </label>
       <input
+        id="parent-pin"
         type="password"
         inputMode="numeric"
         pattern="\d{4}"
@@ -39,14 +39,18 @@ export function ParentPinForm({ hasPinSet }: ParentPinFormProps) {
         value={pin}
         onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
         placeholder="••••"
-        className="w-full rounded-md border border-zinc-300 px-3 py-2 text-center text-lg tracking-widest focus:border-blue-500 focus:outline-none"
+        className={PIN_INPUT}
         required
       />
-      <Button type="submit" className="w-full" disabled={pin.length !== 4 || status === "saving"}>
+      <button type="submit" className={PRIMARY_BUTTON} disabled={pin.length !== 4 || status === "saving"}>
         {status === "saving" ? t("saving") : t("savePin")}
-      </Button>
-      {status === "saved" && <p className="text-sm text-green-600">{t("pinSaved")}</p>}
-      {status === "error" && <p className="text-sm text-red-600">{t("pinError")}</p>}
+      </button>
+      {status === "saved" && <p className="text-sm font-semibold text-[#15803d]">{t("pinSaved")}</p>}
+      {status === "error" && (
+        <p role="alert" className="text-sm text-red-600">
+          {t("pinError")}
+        </p>
+      )}
     </form>
   );
 }

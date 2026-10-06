@@ -45,7 +45,7 @@ export function CreateChildProfileForm({ parentGender }: CreateChildProfileFormP
   }
 
   function handleContinue() {
-    router.push("/dashboard/settings?openChildren=1");
+    router.push("/dashboard/settings");
     router.refresh();
   }
 

@@ -14,8 +14,8 @@ interface ChildDropdownProps {
 
 // The parent screens' child switcher: the selected child as a pill with
 // their stage color; tapping it opens the phone's own list of children.
-// Like ChildSelector, the choice lives in the URL (?childId=). With one
-// child it's just the pill.
+// The choice lives in the URL (?childId=), so any page can read it and it
+// survives a refresh. With one child it's just the pill.
 export function ChildDropdown({ items, selectedId, basePath }: ChildDropdownProps) {
   const t = useTranslations("childSelector");
   const router = useRouter();

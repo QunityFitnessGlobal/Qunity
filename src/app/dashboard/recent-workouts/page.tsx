@@ -4,7 +4,7 @@ import { getProfile, getSupabase, requireUser } from "@/lib/session";
 import { getLinkedChildren } from "@/services/linking.service";
 import { getWorkoutHistory } from "@/services/workout-history.service";
 import { WorkoutHistoryView } from "@/components/parent/WorkoutHistoryView";
-import { ChildSelector } from "@/components/parent/ChildSelector";
+import { ChildDropdown } from "@/components/parent/ChildDropdown";
 
 interface RecentWorkoutsPageProps {
   searchParams: Promise<{ childId?: string }>;
@@ -31,18 +31,19 @@ export default async function RecentWorkoutsPage({ searchParams }: RecentWorkout
   const history = selectedChildId ? await getWorkoutHistory(supabase, selectedChildId) : null;
 
   return (
-    <div className="flex flex-1 flex-col items-center gap-4 px-4 py-8">
-      <h1 className="w-full max-w-md font-display text-[26px] font-bold">{t("title")}</h1>
+    <div className="flex flex-1 flex-col items-center px-4 pb-12 pt-5">
+      <div className="flex w-full max-w-md flex-col gap-4">
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="font-display text-[26px] font-bold">{t("title")}</h1>
+          {linkedChildren.length > 0 && selectedChildId && (
+            <ChildDropdown items={linkedChildren} selectedId={selectedChildId} basePath="/dashboard/recent-workouts" />
+          )}
+        </div>
 
-      {linkedChildren.length === 0 && (
-        <p className="text-zinc-600">{tDashboard("noChildDefined")}</p>
-      )}
+        {linkedChildren.length === 0 && <p className="text-zinc-600">{tDashboard("noChildDefined")}</p>}
 
-      {linkedChildren.length > 0 && selectedChildId && (
-        <ChildSelector items={linkedChildren} selectedId={selectedChildId} />
-      )}
-
-      {history && <WorkoutHistoryView history={history} />}
+        {history && <WorkoutHistoryView history={history} />}
+      </div>
     </div>
   );
 }
