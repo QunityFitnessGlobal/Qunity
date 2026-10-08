@@ -194,6 +194,86 @@ export const EXERCISE_MOTIONS: Readonly<Record<string, ExerciseMotion>> = {
       }
     }
   },
+  SQ07: {
+    main: [
+      {
+        kind: "spec",
+        view: "side",
+        angle: "side",
+        dur: 6800,
+        keys: [
+          [0, "up"],
+          [0.2, "down"],
+          [0.3, "down"],
+          [0.47, "up"],
+          [0.53, "up"],
+          [0.7, "down"],
+          [0.8, "down"],
+          [0.97, "up"],
+          [1, "up"]
+        ],
+        props: [
+          {
+            type: "chair",
+            x1: 180,
+            x2: 216,
+            y: 152,
+            y0: 101,
+            y1: 144,
+            box: [[180, 108], [216, 172]]
+          }
+        ],
+        prints: { kind: "feet", gap: 15, turn: 0, label: "hipWidth" },
+        thumbT: 0.25,
+        poses: {
+          up: { hip: [160, 101], lean: 0, footA: [160, 168], handA: [162, 104] },
+          down: { hip: [184, 144], lean: 55, footA: [160, 168], handA: [150, 165], elbowA: [0, 1], handB: [128, 118], elbowB: [0, 1] }
+        }
+      },
+      {
+        kind: "spec",
+        view: "front",
+        angle: "front",
+        dur: 6800,
+        keys: [
+          [0, "up"],
+          [0.2, "down"],
+          [0.3, "down"],
+          [0.47, "up"],
+          [0.53, "up"],
+          [0.7, "down"],
+          [0.8, "down"],
+          [0.97, "up"],
+          [1, "up"]
+        ],
+        prints: { kind: "feet", gap: 15, turn: 0, label: "hipWidth" },
+        thumbT: 0.25,
+        poses: {
+          up: {
+            hip: [160, 101],
+            footA: [151, 168],
+            footB: [169, 168],
+            kneePtA: [151, 134.5],
+            kneePtB: [169, 134.5],
+            handA: [140, 104],
+            handB: [180, 104]
+          },
+          down: {
+            hip: [160, 142],
+            tl: 0.55,
+            footA: [151, 168],
+            footB: [169, 168],
+            kneePtA: [147, 152],
+            kneePtB: [173, 152],
+            handA: [157, 165],
+            elbowA: [-1, 0],
+            handB: [176, 128],
+            elbowB: [1, 0.3]
+          }
+        }
+      }
+    ]
+  },
   SQ08: {
     main: {
       kind: "spec",
@@ -235,6 +315,107 @@ export const EXERCISE_MOTIONS: Readonly<Record<string, ExerciseMotion>> = {
           handB: [214, 98],
           elbowA: [-1, 0.6],
           elbowB: [1, 0.6]
+        }
+      }
+    }
+  },
+  SQ09: {
+    main: {
+      kind: "spec",
+      view: "front",
+      look: "side",
+      angle: "side",
+      dur: 7200,
+      keys: [
+        [0, "up"],
+        [0.16, "down"],
+        [0.28, "down"],
+        [0.42, "turnA"],
+        [0.5, "turnA"],
+        [0.58, "up"],
+        [0.66, "down"],
+        [0.78, "down"],
+        [0.92, "turnB"],
+        [0.97, "turnB"],
+        [1, "up"]
+      ],
+      props: [
+        {
+          type: "chair",
+          x1: 178,
+          x2: 214,
+          y: 142,
+          y0: 101,
+          y1: 133,
+          box: [[178, 98], [214, 172]]
+        }
+      ],
+      prints: { kind: "feet", gap: 16, turn: 0, label: "slightlyApart" },
+      thumbT: 0.22,
+      poses: {
+        up: {
+          shw: 1,
+          hipw: 1,
+          kneeA: [-1, 0],
+          kneeB: [-1, 0],
+          elbowA: [1, 0.4],
+          elbowB: [1, 0.4],
+          toeA: 165,
+          toeB: 165,
+          hip: [160, 101],
+          lean: 0,
+          footA: [160, 168],
+          footB: [165, 166],
+          handA: [162, 104],
+          handB: [167, 102]
+        },
+        down: {
+          shw: 1,
+          hipw: 1,
+          kneeA: [-1, 0],
+          kneeB: [-1, 0],
+          elbowA: [0, 1],
+          elbowB: [0, 1],
+          toeA: 165,
+          toeB: 165,
+          hip: [184, 133],
+          lean: 34,
+          footA: [160, 168],
+          footB: [165, 166],
+          handA: [114, 98],
+          handB: [119, 96]
+        },
+        turnA: {
+          shw: 13,
+          hipw: 1,
+          kneeA: [-1, 0],
+          kneeB: [-1, 0],
+          elbowA: [-1, 0],
+          elbowB: [1, 0],
+          toeA: 165,
+          toeB: 165,
+          hip: [160, 101],
+          lean: 0,
+          footA: [160, 168],
+          footB: [165, 166],
+          handA: [156, 82],
+          handB: [164, 82]
+        },
+        turnB: {
+          shw: -13,
+          hipw: 1,
+          kneeA: [-1, 0],
+          kneeB: [-1, 0],
+          elbowA: [1, 0],
+          elbowB: [-1, 0],
+          toeA: 165,
+          toeB: 165,
+          hip: [160, 101],
+          lean: 0,
+          footA: [160, 168],
+          footB: [165, 166],
+          handA: [164, 82],
+          handB: [156, 82]
         }
       }
     }
@@ -1390,6 +1571,52 @@ export const EXERCISE_MOTIONS: Readonly<Record<string, ExerciseMotion>> = {
       }
     }
   },
+  MV07: {
+    main: {
+      kind: "spec",
+      view: "front",
+      angle: "above",
+      dur: 2400,
+      keys: [[0, "A"], [0.5, "B"], [1, "A"]],
+      linear: true,
+      props: [
+        {
+          type: "topdown",
+          box: [[96, 14], [224, 184]]
+        },
+        { type: "travel", axis: "y", dist: 40, x1: 96, x2: 224 }
+      ],
+      thumbT: 0,
+      poses: {
+        A: {
+          hip: [160, 112],
+          toeA: 90,
+          toeB: 90,
+          elbowPtA: [130, 52],
+          handA: [140, 28],
+          elbowPtB: [186, 82],
+          handB: [176, 62],
+          kneePtA: [151.5, 144],
+          footA: [152, 176],
+          kneePtB: [200, 124],
+          footB: [184, 154]
+        },
+        B: {
+          hip: [160, 112],
+          toeA: 90,
+          toeB: 90,
+          elbowPtA: [134, 82],
+          handA: [144, 62],
+          elbowPtB: [190, 52],
+          handB: [180, 28],
+          kneePtA: [120, 124],
+          footA: [136, 154],
+          kneePtB: [168.5, 144],
+          footB: [168, 176]
+        }
+      }
+    }
+  },
   MV08: {
     main: {
       kind: "spec",
@@ -1645,6 +1872,131 @@ export const EXERCISE_MOTIONS: Readonly<Record<string, ExerciseMotion>> = {
         }
       }
     }
+  },
+  MV10: {
+    main: [
+      {
+        kind: "spec",
+        view: "front",
+        angle: "front",
+        dur: 4000,
+        keys: [
+          [0, "L"],
+          [0.075, "L"],
+          [0.165, "air"],
+          [0.25, "R"],
+          [0.325, "R"],
+          [0.415, "air"],
+          [0.5, "L"],
+          [0.575, "L"],
+          [0.665, "air"],
+          [0.75, "R"],
+          [0.825, "R"],
+          [0.915, "air"],
+          [1, "L"]
+        ],
+        thumbT: 0,
+        poses: {
+          L: {
+            hip: [122, 112],
+            tl: 0.9,
+            footA: [116, 168],
+            kneePtA: [110, 140],
+            footB: [132, 148],
+            kneePtB: [134, 134],
+            toeB: 90,
+            handA: [92, 100],
+            handB: [112, 116],
+            elbowA: [-1, 0.3],
+            elbowB: [1, 0.3]
+          },
+          air: {
+            hip: [160, 96],
+            footA: [150, 148],
+            kneePtA: [152, 124],
+            footB: [170, 148],
+            kneePtB: [168, 124],
+            toeA: 120,
+            toeB: 60,
+            handA: [150, 104],
+            handB: [170, 104]
+          },
+          R: {
+            hip: [198, 112],
+            tl: 0.9,
+            footB: [204, 168],
+            kneePtB: [210, 140],
+            footA: [188, 148],
+            kneePtA: [186, 134],
+            toeA: 90,
+            handB: [228, 100],
+            handA: [208, 116],
+            elbowA: [-1, 0.3],
+            elbowB: [1, 0.3]
+          }
+        }
+      },
+      {
+        kind: "spec",
+        view: "side",
+        angle: "side",
+        dur: 4000,
+        keys: [
+          [0, "L"],
+          [0.075, "L"],
+          [0.165, "air"],
+          [0.25, "R"],
+          [0.325, "R"],
+          [0.415, "air"],
+          [0.5, "L"],
+          [0.575, "L"],
+          [0.665, "air"],
+          [0.75, "R"],
+          [0.825, "R"],
+          [0.915, "air"],
+          [1, "L"]
+        ],
+        thumbT: 0,
+        poses: {
+          L: {
+            hip: [160, 112],
+            lean: 25,
+            footA: [160, 168],
+            footB: [196, 150],
+            kneeB: [-0.3, 1],
+            toeB: 40,
+            handA: [178, 104],
+            elbowA: [1, 0.3],
+            handB: [124, 92],
+            elbowB: [0, 1]
+          },
+          air: {
+            hip: [160, 98],
+            lean: 15,
+            footA: [158, 150],
+            footB: [166, 150],
+            toeA: 110,
+            toeB: 110,
+            handA: [150, 104],
+            handB: [156, 104],
+            elbowA: [0, 1],
+            elbowB: [0, 1]
+          },
+          R: {
+            hip: [160, 112],
+            lean: 25,
+            footB: [165, 166],
+            footA: [196, 150],
+            kneeA: [-0.3, 1],
+            toeA: 40,
+            handA: [124, 92],
+            elbowA: [0, 1],
+            handB: [178, 104],
+            elbowB: [1, 0.3]
+          }
+        }
+      }
+    ]
   }
 };
 
