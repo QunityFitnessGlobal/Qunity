@@ -2,7 +2,9 @@
 
 import type { ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { ExerciseDemo } from "@/components/child/ExerciseDemo";
 import { ExerciseImage } from "@/components/child/ExerciseImage";
+import { motionFor } from "@/lib/exercise-motion/library";
 import { formatMinutesSeconds } from "@/lib/format";
 import type { Exercise } from "@/lib/types";
 
@@ -41,9 +43,10 @@ interface WorkoutTimerViewProps {
 }
 
 // During the workout: the round bar, the current exercise (or, while
-// resting, the one coming up), and a big ring counting down the phase — the
-// whole screen turns green for work and blue for rest. Pausing freezes the
-// clock behind a "short break" card until the child resumes.
+// resting, the one coming up — shown moving, so the child can learn it
+// during the rest), and a big ring counting down the phase — the whole
+// screen turns green for work and blue for rest. Pausing freezes the clock
+// (and the exercise demo) behind a "short break" card until the child resumes.
 export function WorkoutTimerView({
   interval,
   elapsedSeconds,
@@ -63,6 +66,8 @@ export function WorkoutTimerView({
   const locale = useLocale();
   const resting = interval?.phase === "rest";
   const nameOf = (e: Exercise) => (locale === "en" ? e.name_en : e.name_he);
+  const workMotion = exercise ? motionFor(exercise.id) : null;
+  const nextMotion = nextExercise ? motionFor(nextExercise.id) : null;
 
   const progress = interval ? interval.phaseRemaining / interval.phaseLength : 1;
   const offset = RING_CIRCUMFERENCE * (1 - progress);
@@ -111,12 +116,16 @@ export function WorkoutTimerView({
 
         {!resting && !card && exercise && (
           <div key={`work-${interval?.currentSet ?? 0}`} className="animate-power-fade-up w-full overflow-hidden rounded-[20px] border border-zinc-200 bg-white">
-            <ExerciseImage
-              imageUrl={exercise.image_url}
-              alt={nameOf(exercise)}
-              className="h-36 w-full"
-              figureClassName="h-11 w-11"
-            />
+            {workMotion ? (
+              <ExerciseDemo key={exercise.id} motion={workMotion} playing={!paused} />
+            ) : (
+              <ExerciseImage
+                imageUrl={exercise.image_url}
+                alt={nameOf(exercise)}
+                className="h-36 w-full"
+                figureClassName="h-11 w-11"
+              />
+            )}
             <div className="flex flex-col gap-0.5 px-3.5 py-3">
               <span className="font-display text-xl font-semibold">{nameOf(exercise)}</span>
               {exercise.description_he && <span className="text-sm text-text-muted">{exercise.description_he}</span>}
@@ -131,7 +140,19 @@ export function WorkoutTimerView({
 
         {resting && (
           <div key={`rest-${interval?.currentSet ?? 0}`} className="animate-power-fade-up flex w-full flex-col gap-2.5 rounded-[20px] border border-[#d6e4ff] bg-white px-4 py-4">
-            {nextExercise ? (
+            {nextExercise && nextMotion ? (
+              <>
+                <span className="text-[13px] font-semibold text-[#1d4ed8]">{t("upNext")}</span>
+                <ExerciseDemo
+                  key={nextExercise.id}
+                  motion={nextMotion}
+                  tone="rest"
+                  playing={!paused}
+                  className="rounded-[14px]"
+                />
+                <span className="font-display text-xl font-semibold">{nameOf(nextExercise)}</span>
+              </>
+            ) : nextExercise ? (
               <>
                 <span className="text-[13px] font-semibold text-[#1d4ed8]">{t("upNext")}</span>
                 <div className="flex items-center gap-3">

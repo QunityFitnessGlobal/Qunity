@@ -226,7 +226,25 @@
     "empowerTired": "{gender, select, female {סימנת שאת עייפה. זה סימן שהגוף שלך עבד קשה, והוא נהיה חזק יותר.} other {סימנת שאתה עייף. זה סימן שהגוף שלך עבד קשה, והוא נהיה חזק יותר.}}",
     "empowerExhausted": "{gender, select, female {סימנת שאת מותשת. נתת את כל מה שיש לך, ועכשיו מגיע לך לנוח.} other {סימנת שאתה מותש. נתת את כל מה שיש לך, ועכשיו מגיע לך לנוח.}}",
     "qaFinish100": "סיום מהיר 100% (TEMP)",
-    "qaFinish70": "סיום מהיר 70% (TEMP)"
+    "qaFinish70": "סיום מהיר 70% (TEMP)",
+    "motion": {
+      "angle": {
+        "side": "מהצד",
+        "front": "מלפנים",
+        "above": "מלמעלה"
+      },
+      "prints": {
+        "hipWidth": "רוחב אגן",
+        "together": "צמודות",
+        "wide": "רחבות",
+        "slightlyApart": "מעט פתוחות",
+        "shoulderWidth": "רוחב כתפיים",
+        "close": "צמודות"
+      },
+      "playing": "מוצג למעלה",
+      "watch": "לצפות בתרגיל",
+      "angleChoice": "זווית צילום"
+    }
   },
   "dashboard": {
     "parentTitle": "לוח הורה",

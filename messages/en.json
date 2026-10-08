@@ -226,7 +226,25 @@
     "empowerTired": "You said you're tired. That means your body worked hard, and it's getting stronger.",
     "empowerExhausted": "You said you're exhausted. You gave it everything, and now you've earned a rest.",
     "qaFinish100": "Quick finish 100% (TEMP)",
-    "qaFinish70": "Quick finish 70% (TEMP)"
+    "qaFinish70": "Quick finish 70% (TEMP)",
+    "motion": {
+      "angle": {
+        "side": "From the side",
+        "front": "From the front",
+        "above": "From above"
+      },
+      "prints": {
+        "hipWidth": "Hip width",
+        "together": "Together",
+        "wide": "Wide",
+        "slightlyApart": "Slightly apart",
+        "shoulderWidth": "Shoulder width",
+        "close": "Close"
+      },
+      "playing": "Playing above",
+      "watch": "Watch this exercise",
+      "angleChoice": "Camera angle"
+    }
   },
   "dashboard": {
     "parentTitle": "Parent Dashboard",

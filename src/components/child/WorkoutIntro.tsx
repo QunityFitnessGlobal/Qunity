@@ -1,12 +1,16 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { CameraIcon, ExerciseDemo } from "@/components/child/ExerciseDemo";
 import { ExerciseImage } from "@/components/child/ExerciseImage";
 import { ReadyCountdownOverlay, type CountdownStep } from "@/components/child/ReadyCountdown";
 import { BRACELET_CSS_VAR } from "@/lib/colors";
 import { resolveLocalizedText } from "@/lib/i18n-content";
 import { difficultyLabelKey } from "@/lib/workout-labels";
+import { mainAngle } from "@/lib/exercise-motion/engine";
+import { motionFor } from "@/lib/exercise-motion/library";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { BASE_POINTS } from "@/services/points.service";
 import type { WorkoutExerciseEntry } from "@/services/workout.service";
 import type { BraceletColor, Gender, Workout } from "@/lib/types";
@@ -33,9 +37,13 @@ function stageInk(color: BraceletColor): string {
 }
 
 // Before the workout: which stage and workout this is, how long and how hard,
-// the exercises in order (each with its picture, description and tip from
-// the exercise bank), and one big "I'm ready" — which runs a 3-2-1 count
-// before the timer takes over.
+// a player on top that shows each exercise moving in turn (tap an exercise
+// below to jump to it), the exercises in order (each with its picture,
+// description and tip from the exercise bank), and one big "I'm ready" —
+// which runs a 3-2-1 count before the timer takes over.
+// How long the player stays on each exercise before moving on.
+const PLAYER_TURN_MS = 6000;
+
 export function WorkoutIntro({
   workout,
   color,
@@ -55,6 +63,32 @@ export function WorkoutIntro({
   const genderForm = gender ?? "male";
   const difficultyKey = difficultyLabelKey(workout.recommended_difficulty);
   const description = workout.description ? resolveLocalizedText(workout.description, locale) : null;
+  const reduced = useReducedMotion();
+
+  // Exercises that have a moving demo play in the player, one after another.
+  const playable = exercises
+    .map((entry) => ({ entry, motion: motionFor(entry.exercise.id) }))
+    .filter((d): d is { entry: WorkoutExerciseEntry; motion: NonNullable<typeof d.motion> } => d.motion !== null);
+  const [current, setCurrent] = useState(0);
+  const [angle, setAngle] = useState<"main" | "alt">("main");
+  // Bumped when the child picks an exercise, to restart its turn.
+  const [turn, setTurn] = useState(0);
+  const playing = playable[current] ?? null;
+
+  useEffect(() => {
+    if (reduced || playable.length < 2) return;
+    const timer = setTimeout(() => {
+      setCurrent((c) => (c + 1) % playable.length);
+      setAngle("main");
+    }, PLAYER_TURN_MS);
+    return () => clearTimeout(timer);
+  }, [current, angle, turn, reduced, playable.length]);
+
+  function show(index: number, nextAngle: "main" | "alt" = "main") {
+    setCurrent(index);
+    setAngle(nextAngle);
+    setTurn((n) => n + 1);
+  }
 
   return (
     <div className="fixed inset-0 z-10 flex flex-col overflow-y-auto bg-[#faf8fc]">
@@ -101,6 +135,60 @@ export function WorkoutIntro({
       </header>
 
       <main className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-2.5 px-4 py-4">
+        {playing && (
+          <div className="relative flex-none overflow-hidden rounded-[20px] border border-[#ece6f2]">
+            <ExerciseDemo
+              key={`${playing.entry.exercise.id}-${angle}-${turn}`}
+              motion={playing.motion}
+              angle={angle}
+              showAngle={!playing.motion.alt}
+              angleBelowTop={playable.length > 1}
+            />
+            {playable.length > 1 && (
+              <div className="absolute inset-x-2.5 top-2 flex gap-1" aria-hidden>
+                {playable.map((d, i) => (
+                  <span key={d.entry.exercise.id} className="flex h-1 flex-1 overflow-hidden rounded-full bg-[#221a33]/10">
+                    {i < current && <span className="h-full w-full rounded-full bg-brand-purple" />}
+                    {i === current && (
+                      <span
+                        key={`${current}-${angle}-${turn}`}
+                        className="animate-motion-seg h-full rounded-full bg-brand-purple"
+                        style={{ ["--seg-dur" as string]: `${PLAYER_TURN_MS}ms` } as CSSProperties}
+                      />
+                    )}
+                  </span>
+                ))}
+              </div>
+            )}
+            {playing.motion.alt && (
+              <div
+                role="group"
+                aria-label={t("motion.angleChoice")}
+                className="absolute start-2.5 top-5 inline-flex items-center gap-0.5 rounded-full bg-white/90 p-0.5 text-[#4f4960] shadow-[0_1px_3px_rgba(34,26,51,0.08)]"
+              >
+                <span className="px-1">
+                  <CameraIcon />
+                </span>
+                {(["main", "alt"] as const).map((a) => (
+                  <button
+                    key={a}
+                    type="button"
+                    onClick={() => show(current, a)}
+                    aria-pressed={angle === a}
+                    className={`min-h-7 rounded-full px-2.5 text-xs font-semibold ${
+                      angle === a ? "bg-brand-purple text-white" : ""
+                    }`}
+                  >
+                    {t(`motion.angle.${a === "alt" ? (playing.motion.alt?.angle ?? "front") : mainAngle(playing.motion)}`)}
+                  </button>
+                ))}
+              </div>
+            )}
+            <span className="absolute bottom-2.5 start-2.5 rounded-full bg-[#221a33]/70 px-2.5 py-1 text-[13px] font-semibold text-white">
+              {playing.entry.slotNumber} · {locale === "en" ? playing.entry.exercise.name_en : playing.entry.exercise.name_he}
+            </span>
+          </div>
+        )}
         {description && <p className="text-sm text-text-muted">{description}</p>}
         {exercises.length > 0 && (
           <span className="text-sm font-semibold text-text-muted">
@@ -109,19 +197,26 @@ export function WorkoutIntro({
         )}
         {exercises.map(({ slotNumber, exercise }, i) => {
           const name = locale === "en" ? exercise.name_en : exercise.name_he;
-          return (
-            <div
-              key={`${slotNumber}-${exercise.id}`}
-              className="animate-power-fade-up flex items-center gap-3 rounded-2xl border border-zinc-200 bg-white px-3 py-2.5"
-              style={{ ["--power-fade-delay" as string]: `${0.1 + i * 0.1}s` } as CSSProperties}
-            >
+          const demoIndex = playable.findIndex((d) => d.entry.exercise.id === exercise.id && d.entry.slotNumber === slotNumber);
+          const demo = demoIndex >= 0 ? playable[demoIndex] : null;
+          const active = demo !== null && demoIndex === current;
+          const rowClass = `animate-power-fade-up flex items-center gap-3 rounded-2xl border bg-white px-3 py-2.5 text-start transition-colors ${
+            active ? "border-brand-purple bg-[#fdf6fc]" : "border-zinc-200"
+          }`;
+          const rowStyle = { ["--power-fade-delay" as string]: `${0.1 + i * 0.1}s` } as CSSProperties;
+          const content = (
+            <>
               <span className="relative flex-none">
-                <ExerciseImage imageUrl={exercise.image_url} alt={name} className="h-16 w-16 rounded-xl" />
+                {demo ? (
+                  <ExerciseDemo motion={demo.motion} variant="thumb" className="h-16 w-16 rounded-xl" />
+                ) : (
+                  <ExerciseImage imageUrl={exercise.image_url} alt={name} className="h-16 w-16 rounded-xl" />
+                )}
                 <span className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-brand-purple font-display text-[13px] font-bold text-white">
                   {slotNumber}
                 </span>
               </span>
-              <span className="flex min-w-0 flex-col gap-0.5">
+              <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="font-display text-[17px] font-semibold leading-snug">{name}</span>
                 {exercise.description_he && (
                   <span className="text-[13px] leading-snug text-text-muted">{exercise.description_he}</span>
@@ -132,6 +227,43 @@ export function WorkoutIntro({
                   </span>
                 )}
               </span>
+              {demo && active && (
+                <span
+                  className="flex h-8 w-8 flex-none items-center justify-center gap-0.5 rounded-full bg-brand-purple/10"
+                  aria-label={t("motion.playing")}
+                >
+                  {[0, 0.3, 0.6].map((delay) => (
+                    <span
+                      key={delay}
+                      className="animate-motion-eq h-3.5 w-[3px] rounded-sm bg-brand-purple"
+                      style={{ ["--bar-delay" as string]: `${delay}s` } as CSSProperties}
+                    />
+                  ))}
+                </span>
+              )}
+              {demo && !active && (
+                <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-[#f1edf5]" aria-hidden>
+                  <svg viewBox="0 0 20 20" className="h-3 w-3 fill-brand-purple">
+                    <path d="M6 3.5l11 6.5-11 6.5z" />
+                  </svg>
+                </span>
+              )}
+            </>
+          );
+          return demo ? (
+            <button
+              key={`${slotNumber}-${exercise.id}`}
+              type="button"
+              onClick={() => show(demoIndex)}
+              aria-label={active ? undefined : `${t("motion.watch")}: ${name}`}
+              className={rowClass}
+              style={rowStyle}
+            >
+              {content}
+            </button>
+          ) : (
+            <div key={`${slotNumber}-${exercise.id}`} className={rowClass} style={rowStyle}>
+              {content}
             </div>
           );
         })}

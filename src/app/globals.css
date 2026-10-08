@@ -658,3 +658,32 @@ body {
     animation: none;
   }
 }
+
+/* Exercise demos (ExerciseDemo / the pre-workout player): the player's
+   progress segment fills over --seg-dur, and the row that is playing shows
+   three bouncing bars (--bar-delay). */
+@keyframes motion-seg {
+  from { width: 0; }
+  to { width: 100%; }
+}
+@keyframes motion-eq {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+.animate-motion-seg {
+  animation: motion-seg var(--seg-dur, 6s) linear forwards;
+}
+.animate-motion-eq {
+  transform-origin: bottom;
+  animation: motion-eq 0.9s ease-in-out infinite;
+  animation-delay: var(--bar-delay, 0s);
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-motion-seg {
+    animation: none;
+    width: 100%;
+  }
+  .animate-motion-eq {
+    animation: none;
+  }
+}
