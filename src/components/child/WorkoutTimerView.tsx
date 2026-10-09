@@ -72,6 +72,8 @@ export function WorkoutTimerView({
   const progress = interval ? interval.phaseRemaining / interval.phaseLength : 1;
   const offset = RING_CIRCUMFERENCE * (1 - progress);
   const beat = interval?.phase === "work" && interval.phaseRemaining <= FINAL_SECONDS;
+  // Whether a moving demo is on screen (it stops with the clock).
+  const demoShown = resting ? nextMotion !== null : !card && workMotion !== null;
 
   return (
     <div
@@ -241,7 +243,7 @@ export function WorkoutTimerView({
             <h2 id="workout-paused-title" className="font-display text-2xl font-bold">
               {t("pausedTitle")}
             </h2>
-            <p className="text-sm text-text-muted">{t("pausedText")}</p>
+            <p className="text-sm text-text-muted">{t(demoShown ? "pausedTextDemo" : "pausedText")}</p>
             <button
               type="button"
               onClick={onResume}
@@ -256,7 +258,7 @@ export function WorkoutTimerView({
             <button
               type="button"
               onClick={onFinish}
-              className="min-h-11 text-sm font-medium text-text-muted underline underline-offset-2"
+              className="min-h-11 text-sm font-medium text-text-muted hover:text-[#221a33]"
             >
               {finishLabel ?? t("finishWorkout")}
             </button>

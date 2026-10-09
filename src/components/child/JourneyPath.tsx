@@ -63,6 +63,7 @@ export function JourneyPath({ childId, gender, childInitial, items, contentHeigh
     beltColor: BraceletColor;
     localNumber: number;
     workoutId: string;
+    partial: boolean;
   } | null>(null);
 
   useEffect(() => {
@@ -174,6 +175,7 @@ export function JourneyPath({ childId, gender, childInitial, items, contentHeigh
                     beltColor: station.beltColor,
                     localNumber: station.localNumber,
                     workoutId: station.workoutId,
+                    partial: station.partial,
                   });
                 }
               }}
@@ -222,6 +224,7 @@ export function JourneyPath({ childId, gender, childInitial, items, contentHeigh
             childId={childId}
             beltColor={openSummary.beltColor}
             localNumber={openSummary.localNumber}
+            partial={openSummary.partial}
             gender={gender}
             onReplay={() =>
               router.push(`/workout/${openSummary.workoutId}?replay=${openSummary.localNumber}`)

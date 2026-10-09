@@ -148,6 +148,8 @@ export interface StationWorkoutSummary {
   difficultyReported: number | null;
   feelingAfter: string | null;
   pointsAwarded: number;
+  // How many times the station was done (the first time and every repeat).
+  attempts: number;
   // Best completion across the attempts at this station; null when the
   // station only has sessions from before completion was tracked.
   bestCompletionPercent: number | null;
@@ -224,6 +226,7 @@ export async function getStationWorkoutSummary(
     difficultyReported: result?.difficulty_reported ?? null,
     feelingAfter: result?.feeling_after ?? null,
     pointsAwarded,
+    attempts: sessionRows.length,
     bestCompletionPercent: percents.length > 0 ? Math.max(...percents) : null,
   };
 }

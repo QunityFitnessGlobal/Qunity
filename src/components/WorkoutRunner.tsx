@@ -68,7 +68,29 @@ interface IntervalTimerState {
   totalRemaining: number;
 }
 
-export function WorkoutRunner({
+// "Repeat workout" (a run that ended under 60%) starts the same workout over
+// as a fresh run. Pushing the same address wouldn't (the screen keeps its
+// state), so a new key does it instead, with what a reload would work out:
+// the station now counts as another try at it, and its power was already
+// revealed.
+export function WorkoutRunner(props: WorkoutRunnerProps) {
+  const [attempt, setAttempt] = useState(0);
+  const repeated = attempt > 0;
+  return (
+    <WorkoutRun
+      key={attempt}
+      {...props}
+      replayStation={repeated ? (props.replayStation ?? props.workoutIndex) : props.replayStation}
+      showPowerReveal={props.showPowerReveal && !repeated}
+      onRepeat={() => {
+        setAttempt((n) => n + 1);
+        window.scrollTo(0, 0);
+      }}
+    />
+  );
+}
+
+function WorkoutRun({
   childId,
   workout,
   workoutIndex,
@@ -84,7 +106,8 @@ export function WorkoutRunner({
   gender,
   exercises,
   qaToolsAllowed,
-}: WorkoutRunnerProps) {
+  onRepeat,
+}: WorkoutRunnerProps & { onRepeat: () => void }) {
   const t = useTranslations("workout");
   const tColors = useTranslations("colors");
   const router = useRouter();
@@ -363,6 +386,9 @@ export function WorkoutRunner({
     const announcedChallenges = powerChallenge
       ? [powerChallenge, ...result.newChallenges]
       : result.newChallenges;
+    // Under 60% the station is still open, so the next workout would be this
+    // same one: offer it straight away as a repeat.
+    const passed = meetsCompletionThreshold(result.completionPercent);
     return (
       <div className="w-full max-w-sm space-y-4 text-center">
         <WorkoutCelebration
@@ -378,10 +404,10 @@ export function WorkoutRunner({
           <button
             type="button"
             disabled={nextWorkoutLoading}
-            onClick={handleNextWorkout}
+            onClick={passed ? handleNextWorkout : onRepeat}
             className="block min-h-[52px] w-full rounded-2xl bg-green-600 font-display text-lg font-semibold text-white shadow-[0_4px_0_theme(colors.green.800)] transition-[transform,box-shadow] hover:bg-green-700 active:translate-y-[3px] active:shadow-[0_1px_0_theme(colors.green.800)] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {nextWorkoutLoading ? t("loading") : t("nextWorkout")}
+            {nextWorkoutLoading ? t("loading") : passed ? t("nextWorkout") : t("repeatWorkout")}
           </button>
           {result.unlockedChallenge && result.newColor && (
             <Button className="w-full" onClick={() => setShowChallengeModal(true)}>
