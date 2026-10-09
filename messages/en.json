@@ -231,7 +231,9 @@
       "angle": {
         "side": "From the side",
         "front": "From the front",
-        "above": "From above"
+        "above": "From above",
+        "diagonal": "From a diagonal",
+        "back": "From behind"
       },
       "prints": {
         "hipWidth": "Hip width",
@@ -243,7 +245,10 @@
       },
       "playing": "Playing above",
       "watch": "Watch this exercise",
-      "angleChoice": "Camera angle"
+      "angleChoice": "Camera angle",
+      "position": {
+        "belly": "On the belly"
+      }
     }
   },
   "dashboard": {

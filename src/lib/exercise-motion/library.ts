@@ -1997,6 +1997,564 @@ export const EXERCISE_MOTIONS: Readonly<Record<string, ExerciseMotion>> = {
         }
       }
     ]
+  },
+  PL01: {
+    main: {
+      kind: "spec",
+      view: "front",
+      angle: "above",
+      dur: 3400,
+      keys: [[0, "ext"], [0.4, "pull"], [0.6, "pull"], [0.95, "ext"], [1, "ext"]],
+      props: [
+        {
+          type: "topdown",
+          x: 160,
+          y1: 20,
+          y2: 168,
+          w: 104,
+          box: [[108, 0], [212, 176]]
+        }
+      ],
+      position: "belly",
+      thumbT: 0.5,
+      poses: {
+        ext: {
+          hip: [160, 93],
+          footA: [152, 160],
+          footB: [168, 160],
+          toeA: 90,
+          toeB: 90,
+          elbowA: [-1, 0],
+          elbowB: [1, 0],
+          handA: [146, 8],
+          elbowPtA: [146.5, 30.5],
+          handB: [174, 8],
+          elbowPtB: [173.5, 30.5]
+        },
+        pull: {
+          hip: [160, 93],
+          footA: [152, 160],
+          footB: [168, 160],
+          toeA: 90,
+          toeB: 90,
+          elbowA: [-1, 0],
+          elbowB: [1, 0],
+          handA: [134, 50],
+          elbowPtA: [128, 72],
+          handB: [186, 50],
+          elbowPtB: [192, 72]
+        }
+      }
+    }
+  },
+  PL02: {
+    main: {
+      kind: "oblique",
+      view: "oblique",
+      angle: "diagonal",
+      dur: 7600,
+      keys: [
+        [0, "closed"],
+        [0.06, "mid"],
+        [0.12, "open"],
+        [0.19, "lifted"],
+        [0.34, "lifted"],
+        [0.41, "open"],
+        [0.45, "mid"],
+        [0.5, "closed"],
+        [0.56, "mid"],
+        [0.62, "open"],
+        [0.69, "lifted"],
+        [0.84, "lifted"],
+        [0.91, "open"],
+        [0.95, "mid"],
+        [1, "closed"]
+      ],
+      props: [
+        { type: "mat3", x1: 50, x2: 232, z1: -66, z2: 66 }
+      ],
+      position: "belly",
+      thumbT: 0.25,
+      poses: {
+        closed: {
+          hip: [142, 6, 0],
+          torso: [-1, 0, 0],
+          headDir: [-1, 0.35, 0],
+          footA: [209, 4, -9],
+          footB: [209, 4, 9],
+          kneeA: [0, 1, 0],
+          kneeB: [0, 1, 0],
+          toeA: [1, -0.3, 0],
+          toeB: [1, -0.3, 0],
+          handA: [144, 3, -15],
+          handB: [144, 3, 15],
+          elbowA: [0, 1, 0],
+          elbowB: [0, 1, 0]
+        },
+        mid: {
+          hip: [142, 6, 0],
+          torso: [-1, 0, 0],
+          headDir: [-1, 0.35, 0],
+          footA: [209, 4, -9],
+          footB: [209, 4, 9],
+          kneeA: [0, 1, 0],
+          kneeB: [0, 1, 0],
+          toeA: [1, -0.3, 0],
+          toeB: [1, -0.3, 0],
+          handA: [131.1, 3, -44.1],
+          handB: [131.1, 3, 44.1],
+          elbowA: [0, 1, 0],
+          elbowB: [0, 1, 0]
+        },
+        open: {
+          hip: [142, 6, 0],
+          torso: [-1, 0, 0],
+          headDir: [-1, 0.35, 0],
+          footA: [209, 4, -9],
+          footB: [209, 4, 9],
+          kneeA: [0, 1, 0],
+          kneeB: [0, 1, 0],
+          toeA: [1, -0.3, 0],
+          toeB: [1, -0.3, 0],
+          handA: [100, 3, -57],
+          handB: [100, 3, 57],
+          elbowA: [0, 1, 0],
+          elbowB: [0, 1, 0]
+        },
+        lifted: {
+          hip: [142, 7, 0],
+          torso: [-1, 0.08, 0],
+          headDir: [-1, 0.35, 0],
+          footA: [209, 4, -9],
+          footB: [209, 4, 9],
+          kneeA: [0, 1, 0],
+          kneeB: [0, 1, 0],
+          toeA: [1, -0.3, 0],
+          toeB: [1, -0.3, 0],
+          handA: [100, 18, -55],
+          handB: [100, 18, 55],
+          elbowA: [0, 1, 0],
+          elbowB: [0, 1, 0]
+        }
+      }
+    }
+  },
+  PL03: {
+    main: {
+      kind: "spec",
+      view: "side",
+      angle: "side",
+      dur: 1400,
+      keys: [[0, "A"], [0.5, "B"], [1, "A"]],
+      bounce: 2,
+      thumbT: 0,
+      poses: {
+        A: {
+          hip: [160, 101],
+          footA: [141, 140],
+          kneeA: [-1, -0.5],
+          footB: [162, 168],
+          elbowPtA: [172, 79],
+          handA: [152, 81],
+          elbowPtB: [158, 82],
+          handB: [137, 80]
+        },
+        B: {
+          hip: [160, 101],
+          footA: [160, 168],
+          kneeA: [-1, -0.5],
+          footB: [143, 140],
+          kneeB: [-1, -0.5],
+          elbowPtA: [158, 82],
+          handA: [137, 80],
+          elbowPtB: [172, 79],
+          handB: [152, 81]
+        }
+      }
+    }
+  },
+  PL04: {
+    main: {
+      kind: "spec",
+      view: "front",
+      angle: "back",
+      dur: 1700,
+      keys: [[0, "A"], [0.5, "B"], [1, "A"]],
+      props: [
+        { type: "wallback" }
+      ],
+      thumbT: 0,
+      poses: {
+        A: { hip: [160, 101], footA: [151, 168], footB: [169, 168], handA: [138, 18], elbowA: [-1, 0.2], handB: [182, 60], elbowB: [1, 0.5] },
+        B: { hip: [160, 101], footA: [151, 168], footB: [169, 168], handA: [138, 60], elbowA: [-1, 0.5], handB: [182, 18], elbowB: [1, 0.2] }
+      }
+    }
+  },
+  PL05: {
+    main: [
+      {
+        kind: "oblique",
+        view: "oblique",
+        angle: "diagonal",
+        dur: 7200,
+        keys: [[0, "ext"], [0.15, "pull"], [0.35, "pull"], [0.5, "ext"], [0.65, "pull"], [0.85, "pull"], [1, "ext"]],
+        props: [
+          { type: "mat3", x1: 50, x2: 232, z1: -40, z2: 40 }
+        ],
+        position: "belly",
+        thumbT: 0.25,
+        poses: {
+          ext: {
+            hip: [146, 6, 0],
+            torso: [-1, 0.35, 0],
+            headDir: [-1, 0.35, 0],
+            footA: [213, 4, -9],
+            footB: [213, 4, 9],
+            kneeA: [0, 1, 0],
+            kneeB: [0, 1, 0],
+            toeA: [1, -0.3, 0],
+            toeB: [1, -0.3, 0],
+            handA: [62, 30, -12],
+            handB: [62, 30, 12],
+            elbowA: [0, 1, 0],
+            elbowB: [0, 1, 0]
+          },
+          pull: {
+            hip: [146, 6, 0],
+            torso: [-1, 0.35, 0],
+            headDir: [-1, 0.35, 0],
+            footA: [213, 4, -9],
+            footB: [213, 4, 9],
+            kneeA: [0, 1, 0],
+            kneeB: [0, 1, 0],
+            toeA: [1, -0.3, 0],
+            toeB: [1, -0.3, 0],
+            handA: [108, 26, -17],
+            handB: [108, 26, 17],
+            elbowA: [1, 0.2, -0.6],
+            elbowB: [1, 0.2, 0.6]
+          }
+        }
+      },
+      {
+        kind: "spec",
+        view: "side",
+        angle: "side",
+        dur: 7200,
+        keys: [[0, "ext"], [0.15, "pull"], [0.35, "pull"], [0.5, "ext"], [0.65, "pull"], [0.85, "pull"], [1, "ext"]],
+        mat: true,
+        position: "belly",
+        thumbT: 0.25,
+        poses: {
+          ext: {
+            hip: [146, 162],
+            lean: 72,
+            head: -8,
+            footA: [213, 163],
+            toeA: 8,
+            kneeA: [0, -1],
+            handA: [62, 140],
+            elbowPtA: [83.1, 144.3],
+            handB: [67, 138],
+            elbowPtB: [88.1, 142.3]
+          },
+          pull: {
+            hip: [146, 162],
+            lean: 72,
+            head: -8,
+            footA: [213, 163],
+            toeA: 8,
+            kneeA: [0, -1],
+            handA: [109, 137],
+            elbowPtA: [128, 141],
+            handB: [114, 135],
+            elbowPtB: [133, 139]
+          }
+        }
+      }
+    ]
+  },
+  PL06: {
+    main: {
+      kind: "spec",
+      view: "side",
+      angle: "side",
+      dur: 3200,
+      keys: [[0, "reach"], [0.4, "pull"], [0.55, "pull"], [0.95, "reach"], [1, "reach"]],
+      mat: true,
+      thumbT: 0.5,
+      poses: {
+        reach: { hip: [160, 160], lean: 15, footA: [112, 166], kneeA: [0, -1], toeA: 180, handA: [104, 118], elbowA: [0.4, 1] },
+        pull: { hip: [160, 160], lean: -8, footA: [100, 166], kneeA: [0, -1], toeA: 180, handA: [154, 125], elbowA: [0.4, 1] }
+      }
+    }
+  },
+  PL07: {
+    main: {
+      kind: "oblique",
+      view: "oblique",
+      angle: "diagonal",
+      dur: 3400,
+      keys: [[0, "Ar"], [0.22, "Ap"], [0.42, "Ar"], [0.5, "Br"], [0.72, "Bp"], [0.92, "Br"], [1, "Ar"]],
+      props: [
+        { type: "mat3", x1: 120, x2: 200, z1: -40, z2: 30, mat: false },
+        {
+          type: "touch",
+          layer: "front",
+          at: ["Ka", "Kb"],
+          when: [[0.17, 0.29], [0.67, 0.79]]
+        }
+      ],
+      thumbT: 0.22,
+      poses: {
+        Ar: {
+          hip: [160, 67, 0],
+          torso: [0, 1, 0],
+          headDir: [0, 1, 0],
+          side: [-0.8, 0, 0.6],
+          footA: [167.2, 2, -5.4],
+          footB: [152.8, 2, 5.4],
+          kneeA: [-0.6, 0, -0.8],
+          kneeB: [-0.6, 0, -0.8],
+          toeA: [-0.6, 0, -0.8],
+          toeB: [-0.6, 0, -0.8],
+          elbowA: [0.3, -1, 0],
+          elbowB: [0.3, -1, 0],
+          handA: [168, 65, -11],
+          elbowPtA: [169.2, 87, -9.4],
+          handB: [149.6, 155, 7.8],
+          elbowPtB: [149.6, 132, 7.8]
+        },
+        Ap: {
+          hip: [160, 67, 0],
+          torso: [-0.45, 1, -0.6],
+          headDir: [0, 1, 0],
+          side: [-0.8, 0, 0.6],
+          footA: [142, 46, -32],
+          footB: [152.8, 2, 5.4],
+          kneeA: [-0.6, 0.3, -0.8],
+          kneeB: [-0.6, 0, -0.8],
+          toeA: [-0.6, 0, -0.8],
+          toeB: [-0.6, 0, -0.8],
+          elbowA: [0.3, -1, 0],
+          elbowB: [0.3, -1, 0],
+          handA: [158, 58, -30],
+          elbowPtA: [156.6, 79.3, -29],
+          handB: [144.7, 103.4, -21.5],
+          elbowPtB: [144.7, 84, -26.4]
+        },
+        Br: {
+          hip: [160, 67, 0],
+          torso: [0, 1, 0],
+          headDir: [0, 1, 0],
+          side: [-0.8, 0, 0.6],
+          footA: [167.2, 2, -5.4],
+          footB: [152.8, 2, 5.4],
+          kneeA: [-0.6, 0, -0.8],
+          kneeB: [-0.6, 0, -0.8],
+          toeA: [-0.6, 0, -0.8],
+          toeB: [-0.6, 0, -0.8],
+          elbowA: [0.3, -1, 0],
+          elbowB: [0.3, -1, 0],
+          handA: [170.4, 155, -7.8],
+          elbowPtA: [170.4, 132, -7.8],
+          handB: [147.2, 65, 4.6],
+          elbowPtB: [148.4, 87, 6.2]
+        },
+        Bp: {
+          hip: [160, 67, 0],
+          torso: [-0.45, 1, -0.6],
+          headDir: [0, 1, 0],
+          side: [-0.8, 0, 0.6],
+          footA: [167.2, 2, -5.4],
+          footB: [137, 46, -29],
+          kneeA: [-0.6, 0, -0.8],
+          kneeB: [-0.6, 0.3, -0.8],
+          toeA: [-0.6, 0, -0.8],
+          toeB: [-0.6, 0, -0.8],
+          elbowA: [0.3, -1, 0],
+          elbowB: [0.3, -1, 0],
+          handA: [139.1, 103.2, -17.5],
+          elbowPtA: [139.1, 83.8, -22.4],
+          handB: [132, 58, -14],
+          elbowPtB: [133.2, 79.3, -13.2]
+        }
+      }
+    }
+  },
+  PL08: {
+    main: {
+      kind: "oblique",
+      view: "oblique",
+      angle: "diagonal",
+      dur: 3600,
+      keys: [[0, "base"], [0.15, "liftA"], [0.35, "liftA"], [0.5, "base"], [0.65, "liftB"], [0.85, "liftB"], [1, "base"]],
+      props: [
+        { type: "mat3", x1: 40, x2: 232, z1: -40, z2: 40 }
+      ],
+      position: "belly",
+      thumbT: 0.25,
+      poses: {
+        base: {
+          hip: [142, 6, 0],
+          torso: [-1, 0, 0],
+          headDir: [-1, 0.35, 0],
+          footA: [209, 4, -9],
+          footB: [209, 4, 9],
+          kneeA: [0, 1, 0],
+          kneeB: [0, 1, 0],
+          toeA: [1, -0.3, 0],
+          toeB: [1, -0.3, 0],
+          handA: [57, 3, -12],
+          handB: [57, 3, 12],
+          elbowA: [0, 1, 0],
+          elbowB: [0, 1, 0]
+        },
+        liftA: {
+          hip: [142, 6, 0],
+          torso: [-1, 0, 0],
+          headDir: [-1, 0.35, 0],
+          footA: [209, 4, -9],
+          footB: [207, 16, 9],
+          kneeA: [0, 1, 0],
+          kneeB: [0, 1, 0],
+          toeA: [1, -0.3, 0],
+          toeB: [1, -0.3, 0],
+          handA: [58, 16, -12],
+          handB: [57, 3, 12],
+          elbowA: [0, 1, 0],
+          elbowB: [0, 1, 0]
+        },
+        liftB: {
+          hip: [142, 6, 0],
+          torso: [-1, 0, 0],
+          headDir: [-1, 0.35, 0],
+          footA: [207, 16, -9],
+          footB: [209, 4, 9],
+          kneeA: [0, 1, 0],
+          kneeB: [0, 1, 0],
+          toeA: [1, -0.3, 0],
+          toeB: [1, -0.3, 0],
+          handA: [57, 3, -12],
+          handB: [58, 16, 12],
+          elbowA: [0, 1, 0],
+          elbowB: [0, 1, 0]
+        }
+      }
+    }
+  },
+  PL09: {
+    main: {
+      kind: "spec",
+      view: "front",
+      angle: "above",
+      dur: 4000,
+      keys: [[0, "down"], [0.22, "side"], [0.44, "up"], [0.56, "up"], [0.78, "side"], [1, "down"]],
+      props: [
+        {
+          type: "topdown",
+          x: 160,
+          y1: 20,
+          y2: 168,
+          w: 104,
+          box: [[108, 0], [212, 176]]
+        }
+      ],
+      position: "belly",
+      thumbT: 0.25,
+      poses: {
+        down: {
+          hip: [160, 93],
+          footA: [152, 160],
+          footB: [168, 160],
+          toeA: 90,
+          toeB: 90,
+          elbowA: [-1, 0],
+          elbowB: [1, 0],
+          handA: [137, 100],
+          handB: [183, 100]
+        },
+        side: {
+          hip: [160, 93],
+          footA: [152, 160],
+          footB: [168, 160],
+          toeA: 90,
+          toeB: 90,
+          elbowA: [-1, 0],
+          elbowB: [1, 0],
+          handA: [102, 52],
+          handB: [218, 52]
+        },
+        up: {
+          hip: [160, 93],
+          footA: [152, 160],
+          footB: [168, 160],
+          toeA: 90,
+          toeB: 90,
+          elbowA: [-1, 0],
+          elbowB: [1, 0],
+          handA: [140, 8],
+          handB: [180, 8]
+        }
+      }
+    }
+  },
+  PL10: {
+    main: [
+      {
+        kind: "spec",
+        view: "front",
+        angle: "front",
+        dur: 6400,
+        keys: [
+          [0, "up"],
+          [0.2, "pull"],
+          [0.3, "pull"],
+          [0.47, "up"],
+          [0.53, "up"],
+          [0.7, "pull"],
+          [0.8, "pull"],
+          [0.97, "up"],
+          [1, "up"]
+        ],
+        thumbT: 0.25,
+        poses: {
+          up: { hip: [160, 101], footA: [149, 168], footB: [171, 168], handA: [146, 14], handB: [174, 14], elbowA: [-1, 0], elbowB: [1, 0] },
+          pull: { hip: [160, 112], footA: [149, 168], footB: [171, 168], handA: [138, 64], handB: [182, 64], elbowA: [-1, 0.5], elbowB: [1, 0.5] }
+        }
+      },
+      {
+        kind: "spec",
+        view: "side",
+        angle: "side",
+        dur: 6400,
+        keys: [
+          [0, "up"],
+          [0.2, "pull"],
+          [0.3, "pull"],
+          [0.47, "up"],
+          [0.53, "up"],
+          [0.7, "pull"],
+          [0.8, "pull"],
+          [0.97, "up"],
+          [1, "up"]
+        ],
+        thumbT: 0.25,
+        poses: {
+          up: { hip: [160, 101], lean: 0, footA: [160, 168], handA: [164, 14], elbowPtA: [162, 36.5], handB: [169, 12], elbowPtB: [167, 34.5] },
+          pull: {
+            hip: [172, 112],
+            lean: 12,
+            footA: [160, 168],
+            kneeA: [-1, 0],
+            handA: [160, 72],
+            elbowPtA: [166, 92],
+            handB: [165, 70],
+            elbowPtB: [171, 90]
+          }
+        }
+      }
+    ]
   }
 };
 

@@ -134,6 +134,20 @@ export function ExerciseDemo({
         </span>
       )}
 
+      {variant === "video" && showPrints && f.position && !f.prints && (
+        <span className="absolute bottom-2 end-2 flex flex-col items-center gap-px rounded-xl bg-white/90 px-2 pb-1 pt-1.5 shadow-[0_1px_3px_rgba(34,26,51,0.1)]">
+          <svg width="52" height="32" viewBox="0 0 52 32" aria-hidden>
+            <path d="M4 27 H48" stroke="#d3c6e4" strokeWidth={2} strokeLinecap="round" />
+            <path d="M16 21 H40 L46 23" stroke="#a32894" strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            <path d="M14 22 L6 24" stroke="#3d2f5c" strokeWidth={3} strokeLinecap="round" />
+            <circle cx="10" cy="16" r="4.5" fill="#3d2f5c" />
+          </svg>
+          <span className="whitespace-nowrap text-[10px] font-semibold leading-tight text-[#4f4960]">
+            {t(`position.${f.position}`)}
+          </span>
+        </span>
+      )}
+
       {variant === "video" && showPrints && f.prints && (
         <span className="absolute bottom-2 end-2 flex flex-col items-center gap-px rounded-xl bg-white/90 px-2 pb-1 pt-1.5 shadow-[0_1px_3px_rgba(34,26,51,0.1)]">
           <svg width="52" height="32" viewBox="0 0 52 32" fill="#a32894" aria-hidden>

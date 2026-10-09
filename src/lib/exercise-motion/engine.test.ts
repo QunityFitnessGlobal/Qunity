@@ -28,9 +28,10 @@ describe("solvePose", () => {
 });
 
 describe("the approved exercise motions", () => {
-  it("are keyed by exercise id", () => {
-    expect(motionFor("SQ01")).not.toBeNull();
-    expect(motionFor("PL01")).toBeNull();
+  it("cover the whole exercise bank, keyed by exercise id", () => {
+    for (const group of ["SQ", "PU", "PL", "BE", "MV"]) {
+      for (let n = 1; n <= 10; n++) expect(motionFor(group + String(n).padStart(2, "0"))).not.toBeNull();
+    }
     expect(motionFor("nope")).toBeNull();
   });
 

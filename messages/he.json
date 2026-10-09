@@ -231,7 +231,9 @@
       "angle": {
         "side": "מהצד",
         "front": "מלפנים",
-        "above": "מלמעלה"
+        "above": "מלמעלה",
+        "diagonal": "באלכסון",
+        "back": "מאחור"
       },
       "prints": {
         "hipWidth": "רוחב אגן",
@@ -243,7 +245,10 @@
       },
       "playing": "מוצג למעלה",
       "watch": "לצפות בתרגיל",
-      "angleChoice": "זווית צילום"
+      "angleChoice": "זווית צילום",
+      "position": {
+        "belly": "על הבטן"
+      }
     }
   },
   "dashboard": {
