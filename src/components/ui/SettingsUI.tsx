@@ -55,11 +55,11 @@ interface SettingsDialogProps {
   children: ReactNode;
 }
 
-// A popup over the screen: a card that rises from the bottom on a phone.
+// A popup over the screen: a card in the middle of it.
 export function SettingsDialog({ title, icon, children }: SettingsDialogProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#221a33]/40 px-4 pb-6 sm:items-center sm:pb-0" role="dialog" aria-modal="true">
-      <div className="animate-chat-in flex w-full max-w-sm flex-col gap-3 rounded-[22px] bg-white p-5 text-center shadow-[0_20px_50px_rgba(34,26,51,0.25)]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#221a33]/40 p-4" role="dialog" aria-modal="true">
+      <div className="animate-chat-in flex max-h-[calc(100dvh-2rem)] w-full max-w-sm flex-col gap-3 overflow-y-auto rounded-[22px] bg-white p-5 text-center shadow-[0_20px_50px_rgba(34,26,51,0.25)]">
         {icon && (
           <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-purple/[0.08] text-brand-purple" aria-hidden>
             {icon}
