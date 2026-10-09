@@ -34,9 +34,11 @@ interface WorkoutTimerViewProps {
   elapsedLabel?: string;
   finishLabel?: string;
   onFinish: () => void;
-  paused: boolean;
-  onPause: () => void;
-  onResume: () => void;
+  // Without onPause there's no pause button (a stair challenge is timed by
+  // the server, which can't stop for a pause).
+  paused?: boolean;
+  onPause?: () => void;
+  onResume?: () => void;
   error: string | null;
   // TEMP testing shortcuts, rendered under the finish button.
   children?: ReactNode;
@@ -56,7 +58,7 @@ export function WorkoutTimerView({
   elapsedLabel,
   finishLabel,
   onFinish,
-  paused,
+  paused = false,
   onPause,
   onResume,
   error,
@@ -86,14 +88,16 @@ export function WorkoutTimerView({
           <span className="font-display text-lg font-bold">
             {interval ? t("setOf", { current: interval.currentSet, total: interval.rounds }) : null}
           </span>
-          <button
-            type="button"
-            onClick={onPause}
-            aria-label={t("pause")}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-zinc-200 bg-white text-[#4f4960] hover:bg-zinc-50"
-          >
-            <PauseIcon className="h-[18px] w-[18px]" />
-          </button>
+          {onPause && (
+            <button
+              type="button"
+              onClick={onPause}
+              aria-label={t("pause")}
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-zinc-200 bg-white text-[#4f4960] hover:bg-zinc-50"
+            >
+              <PauseIcon className="h-[18px] w-[18px]" />
+            </button>
+          )}
         </div>
         {interval && (
           <div className="flex gap-1.5" aria-hidden>
@@ -229,7 +233,7 @@ export function WorkoutTimerView({
         {children}
       </footer>
 
-      {paused && (
+      {paused && onResume && (
         <div
           role="dialog"
           aria-modal="true"

@@ -5,16 +5,17 @@ import { useTranslations } from "next-intl";
 import { StairsIcon } from "@/components/child/challengeIcons";
 import { ReadyCountdownOverlay, type CountdownStep } from "@/components/child/ReadyCountdown";
 import { BRACELET_CSS_VAR } from "@/lib/colors";
-import { durationParts } from "@/lib/format";
 import type { BraceletColor, Gender } from "@/lib/types";
 
 interface ChallengeIntroProps {
   title: string;
   description: string | null;
+  // The most a single run pays.
   bonusPoints: number;
   color: BraceletColor | null;
   colorLabel: string | null;
-  bestSeconds: number | null;
+  // Most points from one run so far.
+  bestPoints: number | null;
   timesDone: number;
   gender: Gender | null;
   error: string | null;
@@ -28,16 +29,16 @@ function stageInk(color: BraceletColor | null): string {
   return color === "white" ? "var(--color-bracelet-white-outline)" : BRACELET_CSS_VAR[color];
 }
 
-// Before a challenge: which stage it belongs to, what to do, the bonus it
-// pays every time, and the child's record so far — then the same "I'm
-// ready" and 3-2-1 as a workout.
+// Before a challenge: which stage it belongs to, what to do, the most it
+// pays each time, and the child's best so far — then the same "I'm ready"
+// and 3-2-1 as a workout.
 export function ChallengeIntro({
   title,
   description,
   bonusPoints,
   color,
   colorLabel,
-  bestSeconds,
+  bestPoints,
   timesDone,
   gender,
   error,
@@ -59,7 +60,7 @@ export function ChallengeIntro({
           <h1 className="font-display text-[26px] font-bold leading-tight">{title}</h1>
           <div className="flex flex-wrap gap-2">
             <span className="rounded-full bg-reward-gold-soft px-2.5 py-1 font-display text-[13px] font-semibold text-reward-gold-ink">
-              {tWorkout.rich("pointsChip", { points: bonusPoints, num: (chunks) => <bdi dir="ltr">{chunks}</bdi> })}
+              {t.rich("upToPoints", { points: bonusPoints, num: (chunks) => <bdi dir="ltr">{chunks}</bdi> })}
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f1edf5] px-2.5 py-1 text-[13px] font-medium">
               <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -85,14 +86,14 @@ export function ChallengeIntro({
           </span>
         </section>
 
-        {timesDone > 0 && bestSeconds !== null ? (
+        {timesDone > 0 && bestPoints !== null ? (
           <div
             className="animate-power-fade-up grid grid-cols-2 gap-2.5"
             style={{ ["--power-fade-delay" as string]: "0.2s" } as CSSProperties}
           >
             <div className="flex flex-col items-center gap-0.5 rounded-2xl bg-reward-gold-soft px-3 py-3">
               <span className="text-[12px] font-semibold text-reward-gold-ink">{t("bestLabel")}</span>
-              <span className="font-display text-xl font-bold text-reward-gold-on">{t("duration", durationParts(bestSeconds))}</span>
+              <span className="font-display text-xl font-bold text-reward-gold-on">{t("bestPoints", { points: bestPoints })}</span>
             </div>
             <div className="flex flex-col items-center gap-0.5 rounded-2xl bg-brand-purple/[0.08] px-3 py-3">
               <span className="text-[12px] font-semibold text-brand-purple">{t("timesLabel")}</span>

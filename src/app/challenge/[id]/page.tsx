@@ -32,7 +32,7 @@ export default async function ChallengePage({ params }: ChallengePageProps) {
       .maybeSingle<ChallengeRow>(),
     supabase
       .from("challenge_sessions")
-      .select("actual_duration_seconds")
+      .select("points_awarded")
       .eq("child_id", user.id)
       .eq("challenge_id", id)
       .eq("status", "completed"),
@@ -46,11 +46,11 @@ export default async function ChallengePage({ params }: ChallengePageProps) {
     notFound();
   }
 
-  // The stair challenges are races against the clock, so the record is the
-  // fastest finish so far.
-  const times = ((attempts ?? []) as { actual_duration_seconds: number | null }[])
-    .map((a) => a.actual_duration_seconds)
-    .filter((s): s is number => s !== null && s > 0);
+  // A quicker finish pays less (it probably wasn't all the stairs), so the
+  // child's best is the most points from one run, not the fastest time.
+  const points = ((attempts ?? []) as { points_awarded: number | null }[])
+    .map((a) => a.points_awarded)
+    .filter((p): p is number => p !== null);
   const tColors = await getTranslations("colors");
 
   return (
@@ -63,7 +63,7 @@ export default async function ChallengePage({ params }: ChallengePageProps) {
         bonusPoints={challenge.bonus_points}
         color={challenge.unlock_color}
         colorLabel={challenge.unlock_color ? tColors(challenge.unlock_color) : null}
-        bestSeconds={times.length > 0 ? Math.min(...times) : null}
+        bestPoints={points.length > 0 ? Math.max(...points) : null}
         timesDone={attempts?.length ?? 0}
         gender={profile?.gender ?? null}
       />

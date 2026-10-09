@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
-import { awardPoints } from "@/services/points.service";
+import { awardPoints, meetsCompletionThreshold } from "@/services/points.service";
 import type { ChallengeDefinition, ChallengeConditionType, ChallengeType } from "@/data/challenges.data";
 import type { LocalizedText } from "@/lib/i18n-content";
 import type { BraceletColor } from "@/lib/types";
@@ -14,6 +14,7 @@ export interface ChallengeSessionContext {
 interface CompletedSessionRow {
   start_time: string;
   actual_duration_seconds: number | null;
+  completion_percent: number | null;
 }
 
 interface ChallengeRow {
@@ -113,7 +114,7 @@ export async function checkAndAwardChallenges(
     supabase.from("child_challenges").select("challenge_id").eq("child_id", childId),
     supabase
       .from("workout_sessions")
-      .select("start_time, actual_duration_seconds")
+      .select("start_time, actual_duration_seconds, completion_percent")
       .eq("child_id", childId)
       .eq("status", "completed"),
     getChallengeDefinitions(supabase),
@@ -122,10 +123,16 @@ export async function checkAndAwardChallenges(
   const unlockedIds = new Set((unlockedRows ?? []).map((row) => row.challenge_id as string));
   const sessions = (sessionRows ?? []) as CompletedSessionRow[];
 
-  const totalCompletedSessions = sessions.length;
+  // The first workout and the streaks only count workouts that reached the
+  // 60% pass mark (sessions from before completion was tracked count as
+  // passed); every minute actually trained counts toward the 100 minutes.
+  const passedSessions = sessions.filter(
+    (s) => s.completion_percent === null || meetsCompletionThreshold(s.completion_percent),
+  );
+  const totalCompletedSessions = passedSessions.length;
   const totalSeconds = sessions.reduce((sum, s) => sum + (s.actual_duration_seconds ?? 0), 0);
   const totalMinutes = totalSeconds / 60;
-  const streakDays = calculateStreakDays(sessions.map((s) => new Date(s.start_time)));
+  const streakDays = calculateStreakDays(passedSessions.map((s) => new Date(s.start_time)));
 
   const newlyUnlocked: ChallengeDefinition[] = [];
 
@@ -151,9 +158,14 @@ export async function checkAndAwardChallenges(
       continue;
     }
 
-    await awardPoints(childId, context.sessionId, [
-      { points: challenge.bonusPoints, reason: `challenge_${challenge.id}` },
-    ]);
+    await awardPoints(
+      childId,
+      context.sessionId,
+      [{ points: challenge.bonusPoints, reason: `challenge_${challenge.id}` }],
+      // The level-up bonus goes to the total only: the stage it was earned
+      // in is over, and the next one starts from zero.
+      { countTowardColor: challenge.conditionType !== "color_finisher" },
+    );
 
     newlyUnlocked.push(challenge);
   }
@@ -161,20 +173,17 @@ export async function checkAndAwardChallenges(
   return newlyUnlocked;
 }
 
-// "Received power X": unlocked the moment a color's power is revealed (start of
-// its first workout), not by the checks in checkAndAwardChallenges. Pays the
-// challenge's bonus points once. Returns the challenge only when newly
-// unlocked — which is also how the runner knows the reveal was already seen
-// (see the workout page), so a power is only ever revealed once.
-export async function unlockPowerChallenge(
+// A one-time challenge earned outside the end-of-workout checks: unlocks it
+// and pays its bonus once. Returns the challenge only when newly unlocked.
+async function unlockChallenge(
   supabase: SupabaseClient,
   childId: string,
-  color: BraceletColor,
+  challengeId: string,
 ): Promise<ChallengeDefinition | null> {
   const { data } = await supabase
     .from("challenges")
     .select("id, title, description, bonus_points, condition_type, challenge_type, unlock_color")
-    .eq("id", `power_${color}`)
+    .eq("id", challengeId)
     .maybeSingle();
 
   if (!data) {
@@ -197,6 +206,19 @@ export async function unlockPowerChallenge(
   ]);
 
   return challenge;
+}
+
+// "Received power X": unlocked the moment a color's power is revealed (start of
+// its first workout), not by the checks in checkAndAwardChallenges. Returns
+// the challenge only when newly unlocked — which is also how the runner knows
+// the reveal was already seen (see the workout page), so a power is only ever
+// revealed once.
+export function unlockPowerChallenge(
+  supabase: SupabaseClient,
+  childId: string,
+  color: BraceletColor,
+): Promise<ChallengeDefinition | null> {
+  return unlockChallenge(supabase, childId, `power_${color}`);
 }
 
 // Called alongside checkAndAwardChallenges right after a level-up — looks
@@ -412,58 +434,64 @@ export async function getNewChallengesCount(supabase: SupabaseClient, childId: s
   }).length;
 }
 
+// A stair challenge is timed by the server (see "ADDED FOR TIMED CHALLENGE
+// POINTS" in schema.sql): starting opens a session on the server's clock,
+// and finishing stops it there and pays by the time it measured — so the
+// device's clock only shows the time, it never decides the points.
+export async function startChallengeSession(challengeId: string): Promise<string> {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("start_challenge_session", { p_challenge_id: challengeId });
+  if (error || typeof data !== "string") {
+    throw new Error(error?.message ?? "start_challenge_session returned no session");
+  }
+  return data;
+}
+
+export interface FinishedChallenge {
+  seconds: number;
+  points: number;
+}
+
+// Safe to call again for the same session: it returns the same result
+// without paying twice.
+export async function finishChallengeSession(sessionId: string): Promise<FinishedChallenge> {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("finish_challenge_session", { p_session_id: sessionId });
+  if (error || !data) {
+    throw new Error(error?.message ?? "finish_challenge_session returned nothing");
+  }
+  const result = data as Partial<FinishedChallenge>;
+  return { seconds: result.seconds ?? 0, points: result.points ?? 0 };
+}
+
 export interface CompleteChallengeAnswers {
   difficultyReported: number;
   parentTrainedTogether: boolean;
   feelingAfter: string;
 }
 
-// Awards bonus_points every time, unlike checkAndAwardChallenges — a
-// 'repeatable_workout' challenge can be performed any number of times.
-export async function completeChallenge(
+// The check-in after a challenge: saves the answers on its session. "My
+// parent trained with me" earns the one-time Parent Power challenge here
+// too, as it does after a workout — returned when newly earned.
+export async function saveChallengeAnswers(
   childId: string,
-  challengeId: string,
-  actualDurationSeconds: number,
+  sessionId: string,
   answers: CompleteChallengeAnswers,
-): Promise<{ pointsAwarded: number }> {
+): Promise<ChallengeDefinition | null> {
   const supabase = createClient();
 
-  const { data: challenge } = await supabase
-    .from("challenges")
-    .select("bonus_points")
-    .eq("id", challengeId)
-    .single<{ bonus_points: number }>();
-
-  const pointsAwarded = challenge?.bonus_points ?? 0;
-  const now = new Date();
-
-  const { error: insertError } = await supabase
+  const { error } = await supabase
     .from("challenge_sessions")
-    .insert({
-      child_id: childId,
-      challenge_id: challengeId,
-      status: "completed",
-      start_time: new Date(now.getTime() - actualDurationSeconds * 1000).toISOString(),
-      end_time: now.toISOString(),
-      actual_duration_seconds: actualDurationSeconds,
+    .update({
       difficulty_reported: answers.difficultyReported,
       feeling_after: answers.feelingAfter,
       parent_trained_together: answers.parentTrainedTogether,
-      points_awarded: pointsAwarded,
     })
-    .select("id")
-    .single();
+    .eq("id", sessionId);
 
-  if (insertError) {
-    throw new Error(insertError.message);
+  if (error) {
+    throw new Error(error.message);
   }
 
-  await awardPoints(
-    childId,
-    null,
-    [{ points: pointsAwarded, reason: `challenge_workout_${challengeId}` }],
-    { countTowardColor: false },
-  );
-
-  return { pointsAwarded };
+  return answers.parentTrainedTogether ? unlockChallenge(supabase, childId, "parent_power") : null;
 }

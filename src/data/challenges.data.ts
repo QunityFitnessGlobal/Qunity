@@ -14,7 +14,11 @@ import type { BraceletColor } from "@/lib/types";
 // CHALLENGES" section in schema.sql for the full rationale:
 //   'condition'          — auto-detected from cumulative activity, one-time.
 //   'repeatable_workout' — unlocks when a child finishes unlockColor, then
-//                          can be performed any number of times.
+//                          can be performed any number of times; each run
+//                          pays up to bonusPoints by the time the server
+//                          measured (challenges.min_seconds /
+//                          full_points_seconds — see "ADDED FOR TIMED
+//                          CHALLENGE POINTS" in schema.sql).
 
 export type ChallengeConditionType =
   | "first_workout"
