@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { CHILD_CODE_CHIP, KeyIcon, PRIMARY_BUTTON, SECONDARY_BUTTON, StageBeads } from "@/components/entry/EntryShell";
+import { TrackVisit } from "@/components/entry/TrackVisit";
 
 // The first screen: the logo and the five stage beads on the dark brand
 // background, and a sheet with the ways in — log in, sign up a new family,
@@ -12,6 +13,7 @@ export default async function Home() {
 
   return (
     <div className="flex min-h-dvh flex-col bg-brand-background">
+      <TrackVisit />
       <div className="relative flex flex-1 flex-col items-center justify-center gap-[22px] px-7 pb-12 pt-8 text-center">
         <span aria-hidden className="animate-entry-glow absolute top-1/3 h-[200px] w-[300px] rounded-full bg-brand-purple blur-[80px]" />
         <Image

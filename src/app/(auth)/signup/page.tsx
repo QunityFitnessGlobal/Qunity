@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { signUp } from "@/services/auth";
+import { storedAcquisition } from "@/lib/acquisition";
+import { TrackVisit } from "@/components/entry/TrackVisit";
 import { matchErrorKey } from "@/lib/auth-errors";
 import { EntryShell, PRIMARY_BUTTON } from "@/components/entry/EntryShell";
 import { EntryField, PasswordField } from "@/components/entry/EntryField";
@@ -63,7 +65,7 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      await signUp({ fullName, email, password, role, gender });
+      await signUp({ fullName, email, password, role, gender, acquisition: storedAcquisition() });
       router.push("/dashboard");
       router.refresh();
     } catch (err) {
@@ -84,6 +86,7 @@ export default function SignupPage() {
 
   return (
     <EntryShell backHref="/" backLabel={tEntry("back")} compact>
+      <TrackVisit />
       <h1 className="font-display text-[25px] font-bold">{t("title")}</h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">

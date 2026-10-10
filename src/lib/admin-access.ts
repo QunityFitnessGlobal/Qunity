@@ -5,15 +5,25 @@ import type { Role } from "@/lib/types";
 // SERVER-ONLY (uses the admin client). Admins are listed by email in the
 // ADMIN_EMAILS env var (comma-separated) rather than in code, since the repo
 // is public. Missing or empty means nobody is an admin.
-function adminEmails(): string[] {
-  return (process.env.ADMIN_EMAILS ?? "")
+function emailList(value: string | undefined): string[] {
+  return (value ?? "")
     .split(",")
     .map((email) => email.trim().toLowerCase())
     .filter(Boolean);
 }
 
-function isAdminEmail(email: string | null | undefined): boolean {
+function adminEmails(): string[] {
+  return emailList(process.env.ADMIN_EMAILS);
+}
+
+export function isAdminEmail(email: string | null | undefined): boolean {
   return !!email && adminEmails().includes(email.toLowerCase());
+}
+
+// Families left out of the admin dashboard's numbers by default: the admins'
+// own, plus any extra test accounts listed in ADMIN_TEST_EMAILS.
+export function testEmails(): string[] {
+  return [...adminEmails(), ...emailList(process.env.ADMIN_TEST_EMAILS)];
 }
 
 // Whether the TEMP testing tools (power/level-up previews, workout

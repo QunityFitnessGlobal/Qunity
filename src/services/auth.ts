@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import type { Acquisition } from "@/lib/acquisition";
 import type { Gender, Role } from "@/lib/types";
 
 interface SignUpInput {
@@ -7,9 +8,12 @@ interface SignUpInput {
   password: string;
   role: Role;
   gender: Gender;
+  // Where the family came from (first visit), kept with the account for the
+  // admin dashboard's per-channel numbers.
+  acquisition?: Acquisition | null;
 }
 
-export async function signUp({ fullName, email, password, role, gender }: SignUpInput) {
+export async function signUp({ fullName, email, password, role, gender, acquisition }: SignUpInput) {
   const supabase = createClient();
 
   const { data, error } = await supabase.auth.signUp({
@@ -20,6 +24,14 @@ export async function signUp({ fullName, email, password, role, gender }: SignUp
         full_name: fullName,
         role,
         gender,
+        ...(acquisition
+          ? {
+              signup_source: acquisition.source,
+              signup_medium: acquisition.medium,
+              signup_campaign: acquisition.campaign,
+              signup_referrer: acquisition.referrer,
+            }
+          : {}),
       },
     },
   });
