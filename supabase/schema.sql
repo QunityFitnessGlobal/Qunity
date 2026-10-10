@@ -2308,3 +2308,19 @@ create table if not exists public.site_visits (
 alter table public.site_visits enable row level security;
 
 create index if not exists site_visits_created_at_idx on public.site_visits (created_at);
+
+-- ============================================================================
+-- ADDED FOR THE ADMIN DASHBOARD'S TEST FAMILIES
+--
+-- Families an admin marked "משפחת בדיקה" on the dashboard's families screen:
+-- left out of its numbers while "בלי משתמשי בדיקה" is on. Only the server
+-- writes and reads these rows (service role, after checking the admin), so
+-- there are no policies.
+-- ============================================================================
+
+create table if not exists public.admin_test_families (
+  parent_id uuid primary key references public.parents (id) on delete cascade,
+  marked_at timestamptz not null default now()
+);
+
+alter table public.admin_test_families enable row level security;

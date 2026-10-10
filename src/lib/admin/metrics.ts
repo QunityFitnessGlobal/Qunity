@@ -118,6 +118,8 @@ export interface AdminDataset {
   // Null until the site_visits table exists.
   visits: VisitRow[] | null;
   testEmails: string[];
+  // Families marked "משפחת בדיקה" on the families screen.
+  testParentIds: string[];
   // The marketing launch, marked on the activity chart (ADMIN_PILOT_START).
   pilotStart: string | null;
 }
@@ -200,18 +202,29 @@ export interface Scope {
   prevStart: number | null;
 }
 
+// A test family: marked on the families screen, or its parent's email is
+// listed in ADMIN_TEST_EMAILS.
+export function testParents(d: AdminDataset): Set<string> {
+  const emails = new Set(d.testEmails.map((e) => e.toLowerCase()));
+  const marked = new Set(d.testParentIds);
+  const user = new Map(d.users.map((u) => [u.id, u]));
+  return new Set(
+    d.parents.filter((p) => marked.has(p.id) || emails.has((user.get(p.id)?.email ?? "").toLowerCase())).map((p) => p.id),
+  );
+}
+
 // Which families and children the numbers cover: test families out (unless
 // asked for), and only the chosen channel's families.
 export function buildScope(d: AdminDataset, f: AdminFilters): Scope {
   const user = new Map(d.users.map((u) => [u.id, u]));
-  const tests = new Set(d.testEmails.map((e) => e.toLowerCase()));
+  const tests = testParents(d);
   const parentChannel = new Map<string, Channel>();
   const parentIds = new Set<string>();
   for (const p of d.parents) {
     const u = user.get(p.id);
     const channel = channelOf(u?.source);
     parentChannel.set(p.id, channel);
-    const isTest = !!u?.email && tests.has(u.email.toLowerCase());
+    const isTest = tests.has(p.id);
     if ((f.includeTests || !isTest) && (f.source === "all" || f.source === channel)) parentIds.add(p.id);
   }
   const childrenOf = new Map<string, string[]>();
@@ -737,6 +750,7 @@ export interface FamilyRow {
   ago: string;
   workouts: number;
   status: FamilyStatus;
+  isTest: boolean;
 }
 export interface FamilyDetail extends FamilyRow {
   kidCards: { name: string; color: BraceletColor; workouts: number; points: number }[];
@@ -762,44 +776,50 @@ function agoText(lastWorkout: string | null, now: Date): string {
 
 export function familiesView(d: AdminDataset, f: AdminFilters, status: FamilyStatus | "all", selectedId: string | null): FamiliesView {
   const s = buildScope(d, f);
-  const completed = completedByChild(d, s);
+  // Test families too, so one that was just marked stays open (to unmark it)
+  // even while the list hides it.
+  const wide = buildScope(d, { ...f, includeTests: true });
+  const tests = testParents(d);
+  const completed = completedByChild(d, wide);
   const child = new Map(d.children.map((c) => [c.id, c]));
   const name = new Map(d.profiles.map((p) => [p.id, p.fullName.trim().split(/\s+/)[0] || "הורה"]));
 
-  const all = d.parents
-    .filter((p) => s.parentIds.has(p.id))
+  const everyone = d.parents
+    .filter((p) => wide.parentIds.has(p.id))
     .map((p) => {
-      const kidIds = s.childrenOf.get(p.id) ?? [];
+      const kidIds = wide.childrenOf.get(p.id) ?? [];
       const sessions = kidIds.flatMap((k) => completed.get(k) ?? []);
       const last = sessions.reduce<string | null>((a, r) => (a === null || r.startTime > a ? r.startTime : a), null);
       const st = familyStatus(last, d.now);
       const kids = kidIds.map((k) => child.get(k)).filter((c): c is ChildRow => !!c);
       const noWorkoutReason =
-        kids.length === 0 ? "לא הוסיפו ילד" : kids.some((k) => s.user.get(k.id)?.lastSignInAt) ? "עוד לא התאמנו" : "הילד לא נכנס";
+        kids.length === 0 ? "לא הוסיפו ילד" : kids.some((k) => wide.user.get(k.id)?.lastSignInAt) ? "עוד לא התאמנו" : "הילד לא נכנס";
       const row: FamilyRow = {
         id: p.id,
         parentName: name.get(p.id) ?? "הורה",
         kids: kids.map((k) => ({ name: k.nickname, color: k.currentColor })),
         joined: dayLabel(dayKey(p.createdAt)),
-        channel: CHANNEL_LABELS[s.parentChannel.get(p.id) ?? "direct"],
+        channel: CHANNEL_LABELS[wide.parentChannel.get(p.id) ?? "direct"],
         lastWorkout: last ? dayLabel(dayKey(last)) : null,
         ago: last ? agoText(last, d.now) : noWorkoutReason,
         workouts: sessions.length,
         status: st,
+        isTest: tests.has(p.id),
       };
       return { row, sort: last ?? p.createdAt };
     })
     .sort((a, b) => b.sort.localeCompare(a.sort));
+  const all = everyone.filter(({ row }) => s.parentIds.has(row.id));
 
   const counts = { all: all.length, active: 0, risk: 0, inactive: 0, new: 0 };
   for (const { row } of all) counts[row.status] += 1;
   const rows = all.filter(({ row }) => status === "all" || row.status === status).map(({ row }) => row);
 
   let selected: FamilyDetail | null = null;
-  const pick = all.find(({ row }) => row.id === selectedId) ?? (rows[0] ? all.find(({ row }) => row.id === rows[0].id) : undefined);
+  const pick = everyone.find(({ row }) => row.id === selectedId) ?? (rows[0] ? all.find(({ row }) => row.id === rows[0].id) : undefined);
   if (pick) {
     const p = d.parents.find((x) => x.id === pick.row.id)!;
-    const kidIds = s.childrenOf.get(p.id) ?? [];
+    const kidIds = wide.childrenOf.get(p.id) ?? [];
     const result = new Map(d.results.map((r) => [r.sessionId, r]));
     const workout = new Map(d.workouts.map((w) => [w.id, w]));
     const challenge = new Map(d.challenges.map((c) => [c.id, c]));

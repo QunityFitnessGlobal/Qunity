@@ -39,7 +39,7 @@ const text = (value: LocalizedText | string | null | undefined) =>
 
 export const loadAdminDataset = cache(async (): Promise<AdminDataset> => {
   const admin = createAdminClient();
-  const [users, profiles, parents, children, links, levels, workouts, sessions, results, challenges, childChallenges, challengeSessions, tips, questions, visits] =
+  const [users, profiles, parents, children, links, levels, workouts, sessions, results, challenges, childChallenges, challengeSessions, tips, questions, visits, testFamilies] =
     await Promise.all([
       fetchAllUsers(admin),
       fetchAll<{ id: string; full_name: string }>(admin, "users", "id, full_name"),
@@ -105,6 +105,8 @@ export const loadAdminDataset = cache(async (): Promise<AdminDataset> => {
       ),
       // Missing until the site_visits SQL has run: the funnel then simply has no visits line.
       fetchAll<{ created_at: string; source: string | null }>(admin, "site_visits", "created_at, source").catch(() => null),
+      // Empty until the admin_test_families SQL has run.
+      fetchAll<{ parent_id: string }>(admin, "admin_test_families", "parent_id").catch(() => []),
     ]);
 
   return {
@@ -170,6 +172,7 @@ export const loadAdminDataset = cache(async (): Promise<AdminDataset> => {
     questions: questions.map((q) => ({ text: q.text, matched: q.matched_rule_id !== null, rejected: q.rejected, createdAt: q.created_at })),
     visits: visits ? visits.map((v) => ({ createdAt: v.created_at, source: v.source })) : null,
     testEmails: testEmails(),
+    testParentIds: testFamilies.map((t) => t.parent_id),
     pilotStart: /^\d{4}-\d{2}-\d{2}$/.test(process.env.ADMIN_PILOT_START ?? "") ? process.env.ADMIN_PILOT_START! : null,
   };
 });

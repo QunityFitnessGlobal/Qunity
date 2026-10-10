@@ -3,6 +3,7 @@ import { filterQuery } from "@/lib/admin/filters";
 import { availableChannels, familiesView, STAGE_NAMES, type AdminDataset, type AdminFilters, type FamilyStatus } from "@/lib/admin/metrics";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { FAMILY_STATUS_LABELS, Ltr, StageDot, StatusPill } from "@/components/admin/parts";
+import { TestFamilyToggle } from "@/components/admin/TestFamilyToggle";
 
 const COLUMNS = "grid-cols-[1.1fr_1.2fr_.8fr_.9fr_1.05fr_.7fr_1.25fr]";
 
@@ -53,7 +54,7 @@ export function FamiliesSection({ data, filters, status, familyId }: FamiliesSec
           </div>
 
           <div className="overflow-x-auto">
-            <div className="min-w-[720px]">
+            <div className="min-w-[600px]">
               <div className={`grid ${COLUMNS} gap-2 px-2.5 pb-1 text-xs font-semibold text-[#52514e]`}>
                 <span>הורה</span>
                 <span>ילדים ושלב</span>
@@ -75,7 +76,10 @@ export function FamiliesSection({ data, filters, status, familyId }: FamiliesSec
                       aria-current={on ? "true" : undefined}
                       className={`grid ${COLUMNS} items-center gap-2 rounded-[10px] border px-2.5 py-2 text-[13px] ${on ? "border-[#d9b3d4] bg-[#f6eef6]" : "border-transparent hover:bg-[#f6f5f2]"}`}
                     >
-                      <b className="font-semibold">{f.parentName}</b>
+                      <span className="flex flex-wrap items-center gap-1.5">
+                        <b className="font-semibold">{f.parentName}</b>
+                        {f.isTest && <TestChip />}
+                      </span>
                       <span className="flex flex-col gap-0.5">
                         {f.kids.length === 0 && <span className="text-[#898781]">—</span>}
                         {f.kids.map((k, i) => (
@@ -106,7 +110,10 @@ export function FamiliesSection({ data, filters, status, familyId }: FamiliesSec
             <>
               <div className="flex flex-col gap-0.5">
                 <span className="text-xs text-[#52514e]">משפחה</span>
-                <span className="text-xl font-bold">{v.selected.parentName}</span>
+                <span className="flex items-center gap-2 text-xl font-bold">
+                  {v.selected.parentName}
+                  {v.selected.isTest && <TestChip />}
+                </span>
                 <span className="text-[12.5px] text-[#52514e]">
                   הצטרפו ב־{v.selected.joined} · {v.selected.channel}
                 </span>
@@ -127,6 +134,7 @@ export function FamiliesSection({ data, filters, status, familyId }: FamiliesSec
                   </div>
                 ))}
               </div>
+              <TestFamilyToggle key={v.selected.id} parentId={v.selected.id} isTest={v.selected.isTest} />
               <span className="mt-0.5 text-[13px] font-semibold">ציר זמן</span>
               <ol className="flex flex-col">
                 {v.selected.timeline.map((e, i) => (
@@ -147,4 +155,8 @@ export function FamiliesSection({ data, filters, status, familyId }: FamiliesSec
       </div>
     </AdminShell>
   );
+}
+
+function TestChip() {
+  return <span className="rounded-full bg-[#ebe9e3] px-2 py-px text-[11px] font-semibold text-[#52514e]">בדיקה</span>;
 }

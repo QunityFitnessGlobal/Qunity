@@ -110,6 +110,7 @@ function dataset(): AdminDataset {
       { createdAt: daysAgo(40), source: "facebook" },
     ],
     testEmails: ["admin@example.com"],
+    testParentIds: [],
     pilotStart: null,
   };
 }
@@ -190,6 +191,15 @@ describe("admin dashboard metrics", () => {
     expect(v.selected!.timeline[0].text).toContain("איתי");
     expect(v.selected!.timeline.some((e) => e.text === "נועה · שלב חדש: כתום")).toBe(true);
     expect(familiesView(dataset(), F30, "new", null).rows.map((r) => r.parentName)).toEqual(["רון"]);
+  });
+
+  it("leaves out a family marked as a test one, but can still open it", () => {
+    const d = { ...dataset(), testParentIds: ["p2"] };
+    expect(funnelView(d, F30).steps[0].value).toBe(1);
+    const v = familiesView(d, F30, "all", "p2");
+    expect(v.rows.map((r) => r.parentName)).toEqual(["מיכל"]);
+    expect(v.selected).toMatchObject({ parentName: "רון", isTest: true });
+    expect(familiesView(d, { ...F30, includeTests: true }, "all", null).rows.find((r) => r.parentName === "רון")!.isTest).toBe(true);
   });
 
   it("sorts a family by days since the last workout", () => {

@@ -20,10 +20,11 @@ export function isAdminEmail(email: string | null | undefined): boolean {
   return !!email && adminEmails().includes(email.toLowerCase());
 }
 
-// Families left out of the admin dashboard's numbers by default: the admins'
-// own, plus any extra test accounts listed in ADMIN_TEST_EMAILS.
+// Test accounts listed in ADMIN_TEST_EMAILS, left out of the admin
+// dashboard's numbers by default — on top of the families marked "משפחת
+// בדיקה" on the dashboard itself (admin_test_families).
 export function testEmails(): string[] {
-  return [...adminEmails(), ...emailList(process.env.ADMIN_TEST_EMAILS)];
+  return emailList(process.env.ADMIN_TEST_EMAILS);
 }
 
 // Whether the TEMP testing tools (power/level-up previews, workout
