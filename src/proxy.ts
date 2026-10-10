@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { safeNextPath } from "@/lib/safe-next";
 
 // Next.js 16 renamed `middleware.ts` to `proxy.ts` (same mechanism, new name/export).
 export async function proxy(request: NextRequest) {
@@ -46,13 +47,18 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/forgot-password?error=expired", request.url));
   }
 
+  // Signed out: to the login screen, which comes back here afterwards
+  // (?next=) — e.g. a bookmarked /admin.
   if (!user && !isPublicRoute) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    const login = new URL("/login", request.url);
+    if (pathname !== "/dashboard") login.searchParams.set("next", pathname + request.nextUrl.search);
+    return NextResponse.redirect(login);
   }
 
   // Someone already signed in skips the welcome and sign-in screens.
   if (user && (pathname === "/" || pathname === "/login" || pathname === "/signup")) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    const next = pathname === "/login" ? safeNextPath(request.nextUrl.searchParams.get("next")) : null;
+    return NextResponse.redirect(new URL(next ?? "/dashboard", request.url));
   }
 
   return response;

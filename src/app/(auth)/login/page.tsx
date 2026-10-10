@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { logIn } from "@/services/auth";
+import { safeNextPath } from "@/lib/safe-next";
 import { matchErrorKey } from "@/lib/auth-errors";
 import { CHILD_CODE_CHIP, EntryShell, KeyIcon, PRIMARY_BUTTON } from "@/components/entry/EntryShell";
 import { EntryField, PasswordField } from "@/components/entry/EntryField";
@@ -33,7 +34,8 @@ export default function LoginPage() {
 
     try {
       await logIn({ email, password });
-      router.push("/dashboard");
+      // Back to the page that asked for a sign-in, if any (see proxy.ts).
+      router.push(safeNextPath(new URLSearchParams(window.location.search).get("next")) ?? "/dashboard");
       router.refresh();
     } catch (err) {
       const key =
