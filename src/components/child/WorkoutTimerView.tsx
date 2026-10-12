@@ -6,12 +6,14 @@ import { ExerciseDemo } from "@/components/child/ExerciseDemo";
 import { ExerciseImage } from "@/components/child/ExerciseImage";
 import { motionFor } from "@/lib/exercise-motion/library";
 import { formatMinutesSeconds } from "@/lib/format";
+import { BONUS_ROUND_POINTS } from "@/services/points.service";
 import type { Exercise } from "@/lib/types";
 
 const RING_RADIUS = 96;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 // The last seconds of a work phase beat, to pull the child to the finish.
 const FINAL_SECONDS = 3;
+const STAR_PATH = "M10 1.5l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.6-4.1 6.1-.6z";
 
 interface IntervalProgress {
   phase: "work" | "rest";
@@ -40,6 +42,9 @@ interface WorkoutTimerViewProps {
   onPause?: () => void;
   onResume?: () => void;
   error: string | null;
+  // "done": the timer ran out (the screen behind the bonus-round offer).
+  // "bonus": the bonus round — one more work set, its own gold segment.
+  mode?: "normal" | "done" | "bonus";
   // TEMP testing shortcuts, rendered under the finish button.
   children?: ReactNode;
 }
@@ -62,6 +67,7 @@ export function WorkoutTimerView({
   onPause,
   onResume,
   error,
+  mode = "normal",
   children,
 }: WorkoutTimerViewProps) {
   const t = useTranslations("workout");
@@ -73,7 +79,8 @@ export function WorkoutTimerView({
 
   const progress = interval ? interval.phaseRemaining / interval.phaseLength : 1;
   const offset = RING_CIRCUMFERENCE * (1 - progress);
-  const beat = interval?.phase === "work" && interval.phaseRemaining <= FINAL_SECONDS;
+  const beat = mode !== "done" && interval?.phase === "work" && interval.phaseRemaining <= FINAL_SECONDS;
+  const bonus = mode === "bonus";
   // Whether a moving demo is on screen (it stops with the clock).
   const demoShown = resting ? nextMotion !== null : !card && workMotion !== null;
 
@@ -86,7 +93,16 @@ export function WorkoutTimerView({
       <header className="mx-auto flex w-full max-w-sm flex-none flex-col gap-2.5 px-4 pb-3 pt-5">
         <div className="flex items-center justify-between">
           <span className="font-display text-lg font-bold">
-            {interval ? t("setOf", { current: interval.currentSet, total: interval.rounds }) : null}
+            {bonus ? (
+              <span className="inline-flex items-center gap-2">
+                {t("bonus.title")}
+                <span dir="ltr" className="rounded-full bg-reward-gold px-2.5 py-0.5 text-[13px] text-reward-gold-on shadow-[inset_0_-2px_0_#d99a0b]">
+                  +{BONUS_ROUND_POINTS}
+                </span>
+              </span>
+            ) : interval ? (
+              t("setOf", { current: Math.min(interval.currentSet, interval.rounds), total: interval.rounds })
+            ) : null}
           </span>
           {onPause && (
             <button
@@ -101,15 +117,17 @@ export function WorkoutTimerView({
         </div>
         {interval && (
           <div className="flex gap-1.5" aria-hidden>
-            {Array.from({ length: interval.rounds }, (_, i) => i + 1).map((n) => (
+            {Array.from({ length: interval.rounds + (bonus ? 1 : 0) }, (_, i) => i + 1).map((n) => (
               <span
                 key={n}
                 className={`h-2 flex-1 rounded-full ${
-                  n < interval.currentSet
-                    ? "bg-bracelet-orange"
-                    : n === interval.currentSet
-                      ? "bg-skin-accent"
-                      : "bg-skin-line"
+                  n > interval.rounds
+                    ? "bg-reward-gold"
+                    : mode !== "normal" || n < interval.currentSet
+                      ? "bg-bracelet-orange"
+                      : n === interval.currentSet
+                        ? "bg-skin-accent"
+                        : "bg-skin-line"
                 }`}
               />
             ))}
@@ -209,7 +227,9 @@ export function WorkoutTimerView({
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5" role="timer" aria-live="off">
             <span className={`text-[15px] font-bold tracking-wide ${resting ? "text-skin-rest-label" : "text-skin-work-label"}`}>
-              {interval ? t(resting ? "phaseRest" : "phaseWork") : (elapsedLabel ?? t("elapsedLabel"))}
+              {interval
+                ? t(mode === "done" ? "phaseDone" : bonus ? "bonus.phase" : resting ? "phaseRest" : "phaseWork")
+                : (elapsedLabel ?? t("elapsedLabel"))}
             </span>
             <span
               dir="ltr"
@@ -219,6 +239,18 @@ export function WorkoutTimerView({
             </span>
           </div>
         </div>
+
+        {bonus && (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-reward-gold-soft px-3 py-1.5 text-[13px] font-semibold text-reward-gold-ink">
+            <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" aria-hidden>
+              <path d={STAR_PATH} fill="var(--color-reward-gold)" stroke="#d99a0b" strokeWidth={1} />
+            </svg>
+            {t.rich("bonus.note", {
+              points: BONUS_ROUND_POINTS,
+              num: (chunks) => <bdi dir="ltr">{chunks}</bdi>,
+            })}
+          </span>
+        )}
       </main>
 
       <footer className="mx-auto w-full max-w-sm flex-none space-y-2 px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] pt-3">

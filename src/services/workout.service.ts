@@ -204,6 +204,9 @@ export interface CompleteWorkoutResult {
   // A still-open station that just passed (or failed again) reads false, and
   // gets the normal success / below-threshold messaging instead.
   isReplay: boolean;
+  // The part of pointsAwarded the bonus round earned (0 without one), shown
+  // as its own line on the result screen.
+  bonusRoundPoints: number;
   // Workouts done in the workout's stage after this attempt, and whether this
   // attempt is what moved that count up — the result screen animates the
   // stage bar from one to the other.
@@ -254,10 +257,12 @@ export async function completeWorkout(params: {
   recommendedDurationMinutes: number;
   plannedDurationSeconds: number;
   actualDurationSeconds: number;
-  // True for the stage's fixed work/rest timer, which stops by itself — a
-  // child can't go past it, so there's no "trained longer" bonus there;
-  // points scale with the share of it done instead.
+  // True for the stage's fixed work/rest timer, which stops by itself —
+  // points scale with the share of it done. Its only way past the plan is
+  // the bonus round offered when it runs out.
   hasIntervalTimer: boolean;
+  // The child took the bonus round and finished it.
+  bonusRoundDone: boolean;
   answers: WorkoutQuestionnaireAnswers;
 }): Promise<CompleteWorkoutResult> {
   const {
@@ -269,16 +274,20 @@ export async function completeWorkout(params: {
     plannedDurationSeconds,
     actualDurationSeconds,
     hasIntervalTimer,
+    bonusRoundDone,
     answers,
   } = params;
   const supabase = createClient();
 
   const actualDurationMinutes = Math.round(actualDurationSeconds / 60);
-  // Derived from the timer rather than asked, so it can't be misreported.
-  // Only the open-ended count-up clock can run past the recommended time.
-  const trainedLonger = !hasIntervalTimer && actualDurationMinutes > recommendedDurationMinutes;
+  // Derived from the timer rather than asked: the bonus round (offered only
+  // once the whole timer ran out), or the open-ended count-up clock running
+  // past the recommended time.
   const completionPercent = calculateCompletionPercent(actualDurationSeconds, plannedDurationSeconds);
   const passedThreshold = meetsCompletionThreshold(completionPercent);
+  const trainedLonger = hasIntervalTimer
+    ? bonusRoundDone && completionPercent >= 100
+    : actualDurationMinutes > recommendedDurationMinutes;
 
   const { error: resultError } = await supabase.from("workout_results").insert({
     session_id: sessionId,
@@ -378,6 +387,12 @@ export async function completeWorkout(params: {
   if (totalOnlyBreakdown.length > 0) {
     pointsAwarded += await awardPoints(childId, sessionId, totalOnlyBreakdown, { countTowardColor: false });
   }
+  const bonusRoundPoints =
+    hasIntervalTimer && trainedLonger
+      ? [...colorBreakdown, ...totalOnlyBreakdown]
+          .filter((item) => item.reason === "trained_longer")
+          .reduce((sum, item) => sum + item.points, 0)
+      : 0;
 
   if (!advancesColor) {
     const newChallenges = await checkAndAwardChallenges(childId, {
@@ -392,6 +407,7 @@ export async function completeWorkout(params: {
       // already done before — a still-open station that just now passed (or
       // failed again) gets the normal success/below-threshold messaging.
       isReplay: stationAlreadyDone,
+      bonusRoundPoints,
       workoutsCompletedInColor: workoutsCompletedBefore,
       advancedStage: false,
       didLevelUp: false,
@@ -420,6 +436,7 @@ export async function completeWorkout(params: {
     pointsAwarded,
     completionPercent,
     isReplay: false,
+    bonusRoundPoints,
     workoutsCompletedInColor: workoutsCompletedBefore + 1,
     advancedStage: true,
     didLevelUp: progression.didLevelUp,

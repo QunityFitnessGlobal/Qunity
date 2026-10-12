@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/client";
 // the stage's first workout) — not how hard the child says it felt, which
 // children quickly learn to over-report for points.
 export interface WorkoutPointsInput {
+  // Trained past the plan: finished the bonus round the timer offers at its
+  // end (or, on the rare count-up clock, ran past the recommended time).
   trainedLonger: boolean;
   parentTrainedTogether: boolean;
   isFirstWorkoutInColor: boolean;
@@ -15,7 +17,7 @@ export interface PointsBreakdownItem {
 }
 
 export const BASE_POINTS = 20;
-const TRAINED_LONGER_BONUS = 5;
+export const BONUS_ROUND_POINTS = 5;
 const PARENT_TOGETHER_BONUS = 10;
 const FIRST_IN_COLOR_BONUS = 10;
 
@@ -27,7 +29,7 @@ export function calculateWorkoutPoints(input: WorkoutPointsInput): PointsBreakdo
   const breakdown: PointsBreakdownItem[] = [{ points: BASE_POINTS, reason: "base_workout" }];
 
   if (input.trainedLonger) {
-    breakdown.push({ points: TRAINED_LONGER_BONUS, reason: "trained_longer" });
+    breakdown.push({ points: BONUS_ROUND_POINTS, reason: "trained_longer" });
   }
 
   if (input.parentTrainedTogether) {

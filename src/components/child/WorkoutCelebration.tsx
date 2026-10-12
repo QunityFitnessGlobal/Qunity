@@ -204,10 +204,24 @@ export function WorkoutCelebration({
               +{shownPoints}
             </span>
           </div>
-          {result.pointsAwarded > 0 && (
+          {result.pointsAwarded - result.bonusRoundPoints > 0 && (
             <div className="flex justify-between text-sm text-skin-ink-2">
               <span>{t("resultPointsWorkout")}</span>
-              <span dir="ltr" className="font-semibold">+{result.pointsAwarded}</span>
+              <span dir="ltr" className="font-semibold">+{result.pointsAwarded - result.bonusRoundPoints}</span>
+            </div>
+          )}
+          {result.bonusRoundPoints > 0 && (
+            <div
+              className="animate-home-said -mx-2 flex items-center justify-between gap-2 rounded-[10px] bg-reward-gold-soft px-2 py-1.5 text-sm text-[#5c4200]"
+              style={{ animationDelay: "1.2s" }}
+            >
+              <span className="inline-flex items-center gap-1.5 font-semibold">
+                <svg viewBox="0 0 20 20" className="h-4 w-4" aria-hidden>
+                  <path d={STAR_PATH} fill="var(--color-reward-gold)" stroke="#d99a0b" strokeWidth={1} />
+                </svg>
+                {t("bonus.resultLine")}
+              </span>
+              <span dir="ltr" className="font-bold">+{result.bonusRoundPoints}</span>
             </div>
           )}
           {challenges.map((challenge) => (

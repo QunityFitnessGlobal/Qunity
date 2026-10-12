@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/Button";
 import { WorkoutIntro } from "@/components/child/WorkoutIntro";
 import { useReadyCountdown } from "@/components/child/ReadyCountdown";
 import { WorkoutTimerView } from "@/components/child/WorkoutTimerView";
+import { BonusRoundOffer } from "@/components/child/BonusRoundOffer";
 import { ChallengeUnlockedModal } from "@/components/child/ChallengeUnlockedModal";
 import { ChallengeRevealPopup } from "@/components/child/ChallengeRevealPopup";
 import { WorkoutCelebration } from "@/components/child/WorkoutCelebration";
@@ -33,7 +34,7 @@ import {
   unlockWorkoutAudio,
 } from "@/lib/workout-sounds";
 import { FEELING_CODES, type FeelingCode } from "@/lib/workout-labels";
-import type { BraceletColor, Gender, Workout } from "@/lib/types";
+import type { BraceletColor, Exercise, Gender, Workout } from "@/lib/types";
 
 interface WorkoutRunnerProps {
   childId: string;
@@ -59,7 +60,9 @@ interface WorkoutRunnerProps {
   qaToolsAllowed: boolean;
 }
 
-type Stage = "idle" | "running" | "questionnaire" | "power-reveal" | "result";
+// "bonus-offer": the timer ran out and the bonus round is offered; "bonus":
+// the child is doing it.
+type Stage = "idle" | "running" | "bonus-offer" | "bonus" | "questionnaire" | "power-reveal" | "result";
 
 interface IntervalTimerState {
   phase: "work" | "rest";
@@ -139,6 +142,11 @@ function WorkoutRun({
   // A level-up takes over the result screen once its stage bar has filled
   // ("open"); the challenge popups wait until it's closed ("done").
   const [levelUpPhase, setLevelUpPhase] = useState<"pending" | "open" | "done">("pending");
+  // The bonus round: the exercise picked for it, the seconds left, and
+  // whether it was finished (what earns its points).
+  const [bonusExercise, setBonusExercise] = useState<Exercise | null>(null);
+  const [bonusRemaining, setBonusRemaining] = useState(0);
+  const [bonusDone, setBonusDone] = useState(false);
   // TEMP testing shortcuts (Settings › "כלי בדיקה באימון"), read when the
   // workout starts.
   const [qaTools, setQaTools] = useState(false);
@@ -148,6 +156,10 @@ function WorkoutRun({
   const countdown = useReadyCountdown(launchWorkout);
 
   const recommendedDurationMinutes = workout.recommended_duration_minutes ?? 0;
+  // The workout's exercises, each once: what the bonus round can be.
+  const bonusExercises = exercises
+    .map((entry) => entry.exercise)
+    .filter((exercise, i, all) => all.findIndex((e) => e.id === exercise.id) === i);
 
   // Which exercise corresponds to "right now": set 1 before starting, then
   // cycling through the workout's exercise list as timer.currentSet
@@ -205,11 +217,31 @@ function WorkoutRun({
     return () => clearInterval(interval);
   }, [stage, hasIntervalStructure, stopConfirmOpen, paused, intervalWorkSeconds, intervalRestSeconds]);
 
+  // The bonus round's clock: one work set, a second at a time, then on to
+  // the questions with its points earned.
+  useEffect(() => {
+    if (stage !== "bonus" || paused) {
+      return;
+    }
+    const tick = setTimeout(() => {
+      if (bonusRemaining > 1) {
+        setBonusRemaining(bonusRemaining - 1);
+        return;
+      }
+      playWorkoutSound(getWorkoutSoundPreference(), "rest");
+      setBonusRemaining(0);
+      setBonusDone(true);
+      setStage("questionnaire");
+    }, 1000);
+    return () => clearTimeout(tick);
+  }, [stage, paused, bonusRemaining]);
+
   // Cue sound when the timer starts and on each work<->rest switch (chosen in
   // Settings -> "סוג צלצול לאימון"). Driven off the phase changing rather than
   // played inside the timer's state updater, which must stay free of side
-  // effects. The start counts as a change (null -> "work"), so it rings too.
-  const currentPhase = stage === "running" && timer ? timer.phase : null;
+  // effects. The start counts as a change (null -> "work"), so it rings too,
+  // and so does the bonus round's start.
+  const currentPhase = stage === "running" && timer ? timer.phase : stage === "bonus" ? "work" : null;
   const previousPhaseRef = useRef<typeof currentPhase>(null);
   useEffect(() => {
     const previous = previousPhaseRef.current;
@@ -231,10 +263,11 @@ function WorkoutRun({
   }, [leveledUp, levelUpPhase]);
 
   // Time ran out on its own — finish automatically using the full duration,
-  // as opposed to a manual mid-workout "Finish" tap (see handleManualFinish).
+  // as opposed to a manual mid-workout "Finish" tap (see handleManualFinish),
+  // and offer the bonus round.
   useEffect(() => {
     if (stage === "running" && hasIntervalStructure && timer?.totalRemaining === 0) {
-      finishSession(totalDurationSeconds);
+      finishSession(totalDurationSeconds, bonusExercises.length > 0 ? "bonus-offer" : "questionnaire");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timer?.totalRemaining]);
@@ -293,17 +326,32 @@ function WorkoutRun({
       .catch(() => {});
   }
 
-  async function finishSession(actualSeconds: number) {
+  // The session's time is saved as soon as the timer stops, before any
+  // bonus round, so leaving during the offer loses nothing.
+  async function finishSession(actualSeconds: number, next: Stage = "questionnaire") {
     if (!sessionId) return;
     setError(null);
     try {
       await finishWorkoutSession(sessionId, actualSeconds);
       setPaused(false);
       setActualDurationSeconds(actualSeconds);
-      setStage("questionnaire");
+      setStage(next);
     } catch {
       setError(t("finishError"));
     }
+  }
+
+  function startBonusRound(exercise: Exercise) {
+    setBonusExercise(exercise);
+    setBonusRemaining(intervalWorkSeconds ?? 0);
+    setPaused(false);
+    setStage("bonus");
+  }
+
+  // Stopped before the end: on to the questions, without the bonus.
+  function stopBonusRound() {
+    setPaused(false);
+    setStage("questionnaire");
   }
 
   function manualFinishSeconds() {
@@ -341,6 +389,7 @@ function WorkoutRun({
         plannedDurationSeconds,
         actualDurationSeconds,
         hasIntervalTimer: hasIntervalStructure,
+        bonusRoundDone: bonusDone,
         answers: {
           activityReported: "",
           difficultyReported: answers.difficulty,
@@ -452,6 +501,44 @@ function WorkoutRun({
     );
   }
 
+  if ((stage === "bonus-offer" || stage === "bonus") && hasIntervalStructure) {
+    const lastExercise = exercises.length > 0 ? exercises[(intervalRounds - 1) % exercises.length].exercise : null;
+    return stage === "bonus-offer" ? (
+      <>
+        <WorkoutTimerView
+          interval={{ phase: "work", currentSet: intervalRounds, rounds: intervalRounds, phaseRemaining: 0, phaseLength: intervalWorkSeconds }}
+          elapsedSeconds={0}
+          exercise={lastExercise}
+          nextExercise={null}
+          onFinish={() => setStage("questionnaire")}
+          error={error}
+          mode="done"
+        />
+        <BonusRoundOffer
+          exercises={bonusExercises}
+          rounds={intervalRounds}
+          seconds={intervalWorkSeconds}
+          onAccept={startBonusRound}
+          onDecline={() => setStage("questionnaire")}
+        />
+      </>
+    ) : (
+      <WorkoutTimerView
+        interval={{ phase: "work", currentSet: intervalRounds + 1, rounds: intervalRounds, phaseRemaining: bonusRemaining, phaseLength: intervalWorkSeconds }}
+        elapsedSeconds={0}
+        exercise={bonusExercise}
+        nextExercise={null}
+        finishLabel={t("bonus.stop")}
+        onFinish={stopBonusRound}
+        paused={paused}
+        onPause={() => setPaused(true)}
+        onResume={() => setPaused(false)}
+        error={error}
+        mode="bonus"
+      />
+    );
+  }
+
   if (stage === "questionnaire") {
     return (
       <WorkoutCheckin
@@ -475,7 +562,9 @@ function WorkoutRun({
     <div className="flex gap-2">
       <button
         type="button"
-        onClick={() => finishSession(plannedDurationSeconds)}
+        onClick={() =>
+          finishSession(plannedDurationSeconds, hasIntervalStructure && bonusExercises.length > 0 ? "bonus-offer" : "questionnaire")
+        }
         className="flex-1 rounded-md border border-dashed border-zinc-400 bg-white/70 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
       >
         {t("qaFinish100")}

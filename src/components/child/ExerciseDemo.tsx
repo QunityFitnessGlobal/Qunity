@@ -52,6 +52,8 @@ interface ExerciseDemoProps {
   tone?: "work" | "rest";
   // Paused demos hold the moment they reached.
   playing?: boolean;
+  // A video frame frozen on the exercise's telling moment (a picker tile).
+  still?: boolean;
   // Corner labels on the video: the camera angle, and where the feet or
   // hands go.
   showAngle?: boolean;
@@ -70,6 +72,7 @@ export function ExerciseDemo({
   angle = "main",
   tone = "work",
   playing = true,
+  still: stillFrame = false,
   showAngle = true,
   showPrints = true,
   angleBelowTop = false,
@@ -78,7 +81,7 @@ export function ExerciseDemo({
   const t = useTranslations("workout.motion");
   const reduced = useReducedMotion();
   const [ms, setMs] = useState(0);
-  const animate = variant === "video" && playing && !reduced;
+  const animate = variant === "video" && playing && !reduced && !stillFrame;
 
   useEffect(() => {
     if (!animate) return;
@@ -100,7 +103,7 @@ export function ExerciseDemo({
     return () => cancelAnimationFrame(frame);
   }, [animate]);
 
-  const still = variant === "thumb" || reduced;
+  const still = variant === "thumb" || reduced || stillFrame;
   const f = drawFrame(motion, { ms: still ? stillMoment(motion) : ms, angle, variant: variant === "thumb" ? "thumb" : "video" });
   const colors = TONES[tone];
 

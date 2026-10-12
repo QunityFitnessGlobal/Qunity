@@ -191,6 +191,7 @@
     "finish": "סיים",
     "phaseWork": "אימון!",
     "phaseRest": "מנוחה",
+    "phaseDone": "סיימת!",
     "resultBelowThreshold": "השלמת רק {percent}% מהאימון. מתחת ל-60% לא מקבלים נקודות, והאימון הזה יחכה לך שוב בפעם הבאה.",
     "resultReplayPoints": "כל הכבוד על אימון נוסף! הנקודות נוספו לנקודות שכבר יש לך.",
     "resultReplayNoPoints": "כל הכבוד על אימון נוסף! ההתמדה שלך מחזקת אותך.",
@@ -251,6 +252,19 @@
       "position": {
         "belly": "על הבטן"
       }
+    },
+    "bonus": {
+      "allSetsDone": "סיימת את כל {rounds} הסטים!",
+      "offerTitle": "רוצה עוד סבב בונוס?",
+      "offerText": "עוד {seconds} שניות של תרגיל שבוחרים. מסיימים את הסבב ומקבלים <b><num>+{points}</num> נקודות</b>.",
+      "pickLabel": "איזה תרגיל?",
+      "accept": "כן, עוד סבב!",
+      "decline": "לא תודה, סיימתי",
+      "title": "סבב בונוס",
+      "phase": "סבב בונוס!",
+      "note": "מסיימים את הסבב ומקבלים <num>+{points}</num> נקודות",
+      "stop": "לעצור בלי הבונוס",
+      "resultLine": "סבב בונוס"
     }
   },
   "dashboard": {

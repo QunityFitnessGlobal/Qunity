@@ -191,6 +191,7 @@
     "finish": "Finish",
     "phaseWork": "Work!",
     "phaseRest": "Rest",
+    "phaseDone": "Done!",
     "resultBelowThreshold": "You completed only {percent}% of the workout. Below 60% there are no points, and this workout will be waiting for you next time.",
     "resultReplayPoints": "Great job on another workout! The points were added to the points you already have.",
     "resultReplayNoPoints": "Great job on another workout! Your persistence is making you stronger.",
@@ -251,6 +252,19 @@
       "position": {
         "belly": "On the belly"
       }
+    },
+    "bonus": {
+      "allSetsDone": "You finished all {rounds} sets!",
+      "offerTitle": "One more bonus round?",
+      "offerText": "{seconds} more seconds of an exercise you pick. Finish the round and get <b><num>+{points}</num> points</b>.",
+      "pickLabel": "Which exercise?",
+      "accept": "Yes, one more!",
+      "decline": "No thanks, I'm done",
+      "title": "Bonus round",
+      "phase": "Bonus round!",
+      "note": "Finish the round and get <num>+{points}</num> points",
+      "stop": "Stop without the bonus",
+      "resultLine": "Bonus round"
     }
   },
   "dashboard": {
