@@ -337,7 +337,6 @@ function WorkoutRun({
         sessionId,
         beltColor: color,
         stationNumber: replayStation ?? workoutIndex,
-        recommendedDifficulty: workout.recommended_difficulty ?? 1,
         recommendedDurationMinutes,
         plannedDurationSeconds,
         actualDurationSeconds,

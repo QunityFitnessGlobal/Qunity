@@ -1,9 +1,10 @@
 import { createClient } from "@/lib/supabase/client";
 
+// Only what the app measures earns a bonus (time, a parent training along,
+// the stage's first workout) — not how hard the child says it felt, which
+// children quickly learn to over-report for points.
 export interface WorkoutPointsInput {
   trainedLonger: boolean;
-  difficultyReported: number;
-  recommendedDifficulty: number;
   parentTrainedTogether: boolean;
   isFirstWorkoutInColor: boolean;
 }
@@ -15,7 +16,6 @@ export interface PointsBreakdownItem {
 
 export const BASE_POINTS = 20;
 const TRAINED_LONGER_BONUS = 5;
-const HARDER_THAN_RECOMMENDED_BONUS = 5;
 const PARENT_TOGETHER_BONUS = 10;
 const FIRST_IN_COLOR_BONUS = 10;
 
@@ -28,13 +28,6 @@ export function calculateWorkoutPoints(input: WorkoutPointsInput): PointsBreakdo
 
   if (input.trainedLonger) {
     breakdown.push({ points: TRAINED_LONGER_BONUS, reason: "trained_longer" });
-  }
-
-  if (input.difficultyReported > input.recommendedDifficulty) {
-    breakdown.push({
-      points: HARDER_THAN_RECOMMENDED_BONUS,
-      reason: "harder_than_recommended",
-    });
   }
 
   if (input.parentTrainedTogether) {

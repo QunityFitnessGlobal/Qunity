@@ -251,7 +251,6 @@ export async function completeWorkout(params: {
   sessionId: string;
   beltColor: BraceletColor;
   stationNumber: number;
-  recommendedDifficulty: number;
   recommendedDurationMinutes: number;
   plannedDurationSeconds: number;
   actualDurationSeconds: number;
@@ -266,7 +265,6 @@ export async function completeWorkout(params: {
     sessionId,
     beltColor,
     stationNumber,
-    recommendedDifficulty,
     recommendedDurationMinutes,
     plannedDurationSeconds,
     actualDurationSeconds,
@@ -352,8 +350,6 @@ export async function completeWorkout(params: {
 
   const breakdown = calculateWorkoutPoints({
     trainedLonger,
-    difficultyReported: answers.difficultyReported,
-    recommendedDifficulty,
     parentTrainedTogether: answers.parentTrainedTogether,
     isFirstWorkoutInColor,
   });

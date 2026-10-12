@@ -38,9 +38,9 @@ interface WorkoutCheckinProps {
 }
 
 // The questionnaire after a workout: three questions answered by tapping,
-// with nothing pre-selected — the answers feed the points (harder than
-// recommended, trained together) and the closing line on the result
-// screen, so a guessed default would skew both. The button stays closed
+// with nothing pre-selected — the answers feed the points (trained
+// together), the parent's reports (how hard it felt) and the closing line
+// on the result screen, so a guessed default would skew them. The button stays closed
 // until all three are answered and says how many are left.
 export function WorkoutCheckin({
   actualDurationSeconds,

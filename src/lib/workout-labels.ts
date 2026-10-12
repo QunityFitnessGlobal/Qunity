@@ -3,9 +3,8 @@
 // WorkoutHistoryView), so the ordinal<->word and code<->label mappings only
 // live in one place.
 
-// difficulty_reported: 1-4 ordinal (קליל/בינוני/מאתגר/קשה מאוד). The
-// existing recommended_difficulty bonus comparison (points.service.ts) just
-// compares these ordinals, so it keeps working unchanged.
+// difficulty_reported: 1-4 ordinal (קליל/בינוני/מאתגר/קשה מאוד). It earns
+// no points (see points.service.ts) — it's for the parent's reports and tips.
 export const DIFFICULTY_VALUES = [1, 2, 3, 4] as const;
 export type DifficultyValue = (typeof DIFFICULTY_VALUES)[number];
 export const DIFFICULTY_LABEL_KEYS: Record<DifficultyValue, string> = {

@@ -2,16 +2,15 @@
 -- Run once in the SQL Editor, after supabase/schema.sql (including the
 -- Prompt 2/7 addition) has already been applied.
 
--- required_points is 1.5x (base_points=20 per workout * required_workouts),
--- not an exact match — see the "ADDED FOR POINTS HEADROOM" note in
--- schema.sql for why an exact match causes the "0 points left" display to
--- show before all required_workouts are actually done.
+-- required_points is exactly what the stage's workouts are worth (20 each)
+-- — see the 'ADDED FOR "ALL THE WORKOUTS DONE = NEXT STAGE"' note in
+-- schema.sql.
 insert into public.bracelet_levels (color, order_index, required_workouts, required_points) values
-  ('white',  1, 10, 300),
-  ('orange', 2, 14, 420),
-  ('green',  3, 18, 540),
-  ('blue',   4, 22, 660),
-  ('purple', 5, 26, 780);
+  ('white',  1, 10, 200),
+  ('orange', 2, 14, 280),
+  ('green',  3, 18, 360),
+  ('blue',   4, 22, 440),
+  ('purple', 5, 26, 520);
 
 insert into public.workouts (title, description, recommended_duration_minutes, recommended_difficulty, color, order_in_color) values
   ('קפיצות במקום', 'חימום קליל עם קפיצות פישוק במקום.', 10, 1, 'white', 1),
