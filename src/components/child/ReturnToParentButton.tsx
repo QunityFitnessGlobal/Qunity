@@ -111,7 +111,7 @@ function ParentPinDialog({ onClose }: { onClose: () => void }) {
 
   return (
     <SettingsDialog title={t("returnTitle")} icon={SettingsIcons.lock}>
-      <p className="-mt-1 text-sm text-[#6c6580]">{t("returnDescription")}</p>
+      <p className="-mt-1 text-sm text-skin-muted">{t("returnDescription")}</p>
 
       <div
         key={attempt}
@@ -129,19 +129,19 @@ function ParentPinDialog({ onClose }: { onClose: () => void }) {
                 error
                   ? "border-[#f5a3a8] bg-[#fff5f5]"
                   : filled
-                    ? "animate-power-badge-pop border-brand-purple bg-brand-purple/[0.06]"
+                    ? "animate-power-badge-pop border-skin-accent bg-skin-accent/[0.06]"
                     : i === pin.length
-                      ? "border-reward-gold bg-[#faf8fc]"
-                      : "border-[#e4dfeb] bg-[#faf8fc]"
+                      ? "border-reward-gold bg-skin-page-solid"
+                      : "border-skin-line bg-skin-page-solid"
               }`}
             >
-              {filled && <span className="h-3.5 w-3.5 rounded-full bg-brand-purple" />}
+              {filled && <span className="h-3.5 w-3.5 rounded-full bg-skin-accent" />}
             </span>
           );
         })}
       </div>
       <span
-        className={`min-h-[18px] text-[13px] ${error ? "font-semibold text-red-600" : "text-[#8a8399]"}`}
+        className={`min-h-[18px] text-[13px] ${error ? "font-semibold text-red-600" : "text-skin-faint"}`}
         role={error ? "alert" : undefined}
         aria-live="polite"
       >
@@ -159,7 +159,7 @@ function ParentPinDialog({ onClose }: { onClose: () => void }) {
               onClick={() => press(key)}
               disabled={loading}
               aria-label={key === "del" ? tPair("delete") : key}
-              className="h-[54px] w-[76px] rounded-2xl bg-[#f4f2f7] font-display text-2xl font-semibold text-[#221a33] transition-transform active:scale-90 disabled:opacity-60"
+              className="h-[54px] w-[76px] rounded-2xl bg-skin-surface-2 font-display text-2xl font-semibold text-skin-ink transition-transform active:scale-90 disabled:opacity-60"
             >
               {key === "del" ? "⌫" : key}
             </button>

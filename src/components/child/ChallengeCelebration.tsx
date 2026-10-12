@@ -64,14 +64,14 @@ export function ChallengeCelebration({
         </div>
       </div>
 
-      <p className="animate-power-fade-up text-center text-[15px] text-zinc-600" style={delay(0.6)}>
+      <p className="animate-power-fade-up text-center text-[15px] text-skin-ink-2" style={delay(0.6)}>
         {t("finishedIn", durationParts(durationSeconds))}
       </p>
 
       {pointsAwarded > 0 ? (
         <section
           className={`animate-power-fade-up flex items-center justify-between rounded-2xl px-4 py-3 ${
-            full ? "bg-reward-gold-soft" : "border border-[#f3e3b5] bg-white"
+            full ? "bg-reward-gold-soft" : "border border-[#f3e3b5] bg-skin-surface"
           }`}
           style={delay(0.75)}
         >
@@ -79,25 +79,25 @@ export function ChallengeCelebration({
             <span className={`text-[15px] font-semibold ${full ? "text-reward-gold-on" : ""}`}>
               {full ? t("fullPoints") : t("pointsTitle")}
             </span>
-            {!full && <span className="text-[13px] text-text-muted">{t("pointsOutOf", { max: maxPoints })}</span>}
+            {!full && <span className="text-[13px] text-skin-muted">{t("pointsOutOf", { max: maxPoints })}</span>}
           </span>
-          <span dir="ltr" className="font-display text-[34px] font-bold tabular-nums text-reward-gold-ink">
+          <span dir="ltr" className={`font-display text-[34px] font-bold tabular-nums ${full ? "text-reward-gold-ink" : "text-skin-gold-ink"}`}>
             +{shownPoints}
           </span>
         </section>
       ) : (
         <section
-          className="animate-power-fade-up flex flex-col gap-0.5 rounded-2xl border border-zinc-200 bg-white px-4 py-3"
+          className="animate-power-fade-up flex flex-col gap-0.5 rounded-2xl border border-skin-line bg-skin-surface px-4 py-3"
           style={delay(0.75)}
         >
           <span className="text-[15px] font-semibold">{t("noPointsTitle")}</span>
-          <span className="text-[13px] text-text-muted">{t("noPointsNote")}</span>
+          <span className="text-[13px] text-skin-muted">{t("noPointsNote")}</span>
         </section>
       )}
 
       {best !== null && (
         <section
-          className="animate-power-fade-up flex items-center justify-between gap-3 rounded-2xl border border-zinc-200 bg-white px-4 py-3"
+          className="animate-power-fade-up flex items-center justify-between gap-3 rounded-2xl border border-skin-line bg-skin-surface px-4 py-3"
           style={delay(0.9)}
         >
           <span className="inline-flex items-center gap-2 text-[15px] font-semibold">
@@ -108,18 +108,18 @@ export function ChallengeCelebration({
               </span>
             )}
           </span>
-          <span className="font-display text-xl font-bold text-reward-gold-ink">{t("bestPoints", { points: best })}</span>
+          <span className="font-display text-xl font-bold text-skin-gold-ink">{t("bestPoints", { points: best })}</span>
         </section>
       )}
 
       <section
-        className="animate-power-fade-up flex items-start gap-2.5 rounded-2xl bg-brand-purple/[0.07] px-3.5 py-3"
+        className="animate-power-fade-up flex items-start gap-2.5 rounded-2xl bg-skin-accent/[0.07] px-3.5 py-3"
         style={delay(1.1)}
       >
-        <svg viewBox="0 0 20 20" className="mt-0.5 h-5 w-5 flex-none text-brand-purple" fill="currentColor" aria-hidden>
+        <svg viewBox="0 0 20 20" className="mt-0.5 h-5 w-5 flex-none text-skin-accent-ink" fill="currentColor" aria-hidden>
           <path d="M10 17.5s-6.5-4-6.5-9.2A3.7 3.7 0 0110 6.1a3.7 3.7 0 016.5 2.2c0 5.2-6.5 9.2-6.5 9.2z" />
         </svg>
-        <p className="text-sm leading-relaxed text-[#4a1c44]">{tWorkout(EMPOWER_KEYS[feeling], { gender: genderForm })}</p>
+        <p className="text-sm leading-relaxed text-skin-accent-deep">{tWorkout(EMPOWER_KEYS[feeling], { gender: genderForm })}</p>
       </section>
 
       <div className="mt-1 space-y-2">
@@ -133,7 +133,7 @@ export function ChallengeCelebration({
         <button
           type="button"
           onClick={onBack}
-          className="block min-h-12 w-full rounded-2xl border border-zinc-200 bg-white font-display text-base font-semibold text-zinc-800 hover:bg-zinc-50"
+          className="block min-h-12 w-full rounded-2xl border border-skin-line bg-skin-surface font-display text-base font-semibold text-skin-ink hover:bg-skin-surface-2"
         >
           {t("backToChallenges")}
         </button>

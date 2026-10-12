@@ -60,12 +60,12 @@ export function ChallengesTabs({ completed, pending, canPerform = false, viewerI
 
   return (
     <div className="w-full max-w-sm">
-      <div className="mb-4 flex gap-1 rounded-2xl border border-zinc-200 p-1">
+      <div className="mb-4 flex gap-1 rounded-2xl border border-skin-line bg-skin-surface p-1">
         <button
           type="button"
           onClick={handleDoneTabClick}
           className={`relative flex-1 rounded-xl py-2 text-sm font-medium transition-colors ${
-            tab === "done" ? "bg-brand-purple/10 font-semibold text-brand-purple" : "text-text-muted"
+            tab === "done" ? "bg-skin-accent/10 font-semibold text-skin-accent-ink" : "text-skin-muted"
           }`}
         >
           {t("doneTab")}
@@ -82,7 +82,7 @@ export function ChallengesTabs({ completed, pending, canPerform = false, viewerI
           type="button"
           onClick={() => setTab("todo")}
           className={`flex-1 rounded-xl py-2 text-sm font-medium transition-colors ${
-            tab === "todo" ? "bg-brand-purple/10 font-semibold text-brand-purple" : "text-text-muted"
+            tab === "todo" ? "bg-skin-accent/10 font-semibold text-skin-accent-ink" : "text-skin-muted"
           }`}
         >
           {t("todoTab")}
@@ -91,11 +91,11 @@ export function ChallengesTabs({ completed, pending, canPerform = false, viewerI
 
       {tab === "done" && (
         <div className="space-y-2">
-          {completed.length === 0 && <p className="text-sm text-text-muted">{t("emptyDone")}</p>}
+          {completed.length === 0 && <p className="text-sm text-skin-muted">{t("emptyDone")}</p>}
           {completed.map((entry) => (
             <div
               key={entry.id}
-              className="flex items-center gap-3 rounded-2xl border border-zinc-200 bg-white px-3.5 py-3"
+              className="flex items-center gap-3 rounded-2xl border border-skin-line bg-skin-surface px-3.5 py-3"
             >
               <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-reward-gold-soft text-reward-gold-ink">
                 <StarIcon className="h-5 w-5" />
@@ -104,7 +104,7 @@ export function ChallengesTabs({ completed, pending, canPerform = false, viewerI
                 <p className="truncate font-display text-[15px] font-medium">
                   {resolveLocalizedText(entry.title, locale)}
                 </p>
-                <p className="text-xs text-text-muted tabular-nums">
+                <p className="text-xs text-skin-muted tabular-nums">
                   {entry.completedAt ? new Date(entry.completedAt).toLocaleDateString(locale) : ""}
                   {entry.durationSeconds != null && ` · ${formatDurationClock(entry.durationSeconds)}`}
                 </p>
@@ -124,12 +124,12 @@ export function ChallengesTabs({ completed, pending, canPerform = false, viewerI
 
       {tab === "todo" && (
         <div className="space-y-2">
-          {pending.length === 0 && fresh.length === 0 && <p className="text-sm text-text-muted">{t("emptyTodo")}</p>}
+          {pending.length === 0 && fresh.length === 0 && <p className="text-sm text-skin-muted">{t("emptyTodo")}</p>}
           {open.map((entry) => {
             return (
-              <div key={entry.challengeId} className="rounded-2xl border border-zinc-200 bg-white p-3">
+              <div key={entry.challengeId} className="rounded-2xl border border-skin-line bg-skin-surface p-3">
                 <div className="flex items-start gap-3">
-                  <span className="flex h-11 w-11 flex-none items-center justify-center rounded-xl bg-brand-purple/10 text-brand-purple">
+                  <span className="flex h-11 w-11 flex-none items-center justify-center rounded-xl bg-skin-accent/10 text-skin-accent-ink">
                     <ChallengeIcon conditionType={null} challengeType={entry.challengeType} className="h-5 w-5" />
                   </span>
                   <div className="min-w-0 flex-1">
@@ -138,16 +138,16 @@ export function ChallengesTabs({ completed, pending, canPerform = false, viewerI
                         <p className="truncate font-display text-[15px] font-semibold">
                           {resolveLocalizedText(entry.title, locale)}
                         </p>
-                        <p className="mt-1 text-xs text-text-muted">
+                        <p className="mt-1 text-xs text-skin-muted">
                           {t("completedTimes", { count: entry.completionCount })}
                         </p>
                       </div>
-                      <span className="whitespace-nowrap rounded-full bg-brand-purple/10 px-2.5 py-1 font-display text-xs font-semibold text-brand-purple">
+                      <span className="whitespace-nowrap rounded-full bg-skin-accent/10 px-2.5 py-1 font-display text-xs font-semibold text-skin-accent-ink">
                         {t("perCompletion", { points: entry.bonusPoints })}
                       </span>
                     </div>
                     {entry.unlockColor && (
-                      <div className="mt-2 flex items-center gap-1 text-xs text-text-muted">
+                      <div className="mt-2 flex items-center gap-1 text-xs text-skin-muted">
                         {(() => {
                           const PowerIcon = POWER_ICON[entry.unlockColor];
                           return <PowerIcon className="h-3.5 w-3.5" />;
@@ -188,7 +188,7 @@ export function ChallengesTabs({ completed, pending, canPerform = false, viewerI
 
           {locked.length > 0 && (
             <>
-              <p className="pt-1 text-xs font-medium text-text-muted">
+              <p className="pt-1 text-xs font-medium text-skin-muted">
                 {t("lockedGroup", { count: locked.length })}
               </p>
               {locked.map((entry) => (

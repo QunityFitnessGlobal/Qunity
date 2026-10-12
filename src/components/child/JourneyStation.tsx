@@ -51,14 +51,14 @@ export function JourneyStation({
   const isCurrent = state === "current";
   const isDone = state === "done";
   const circleSize = isCurrent ? "h-16 w-16" : "h-12 w-12";
-  const emphasis = isCurrent ? "ring-4 ring-brand-purple ring-offset-2" : "";
+  const emphasis = isCurrent ? "ring-4 ring-skin-accent ring-offset-2 ring-offset-skin-surface" : "";
   // Locked stations are solid light gray, not a dimmed/transparent version
   // of the belt color — opacity would let the road SVG underneath show
   // through the circle, which looked broken for the whole "future" stretch
   // of the path. A colored border (rather than a colored fill) still shows
   // which belt a locked station belongs to.
   const isLocked = state === "locked";
-  const fillClass = isLocked ? "bg-zinc-300" : BRACELET_BADGE_CLASSES[beltColor];
+  const fillClass = isLocked ? "bg-skin-locked text-skin-locked-ink" : `${BRACELET_BADGE_CLASSES[beltColor]} text-zinc-800`;
   const lockedBorderStyle: CSSProperties = isLocked
     ? { borderWidth: 3, borderStyle: "solid", borderColor: BRACELET_CSS_VAR[beltColor] }
     : {};
@@ -73,7 +73,7 @@ export function JourneyStation({
       {isCurrent && (
         <span
           aria-hidden
-          className="pointer-events-none absolute left-0 top-0 h-16 w-16 rounded-full bg-brand-purple animate-journey-pulse-ring"
+          className="pointer-events-none absolute left-0 top-0 h-16 w-16 rounded-full bg-skin-accent animate-journey-pulse-ring"
         />
       )}
       <button
@@ -81,7 +81,7 @@ export function JourneyStation({
         onClick={handleClick}
         aria-label={title}
         style={lockedBorderStyle}
-        className={`relative flex ${circleSize} items-center justify-center rounded-full font-bold text-zinc-800 transition-transform ${depthClass} ${fillClass} ${emphasis} ${arrivalClass} ${
+        className={`relative flex ${circleSize} items-center justify-center rounded-full font-bold transition-transform ${depthClass} ${fillClass} ${emphasis} ${arrivalClass} ${
           showLockedHint ? "animate-journey-shake" : ""
         }`}
       >
@@ -103,7 +103,7 @@ export function JourneyStation({
           </span>
         )}
         {isCurrent && (
-          <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-brand-purple text-white">
+          <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-skin-accent text-white">
             <PlayIcon className="h-3 w-3" />
           </span>
         )}

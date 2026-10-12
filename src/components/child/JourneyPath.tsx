@@ -32,7 +32,7 @@ function centerYOffset(item: JourneyRenderItem): number {
 // Bracelet white is nearly invisible on the white page, so anything drawn in
 // the stage's color uses the dark outline shade for white instead.
 function visibleStageColor(color: BraceletColor): string {
-  return color === "white" ? "var(--color-bracelet-white-outline)" : BRACELET_CSS_VAR[color];
+  return color === "white" ? "var(--skin-stage-white)" : BRACELET_CSS_VAR[color];
 }
 
 // The "you are here" marker sits beside the current workout (on whichever
@@ -85,7 +85,7 @@ export function JourneyPath({ childId, gender, childInitial, items, contentHeigh
   const markerOnLeft = current ? current.left >= pathWidth / 2 : false;
 
   return (
-    <div className="w-full bg-white" style={{ height: contentHeight }}>
+    <div className="w-full bg-skin-canvas" style={{ height: contentHeight }}>
       <div className="relative mx-auto h-full" style={{ width: pathWidth }}>
         <svg
           className="absolute left-0 top-0"
@@ -97,7 +97,7 @@ export function JourneyPath({ childId, gender, childInitial, items, contentHeigh
           <polyline
             points={points.join(" ")}
             fill="none"
-            stroke="#e4e4e7"
+            stroke="var(--skin-road)"
             strokeWidth={18}
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -105,7 +105,7 @@ export function JourneyPath({ childId, gender, childInitial, items, contentHeigh
           <polyline
             points={points.join(" ")}
             fill="none"
-            stroke="#ffffff"
+            stroke="var(--skin-road-dash)"
             strokeWidth={2}
             strokeDasharray="6 9"
             strokeLinecap="round"
@@ -194,11 +194,11 @@ export function JourneyPath({ childId, gender, childInitial, items, contentHeigh
             }}
           >
             <div className="flex flex-col items-center gap-1 animate-journey-bob">
-              <span className="whitespace-nowrap rounded-full bg-brand-purple px-2.5 py-0.5 text-xs font-bold text-white">
+              <span className="whitespace-nowrap rounded-full bg-skin-accent px-2.5 py-0.5 text-xs font-bold text-white">
                 {t("youAreHere", { gender: gender ?? "male" })}
               </span>
               <span
-                className="relative flex h-10 w-10 items-center justify-center rounded-full border-[3px] bg-white font-display text-lg font-semibold text-zinc-700 shadow-md"
+                className="relative flex h-10 w-10 items-center justify-center rounded-full border-[3px] bg-skin-surface font-display text-lg font-semibold text-skin-ink-2 shadow-md"
                 style={{ borderColor: visibleStageColor(currentStageColor) }}
               >
                 {childInitial ??

@@ -5,9 +5,21 @@ import { useTranslations } from "next-intl";
 import { drawFrame, stillMoment, type ExerciseMotion } from "@/lib/exercise-motion/engine";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
+// The room the figure stands in, in the child's skin (see globals.css's
+// --skin-demo-*; the defaults are the regular look).
 const TONES = {
-  work: { wall: "#f4f0f8", floor: "#e9e2f1", edge: "#d9cfe6", mat: "#d8c9ea" },
-  rest: { wall: "#eef3ff", floor: "#e1e9fb", edge: "#cddbf6", mat: "#c9d8f7" },
+  work: {
+    wall: "var(--skin-demo-wall)",
+    floor: "var(--skin-demo-floor)",
+    edge: "var(--skin-demo-edge)",
+    mat: "var(--skin-demo-mat)",
+  },
+  rest: {
+    wall: "var(--skin-demo-rest-wall)",
+    floor: "var(--skin-demo-rest-floor)",
+    edge: "var(--skin-demo-rest-edge)",
+    mat: "var(--skin-demo-rest-mat)",
+  },
 };
 
 // Footprint / handprint seen from above, toes or fingers up (a left one;

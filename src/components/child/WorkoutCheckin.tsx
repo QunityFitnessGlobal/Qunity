@@ -71,11 +71,11 @@ export function WorkoutCheckin({
     <div className="w-full max-w-sm space-y-4 text-right">
       <div className="space-y-1">
         <h1 className="font-display text-3xl font-bold">{t("title")}</h1>
-        <p className="text-sm text-text-muted">{t("subtitle")}</p>
+        <p className="text-sm text-skin-muted">{t("subtitle")}</p>
       </div>
 
-      <div className="flex items-start gap-2.5 rounded-2xl border border-zinc-200 bg-white px-3.5 py-2.5">
-        <svg viewBox="0 0 20 20" className="mt-0.5 h-5 w-5 flex-none text-green-700" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" aria-hidden>
+      <div className="flex items-start gap-2.5 rounded-2xl border border-skin-line bg-skin-surface px-3.5 py-2.5">
+        <svg viewBox="0 0 20 20" className="mt-0.5 h-5 w-5 flex-none text-skin-work-label" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" aria-hidden>
           <circle cx="10" cy="10" r="7.5" />
           <path d="M10 6v4.2l2.5 1.7" />
         </svg>
@@ -108,7 +108,7 @@ export function WorkoutCheckin({
                 aria-pressed={on}
                 onClick={() => setDifficulty(level)}
                 className={`flex min-h-[72px] flex-col items-center justify-center gap-1.5 rounded-2xl border-2 text-[13px] font-semibold transition-colors ${
-                  on ? "animate-checkin-pick border-brand-purple bg-brand-purple text-white" : "border-zinc-200 bg-white text-zinc-800"
+                  on ? "animate-checkin-pick border-skin-accent bg-skin-accent text-white" : "border-skin-line bg-skin-surface text-skin-ink"
                 }`}
               >
                 <span className="flex h-5 items-end gap-[3px]" aria-hidden>
@@ -116,7 +116,7 @@ export function WorkoutCheckin({
                     <span
                       key={bar}
                       className={`w-[5px] rounded-sm ${
-                        bar <= level ? (on ? "bg-white" : "bg-brand-purple") : on ? "bg-white/35" : "bg-zinc-200"
+                        bar <= level ? (on ? "bg-white" : "bg-skin-accent") : on ? "bg-white/35" : "bg-skin-line"
                       }`}
                       style={{ height: 2 + bar * 4 }}
                     />
@@ -139,10 +139,10 @@ export function WorkoutCheckin({
             className={`flex min-h-[76px] items-center justify-center gap-2.5 rounded-2xl border-2 transition-colors ${
               trainedTogether === true
                 ? "animate-checkin-pick border-reward-gold bg-reward-gold-soft"
-                : "border-zinc-200 bg-white"
+                : "border-skin-line bg-skin-surface"
             }`}
           >
-            <svg width="40" height="30" viewBox="0 0 40 30" fill="none" stroke="#4f4960" strokeWidth={1.8} strokeLinecap="round" aria-hidden>
+            <svg width="40" height="30" viewBox="0 0 40 30" fill="none" stroke="var(--skin-ink-2)" strokeWidth={1.8} strokeLinecap="round" aria-hidden>
               <circle cx="10" cy="7" r="3.2" />
               <path d="M10 11v9M10 20l-3.5 7M10 20l3.5 7M4.5 14.5h11" />
               <circle cx="29" cy="9" r="2.6" />
@@ -156,10 +156,10 @@ export function WorkoutCheckin({
             aria-pressed={trainedTogether === false}
             onClick={() => setTrainedTogether(false)}
             className={`flex min-h-[76px] items-center justify-center gap-2.5 rounded-2xl border-2 transition-colors ${
-              trainedTogether === false ? "border-brand-purple bg-brand-purple/[0.07]" : "border-zinc-200 bg-white"
+              trainedTogether === false ? "border-skin-accent bg-skin-accent/[0.07]" : "border-skin-line bg-skin-surface"
             }`}
           >
-            <svg width="22" height="30" viewBox="0 0 22 30" fill="none" stroke="#4f4960" strokeWidth={1.8} strokeLinecap="round" aria-hidden>
+            <svg width="22" height="30" viewBox="0 0 22 30" fill="none" stroke="var(--skin-ink-2)" strokeWidth={1.8} strokeLinecap="round" aria-hidden>
               <circle cx="11" cy="7" r="3.2" />
               <path d="M11 11v9M11 20l-3.5 7M11 20l3.5 7M5.5 14.5h11" />
             </svg>
@@ -206,7 +206,7 @@ export function WorkoutCheckin({
         onClick={handleSubmit}
         className={`block min-h-14 w-full rounded-2xl font-display text-lg font-semibold transition-[transform,box-shadow] ${
           answersLeft > 0
-            ? "cursor-not-allowed bg-zinc-200 text-zinc-600"
+            ? "cursor-not-allowed bg-skin-line text-skin-ink-2"
             : "animate-go-pulse bg-green-600 text-white shadow-[0_4px_0_theme(colors.green.800)] hover:bg-green-700 active:translate-y-[3px] disabled:cursor-wait disabled:opacity-70"
         }`}
       >
@@ -229,7 +229,7 @@ interface TimeFeedbackProps {
 function TimeFeedback({ actualSeconds, plannedSeconds, hasIntervalTimer, recommendedMinutes }: TimeFeedbackProps) {
   const t = useTranslations("checkin");
   const tWorkout = useTranslations("workout");
-  const praise = "text-[13px] font-semibold text-green-700";
+  const praise = "text-[13px] font-semibold text-skin-work-label";
   const style = { ["--power-fade-delay" as string]: "0.3s" } as CSSProperties;
 
   if (!hasIntervalTimer) {
@@ -258,7 +258,7 @@ function TimeFeedback({ actualSeconds, plannedSeconds, hasIntervalTimer, recomme
     const unit = missingSeconds < 60 ? "seconds" : Math.ceil(missingSeconds / 60) === 1 ? "minute" : "minutes";
     const count = missingSeconds < 60 ? missingSeconds : Math.ceil(missingSeconds / 60);
     return (
-      <span className="animate-power-fade-up text-[13px] font-semibold text-brand-purple" style={style}>
+      <span className="animate-power-fade-up text-[13px] font-semibold text-skin-accent-ink" style={style}>
         {t("belowThreshold", { unit, count })}
       </span>
     );

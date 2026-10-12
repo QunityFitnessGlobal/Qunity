@@ -417,7 +417,7 @@ function WorkoutRun({
           <button
             type="button"
             onClick={() => router.push("/dashboard/journey")}
-            className="block min-h-12 w-full rounded-2xl border border-zinc-200 bg-white font-display text-base font-semibold text-zinc-800 hover:bg-zinc-50"
+            className="block min-h-12 w-full rounded-2xl border border-skin-line bg-skin-surface font-display text-base font-semibold text-skin-ink hover:bg-skin-surface-2"
           >
             {t("finishSession")}
           </button>
@@ -525,7 +525,7 @@ function WorkoutRun({
 
         {stopConfirmOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-            <div className="w-full max-w-xs space-y-4 rounded-2xl bg-white p-5 text-center">
+            <div className="w-full max-w-xs space-y-4 rounded-2xl bg-skin-surface p-5 text-center">
               <p className="text-base font-semibold">{t("stopConfirmMessage")}</p>
               <div className="flex gap-2">
                 <Button className="flex-1" onClick={() => setStopConfirmOpen(false)}>

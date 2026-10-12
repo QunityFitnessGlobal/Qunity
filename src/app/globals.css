@@ -52,6 +52,55 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* The child screens' skin tokens (see src/lib/skins.ts). These defaults
+     are the regular Qunity look; a skin overrides them on the child's
+     screens through an inline style on the screen's root, so nothing here
+     changes for parents. Meaningful colors — stage colors, green for go and
+     work, blue for rest, gold for points — are never tokens (the one
+     exception is how the white stage is drawn: its dark outline on light
+     skins, plain white on a dark one). "page" is the full-screen background
+     (transparent in a skin, so its backdrop shows), "page-solid" the same
+     color where something must fade into it, "canvas" the journey's. */
+  --skin-page: #faf8fc;
+  --skin-page-solid: #faf8fc;
+  --skin-canvas: #ffffff;
+  --skin-surface: #ffffff;
+  --skin-surface-2: #f4f2f7;
+  --skin-line: #ece6f2;
+  --skin-divide: #f1edf5;
+  --skin-ink: #221a33;
+  --skin-ink-2: #4f4960;
+  --skin-muted: #6c6580;
+  --skin-faint: #8a8399;
+  --skin-accent: #a32894;
+  --skin-accent-ink: #a32894;
+  --skin-accent-deep: #7d1f72;
+  --skin-stage-white: #2c2c30;
+  --skin-gold-ink: #8a5d00;
+  --skin-tab: #ffffff;
+  --skin-road: #e4e4e7;
+  --skin-road-dash: #ffffff;
+  --skin-locked: #d4d4d8;
+  --skin-locked-ink: #27272a;
+  --skin-work-bg: #f4fbf6;
+  --skin-rest-bg: #f3f6ff;
+  --skin-work-track: #e3f8ea;
+  --skin-rest-track: #e6efff;
+  --skin-rest-line: #d6e4ff;
+  --skin-ring-fill: #ffffff;
+  --skin-work-label: #15803d;
+  --skin-rest-label: #1d4ed8;
+  --skin-finish: #3f3f46;
+  --skin-finish-edge: #18181b;
+  --skin-demo-wall: #f4f0f8;
+  --skin-demo-floor: #e9e2f1;
+  --skin-demo-edge: #d9cfe6;
+  --skin-demo-mat: #d8c9ea;
+  --skin-demo-rest-wall: #eef3ff;
+  --skin-demo-rest-floor: #e1e9fb;
+  --skin-demo-rest-edge: #cddbf6;
+  --skin-demo-rest-mat: #c9d8f7;
 }
 
 @theme inline {
@@ -65,6 +114,33 @@
   --font-display: var(--font-fredoka);
   /* The mockups' text face — see layout.tsx. */
   --font-ui: var(--font-rubik);
+
+  /* Skin tokens as utilities: bg-skin-surface, text-skin-ink, border-skin-line… */
+  --color-skin-page: var(--skin-page);
+  --color-skin-page-solid: var(--skin-page-solid);
+  --color-skin-canvas: var(--skin-canvas);
+  --color-skin-surface: var(--skin-surface);
+  --color-skin-surface-2: var(--skin-surface-2);
+  --color-skin-line: var(--skin-line);
+  --color-skin-divide: var(--skin-divide);
+  --color-skin-ink: var(--skin-ink);
+  --color-skin-ink-2: var(--skin-ink-2);
+  --color-skin-muted: var(--skin-muted);
+  --color-skin-faint: var(--skin-faint);
+  --color-skin-accent: var(--skin-accent);
+  --color-skin-accent-ink: var(--skin-accent-ink);
+  --color-skin-accent-deep: var(--skin-accent-deep);
+  --color-skin-gold-ink: var(--skin-gold-ink);
+  --color-skin-tab: var(--skin-tab);
+  --color-skin-locked: var(--skin-locked);
+  --color-skin-locked-ink: var(--skin-locked-ink);
+  --color-skin-work-bg: var(--skin-work-bg);
+  --color-skin-rest-bg: var(--skin-rest-bg);
+  --color-skin-rest-line: var(--skin-rest-line);
+  --color-skin-work-label: var(--skin-work-label);
+  --color-skin-rest-label: var(--skin-rest-label);
+  --color-skin-finish: var(--skin-finish);
+  --color-skin-finish-edge: var(--skin-finish-edge);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -684,6 +760,38 @@ body {
     width: 100%;
   }
   .animate-motion-eq {
+    animation: none;
+  }
+}
+
+/* Skin backdrops (SkinBackdrop): stars twinkle, a comet crosses, the
+   dragon floats, the torches flicker. Still for reduced motion. */
+@keyframes skin-twinkle {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+@keyframes skin-comet {
+  0% { transform: translate(0, 0); opacity: 0; }
+  10% { opacity: 0.9; }
+  40%, 100% { transform: translate(-160px, 62px); opacity: 0; }
+}
+@keyframes skin-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes skin-flame {
+  0%, 100% { opacity: 0.18; }
+  50% { opacity: 0.4; }
+}
+.skin-twinkle { animation: skin-twinkle 3s ease-in-out infinite; }
+.skin-comet { animation: skin-comet 6s ease-in 1.5s infinite; }
+.skin-float { animation: skin-float 5s ease-in-out infinite; }
+.skin-flame { animation: skin-flame 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .skin-twinkle,
+  .skin-comet,
+  .skin-float,
+  .skin-flame {
     animation: none;
   }
 }

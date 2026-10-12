@@ -51,9 +51,9 @@ export default async function SettingsPage() {
         <h1 className="font-display text-[26px] font-bold">{t("title")}</h1>
 
         {(name || (!isChild && user.email)) && (
-          <section className="flex items-center gap-3 rounded-[20px] border border-[#ece6f2] bg-white px-4 py-3.5">
+          <section className="flex items-center gap-3 rounded-[20px] border border-skin-line bg-skin-surface px-4 py-3.5">
             <span
-              className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-brand-purple font-display text-xl font-bold text-white"
+              className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-skin-accent font-display text-xl font-bold text-white"
               aria-hidden
             >
               {name ? name[0] : "?"}
@@ -61,7 +61,7 @@ export default async function SettingsPage() {
             <span className="flex min-w-0 flex-col">
               {name && <span className="font-display text-lg font-semibold">{name}</span>}
               {!isChild && user.email && (
-                <span dir="ltr" className="truncate text-start text-sm text-[#6c6580]">
+                <span dir="ltr" className="truncate text-start text-sm text-skin-muted">
                   {user.email}
                 </span>
               )}
@@ -89,6 +89,9 @@ export default async function SettingsPage() {
 
         {isChild && (
           <SettingsSection>
+            <Link href="/dashboard/settings/skin" className={SETTINGS_ROW}>
+              <SettingsRowContent icon={SettingsIcons.skin} label={t("mySkin")} />
+            </Link>
             <Link href="/dashboard/settings/code" className={SETTINGS_ROW}>
               <SettingsRowContent icon={SettingsIcons.code} label={t("myCode")} />
             </Link>
@@ -103,7 +106,7 @@ export default async function SettingsPage() {
 
         {qaAllowed && (
           <section className="flex flex-col gap-2 [&>*]:max-w-none">
-            <h2 className="px-1 text-[13px] font-semibold text-[#6c6580]">{t("qaSection")}</h2>
+            <h2 className="px-1 text-[13px] font-semibold text-skin-muted">{t("qaSection")}</h2>
             <PowerPreviewTester />
             <LevelUpPreviewTester stages={stageRequirements} />
             <QaToolsToggle />

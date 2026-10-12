@@ -80,7 +80,7 @@ export function WorkoutTimerView({
   return (
     <div
       className={`fixed inset-0 z-10 flex flex-col overflow-y-auto transition-colors duration-500 ${
-        resting ? "bg-[#f3f6ff]" : "bg-[#f4fbf6]"
+        resting ? "bg-skin-rest-bg" : "bg-skin-work-bg"
       }`}
     >
       <header className="mx-auto flex w-full max-w-sm flex-none flex-col gap-2.5 px-4 pb-3 pt-5">
@@ -93,7 +93,7 @@ export function WorkoutTimerView({
               type="button"
               onClick={onPause}
               aria-label={t("pause")}
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-zinc-200 bg-white text-[#4f4960] hover:bg-zinc-50"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-skin-line bg-skin-surface text-skin-ink-2 hover:bg-skin-surface-2"
             >
               <PauseIcon className="h-[18px] w-[18px]" />
             </button>
@@ -108,8 +108,8 @@ export function WorkoutTimerView({
                   n < interval.currentSet
                     ? "bg-bracelet-orange"
                     : n === interval.currentSet
-                      ? "bg-brand-purple"
-                      : "bg-zinc-200"
+                      ? "bg-skin-accent"
+                      : "bg-skin-line"
                 }`}
               />
             ))}
@@ -121,7 +121,7 @@ export function WorkoutTimerView({
         {!resting && card}
 
         {!resting && !card && exercise && (
-          <div key={`work-${interval?.currentSet ?? 0}`} className="animate-power-fade-up w-full overflow-hidden rounded-[20px] border border-zinc-200 bg-white">
+          <div key={`work-${interval?.currentSet ?? 0}`} className="animate-power-fade-up w-full overflow-hidden rounded-[20px] border border-skin-line bg-skin-surface">
             {workMotion ? (
               <ExerciseDemo key={exercise.id} motion={workMotion} playing={!paused} />
             ) : (
@@ -134,9 +134,9 @@ export function WorkoutTimerView({
             )}
             <div className="flex flex-col gap-0.5 px-3.5 py-3">
               <span className="font-display text-xl font-semibold">{nameOf(exercise)}</span>
-              {exercise.description_he && <span className="text-sm text-text-muted">{exercise.description_he}</span>}
+              {exercise.description_he && <span className="text-sm text-skin-muted">{exercise.description_he}</span>}
               {exercise.difficulty_tip_he && (
-                <span className="text-[13px] text-brand-purple">
+                <span className="text-[13px] text-skin-accent-ink">
                   <b>{t("tip")}:</b> {exercise.difficulty_tip_he}
                 </span>
               )}
@@ -145,10 +145,10 @@ export function WorkoutTimerView({
         )}
 
         {resting && (
-          <div key={`rest-${interval?.currentSet ?? 0}`} className="animate-power-fade-up flex w-full flex-col gap-2.5 rounded-[20px] border border-[#d6e4ff] bg-white px-4 py-4">
+          <div key={`rest-${interval?.currentSet ?? 0}`} className="animate-power-fade-up flex w-full flex-col gap-2.5 rounded-[20px] border border-skin-rest-line bg-skin-surface px-4 py-4">
             {nextExercise && nextMotion ? (
               <>
-                <span className="text-[13px] font-semibold text-[#1d4ed8]">{t("upNext")}</span>
+                <span className="text-[13px] font-semibold text-skin-rest-label">{t("upNext")}</span>
                 <ExerciseDemo
                   key={nextExercise.id}
                   motion={nextMotion}
@@ -160,7 +160,7 @@ export function WorkoutTimerView({
               </>
             ) : nextExercise ? (
               <>
-                <span className="text-[13px] font-semibold text-[#1d4ed8]">{t("upNext")}</span>
+                <span className="text-[13px] font-semibold text-skin-rest-label">{t("upNext")}</span>
                 <div className="flex items-center gap-3">
                   <ExerciseImage
                     imageUrl={nextExercise.image_url}
@@ -175,7 +175,7 @@ export function WorkoutTimerView({
             ) : (
               <span className="font-display text-xl font-semibold">{t("almostDone")}</span>
             )}
-            <span className="flex items-center gap-2 text-sm text-[#4f4960]">
+            <span className="flex items-center gap-2 text-sm text-skin-ink-2">
               <span className="animate-workout-breathe h-3.5 w-3.5 rounded-full bg-[#93b4f5]" aria-hidden />
               {t("breathe")}
             </span>
@@ -188,8 +188,8 @@ export function WorkoutTimerView({
               cx="118"
               cy="118"
               r={RING_RADIUS}
-              fill="#ffffff"
-              stroke={resting ? "#e6efff" : "#e3f8ea"}
+              fill="var(--skin-ring-fill)"
+              stroke={resting ? "var(--skin-rest-track)" : "var(--skin-work-track)"}
               strokeWidth={18}
             />
             {interval && (
@@ -208,7 +208,7 @@ export function WorkoutTimerView({
             )}
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5" role="timer" aria-live="off">
-            <span className={`text-[15px] font-bold tracking-wide ${resting ? "text-[#1d4ed8]" : "text-green-700"}`}>
+            <span className={`text-[15px] font-bold tracking-wide ${resting ? "text-skin-rest-label" : "text-skin-work-label"}`}>
               {interval ? t(resting ? "phaseRest" : "phaseWork") : (elapsedLabel ?? t("elapsedLabel"))}
             </span>
             <span
@@ -226,7 +226,7 @@ export function WorkoutTimerView({
         <button
           type="button"
           onClick={onFinish}
-          className="block min-h-[52px] w-full rounded-2xl bg-zinc-700 font-display text-lg font-semibold text-white shadow-[0_4px_0_theme(colors.zinc.900)] transition-transform hover:bg-zinc-800 active:translate-y-[3px]"
+          className="block min-h-[52px] w-full rounded-2xl bg-skin-finish font-display text-lg font-semibold text-white shadow-[0_4px_0_var(--skin-finish-edge)] transition-transform hover:brightness-90 active:translate-y-[3px]"
         >
           {finishLabel ?? t("finishWorkout")}
         </button>
@@ -240,14 +240,14 @@ export function WorkoutTimerView({
           aria-labelledby="workout-paused-title"
           className="fixed inset-0 z-20 flex items-center justify-center bg-[#221a33]/75 px-6"
         >
-          <div className="animate-power-fade-up flex w-full max-w-xs flex-col items-center gap-3 rounded-3xl bg-white px-5 py-6 text-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-purple/10 text-brand-purple">
+          <div className="animate-power-fade-up flex w-full max-w-xs flex-col items-center gap-3 rounded-3xl bg-skin-surface px-5 py-6 text-center">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-skin-accent/10 text-skin-accent-ink">
               <PauseIcon className="h-6 w-6" />
             </span>
             <h2 id="workout-paused-title" className="font-display text-2xl font-bold">
               {t("pausedTitle")}
             </h2>
-            <p className="text-sm text-text-muted">{t(demoShown ? "pausedTextDemo" : "pausedText")}</p>
+            <p className="text-sm text-skin-muted">{t(demoShown ? "pausedTextDemo" : "pausedText")}</p>
             <button
               type="button"
               onClick={onResume}
@@ -262,7 +262,7 @@ export function WorkoutTimerView({
             <button
               type="button"
               onClick={onFinish}
-              className="min-h-11 text-sm font-medium text-text-muted hover:text-[#221a33]"
+              className="min-h-11 text-sm font-medium text-skin-muted hover:text-skin-ink"
             >
               {finishLabel ?? t("finishWorkout")}
             </button>

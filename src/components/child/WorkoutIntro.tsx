@@ -33,7 +33,7 @@ interface WorkoutIntroProps {
 
 // Bracelet white vanishes on white, so it's drawn in its outline shade.
 function stageInk(color: BraceletColor): string {
-  return color === "white" ? "var(--color-bracelet-white-outline)" : BRACELET_CSS_VAR[color];
+  return color === "white" ? "var(--skin-stage-white)" : BRACELET_CSS_VAR[color];
 }
 
 // Before the workout: which stage and workout this is, how long and how hard,
@@ -91,13 +91,13 @@ export function WorkoutIntro({
   }
 
   return (
-    <div className="fixed inset-0 z-10 flex flex-col overflow-y-auto bg-[#faf8fc]">
-      <header className="flex-none bg-white px-4 pb-3.5 pt-5 shadow-[0_1px_0_#ece6f2]">
+    <div className="fixed inset-0 z-10 flex flex-col overflow-y-auto bg-skin-page">
+      <header className="flex-none bg-skin-surface px-4 pb-3.5 pt-5 shadow-[0_1px_0_var(--skin-line)]">
         <div className="mx-auto flex max-w-sm flex-col gap-2">
           <span className="flex flex-wrap items-center gap-2 text-[13px] font-semibold" style={{ color: stageInk(color) }}>
             {t("colorProgress", { color: colorLabel, index: workoutIndex, total: requiredWorkouts })}
             {isReplay && (
-              <span className="rounded-full bg-brand-purple/10 px-2 py-0.5 text-[12px] text-brand-purple">
+              <span className="rounded-full bg-skin-accent/10 px-2 py-0.5 text-[12px] text-skin-accent-ink">
                 {t("replayBadge")}
               </span>
             )}
@@ -107,7 +107,7 @@ export function WorkoutIntro({
           </h1>
           <div className="flex flex-wrap gap-2">
             {minutes > 0 && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f1edf5] px-2.5 py-1 text-[13px] font-medium">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-skin-surface-2 px-2.5 py-1 text-[13px] font-medium">
                 <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" aria-hidden>
                   <circle cx="10" cy="10" r="7.5" />
                   <path d="M10 6v4.2l2.5 1.7" />
@@ -116,7 +116,7 @@ export function WorkoutIntro({
               </span>
             )}
             {difficultyKey && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f1edf5] px-2.5 py-1 text-[13px] font-medium">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-skin-surface-2 px-2.5 py-1 text-[13px] font-medium">
                 <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="currentColor" aria-hidden>
                   <rect x="3" y="12" width="3" height="5" rx="0.5" />
                   <rect x="8.5" y="8" width="3" height="9" rx="0.5" opacity={(workout.recommended_difficulty ?? 0) >= 2 ? 1 : 0.3} />
@@ -136,7 +136,7 @@ export function WorkoutIntro({
 
       <main className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-2.5 px-4 py-4">
         {playing && (
-          <div className="relative flex-none overflow-hidden rounded-[20px] border border-[#ece6f2]">
+          <div className="relative flex-none overflow-hidden rounded-[20px] border border-skin-line">
             <ExerciseDemo
               key={`${playing.entry.exercise.id}-${angle}-${turn}`}
               motion={playing.motion}
@@ -147,12 +147,12 @@ export function WorkoutIntro({
             {playable.length > 1 && (
               <div className="absolute inset-x-2.5 top-2 flex gap-1" aria-hidden>
                 {playable.map((d, i) => (
-                  <span key={d.entry.exercise.id} className="flex h-1 flex-1 overflow-hidden rounded-full bg-[#221a33]/10">
-                    {i < current && <span className="h-full w-full rounded-full bg-brand-purple" />}
+                  <span key={d.entry.exercise.id} className="flex h-1 flex-1 overflow-hidden rounded-full bg-skin-ink/10">
+                    {i < current && <span className="h-full w-full rounded-full bg-skin-accent" />}
                     {i === current && (
                       <span
                         key={`${current}-${angle}-${turn}`}
-                        className="animate-motion-seg h-full rounded-full bg-brand-purple"
+                        className="animate-motion-seg h-full rounded-full bg-skin-accent"
                         style={{ ["--seg-dur" as string]: `${PLAYER_TURN_MS}ms` } as CSSProperties}
                       />
                     )}
@@ -176,7 +176,7 @@ export function WorkoutIntro({
                     onClick={() => show(current, a)}
                     aria-pressed={angle === a}
                     className={`min-h-7 rounded-full px-2.5 text-xs font-semibold ${
-                      angle === a ? "bg-brand-purple text-white" : ""
+                      angle === a ? "bg-skin-accent text-white" : ""
                     }`}
                   >
                     {t(`motion.angle.${a === "alt" ? (playing.motion.alt?.angle ?? "front") : mainAngle(playing.motion)}`)}
@@ -189,9 +189,9 @@ export function WorkoutIntro({
             </span>
           </div>
         )}
-        {description && <p className="text-sm text-text-muted">{description}</p>}
+        {description && <p className="text-sm text-skin-muted">{description}</p>}
         {exercises.length > 0 && (
-          <span className="text-sm font-semibold text-text-muted">
+          <span className="text-sm font-semibold text-skin-muted">
             {t("missionHeading", { count: exercises.length })}
           </span>
         )}
@@ -200,8 +200,8 @@ export function WorkoutIntro({
           const demoIndex = playable.findIndex((d) => d.entry.exercise.id === exercise.id && d.entry.slotNumber === slotNumber);
           const demo = demoIndex >= 0 ? playable[demoIndex] : null;
           const active = demo !== null && demoIndex === current;
-          const rowClass = `animate-power-fade-up flex items-center gap-3 rounded-2xl border bg-white px-3 py-2.5 text-start transition-colors ${
-            active ? "border-brand-purple bg-[#fdf6fc]" : "border-zinc-200"
+          const rowClass = `animate-power-fade-up flex items-center gap-3 rounded-2xl border px-3 py-2.5 text-start transition-colors ${
+            active ? "border-skin-accent bg-[color-mix(in_srgb,var(--skin-accent)_4%,var(--skin-surface))]" : "border-skin-line bg-skin-surface"
           }`;
           const rowStyle = { ["--power-fade-delay" as string]: `${0.1 + i * 0.1}s` } as CSSProperties;
           const content = (
@@ -212,37 +212,37 @@ export function WorkoutIntro({
                 ) : (
                   <ExerciseImage imageUrl={exercise.image_url} alt={name} className="h-16 w-16 rounded-xl" />
                 )}
-                <span className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-brand-purple font-display text-[13px] font-bold text-white">
+                <span className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-skin-surface bg-skin-accent font-display text-[13px] font-bold text-white">
                   {slotNumber}
                 </span>
               </span>
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="font-display text-[17px] font-semibold leading-snug">{name}</span>
                 {exercise.description_he && (
-                  <span className="text-[13px] leading-snug text-text-muted">{exercise.description_he}</span>
+                  <span className="text-[13px] leading-snug text-skin-muted">{exercise.description_he}</span>
                 )}
                 {exercise.difficulty_tip_he && (
-                  <span className="text-[12px] leading-snug text-brand-purple">
+                  <span className="text-[12px] leading-snug text-skin-accent-ink">
                     <b>{t("tip")}:</b> {exercise.difficulty_tip_he}
                   </span>
                 )}
               </span>
               {demo && active && (
                 <span
-                  className="flex h-8 w-8 flex-none items-center justify-center gap-0.5 rounded-full bg-brand-purple/10"
+                  className="flex h-8 w-8 flex-none items-center justify-center gap-0.5 rounded-full bg-skin-accent/10"
                   aria-label={t("motion.playing")}
                 >
                   {[0, 0.3, 0.6].map((delay) => (
                     <span
                       key={delay}
-                      className="animate-motion-eq h-3.5 w-[3px] rounded-sm bg-brand-purple"
+                      className="animate-motion-eq h-3.5 w-[3px] rounded-sm bg-skin-accent"
                       style={{ ["--bar-delay" as string]: `${delay}s` } as CSSProperties}
                     />
                   ))}
                 </span>
               )}
               {demo && !active && (
-                <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-[#f1edf5]" aria-hidden>
+                <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-skin-surface-2" aria-hidden>
                   <svg viewBox="0 0 20 20" className="h-3 w-3 fill-brand-purple">
                     <path d="M6 3.5l11 6.5-11 6.5z" />
                   </svg>
@@ -269,7 +269,7 @@ export function WorkoutIntro({
         })}
       </main>
 
-      <footer className="sticky bottom-0 flex-none bg-gradient-to-t from-[#faf8fc] from-70% to-transparent px-4 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] pt-3">
+      <footer className="sticky bottom-0 flex-none bg-gradient-to-t from-skin-page-solid from-70% to-transparent px-4 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] pt-3">
         <div className="mx-auto max-w-sm space-y-2">
           {error && <p className="text-center text-sm text-red-600">{error}</p>}
           <button

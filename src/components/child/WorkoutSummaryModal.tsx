@@ -74,7 +74,7 @@ export function WorkoutSummaryModal({
   const percent = summary?.bestCompletionPercent ?? null;
   const difficultyKey = summary ? difficultyLabelKey(summary.difficultyReported) : null;
   const feelingKey = summary ? feelingLabelKey(summary.feelingAfter) : null;
-  const tile = "flex flex-col items-center gap-0.5 rounded-2xl border border-[#ece6f2] bg-[#faf8fc] px-1.5 py-2.5 text-center";
+  const tile = "flex flex-col items-center gap-0.5 rounded-2xl border border-skin-line bg-skin-page px-1.5 py-2.5 text-center";
 
   return (
     <div
@@ -85,7 +85,7 @@ export function WorkoutSummaryModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="workout-summary-title"
-        className="animate-power-fade-up flex max-h-[calc(100dvh-2rem)] w-full max-w-md flex-col gap-3.5 overflow-y-auto rounded-[28px] bg-white px-[18px] pb-5 pt-[18px] text-right shadow-[0_20px_50px_rgba(34,26,51,0.25)]"
+        className="animate-power-fade-up flex max-h-[calc(100dvh-2rem)] w-full max-w-md flex-col gap-3.5 overflow-y-auto rounded-[28px] bg-skin-surface px-[18px] pb-5 pt-[18px] text-right shadow-[0_20px_50px_rgba(34,26,51,0.25)]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start gap-3">
@@ -103,7 +103,7 @@ export function WorkoutSummaryModal({
               {summary?.workoutTitle ? resolveLocalizedText(summary.workoutTitle, locale) : t("unknownWorkout")}
             </h2>
             {summary && (
-              <span className="text-[13px] text-[#8a8399]">
+              <span className="text-[13px] text-skin-faint">
                 {new Date(summary.date).toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" })}
               </span>
             )}
@@ -112,7 +112,7 @@ export function WorkoutSummaryModal({
             type="button"
             onClick={onClose}
             aria-label={t("close")}
-            className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-[#f4f2f7] text-[#6c6580]"
+            className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-skin-surface-2 text-skin-muted"
           >
             <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" aria-hidden>
               <path d="M5 5l10 10M15 5L5 15" />
@@ -120,13 +120,13 @@ export function WorkoutSummaryModal({
           </button>
         </div>
 
-        {loading && <p className="py-6 text-center text-sm text-text-muted">{t("loading")}</p>}
+        {loading && <p className="py-6 text-center text-sm text-skin-muted">{t("loading")}</p>}
 
-        {!loading && !summary && <p className="py-6 text-center text-sm text-text-muted">{t("notFound")}</p>}
+        {!loading && !summary && <p className="py-6 text-center text-sm text-skin-muted">{t("notFound")}</p>}
 
         {!loading && summary && (
           <>
-            <div className="flex items-center gap-3 rounded-[18px] border border-[#f3e3b5] bg-gradient-to-br from-[#fff8e6] to-white px-3.5 py-3">
+            <div className="flex items-center gap-3 rounded-[18px] border border-[#f3e3b5] bg-gradient-to-br from-[#fff8e6] to-white px-3.5 py-3 text-[#221a33]">
               <svg viewBox="0 0 20 20" className="h-[46px] w-[46px] flex-none drop-shadow-[0_3px_5px_rgba(217,154,11,0.35)]" aria-hidden>
                 {full ? (
                   <path d={STAR_PATH} fill="var(--color-reward-gold)" stroke="#d99a0b" strokeWidth={0.6} strokeLinejoin="round" />
@@ -175,14 +175,14 @@ export function WorkoutSummaryModal({
 
             <div className="grid grid-cols-3 gap-2">
               <div className={tile}>
-                <svg viewBox="0 0 20 20" className="h-5 w-5 text-brand-purple" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <svg viewBox="0 0 20 20" className="h-5 w-5 text-skin-accent-ink" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                   <circle cx="10" cy="10.5" r="6.5" />
                   <path d="M10 7v3.5l2.3 1.6M8 2.5h4" />
                 </svg>
                 <span dir="ltr" className="font-display text-[17px] font-bold">
                   {summary.durationSeconds !== null ? formatDurationClock(summary.durationSeconds) : "-"}
                 </span>
-                <span className="text-xs text-[#8a8399]">{t("time")}</span>
+                <span className="text-xs text-skin-faint">{t("time")}</span>
               </div>
               <div className={tile}>
                 <svg viewBox="0 0 20 20" className="h-5 w-5" aria-hidden>
@@ -194,12 +194,12 @@ export function WorkoutSummaryModal({
                       width={3}
                       height={5 + i * 3}
                       rx={1}
-                      fill={summary.difficultyReported !== null && i < summary.difficultyReported ? "var(--color-brand-purple)" : "#e4dfeb"}
+                      fill={summary.difficultyReported !== null && i < summary.difficultyReported ? "var(--skin-accent)" : "var(--skin-line)"}
                     />
                   ))}
                 </svg>
                 <span className="font-display text-[17px] font-bold">{difficultyKey ? tWorkout(difficultyKey) : "-"}</span>
-                <span className="text-xs text-[#8a8399]">{t("difficultyFelt")}</span>
+                <span className="text-xs text-skin-faint">{t("difficultyFelt")}</span>
               </div>
               <div className={tile}>
                 <span className="text-[19px] leading-5" aria-hidden>
@@ -208,21 +208,21 @@ export function WorkoutSummaryModal({
                 <span className="font-display text-[17px] font-bold">
                   {feelingKey ? tWorkout(feelingKey, { gender: gender ?? "male" }) : "-"}
                 </span>
-                <span className="text-xs text-[#8a8399]">{t("feelingFelt")}</span>
+                <span className="text-xs text-skin-faint">{t("feelingFelt")}</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 rounded-2xl border border-[#f3e3b5] bg-white px-3.5 py-2.5">
+            <div className="flex items-center gap-2.5 rounded-2xl border border-[#f3e3b5] bg-skin-surface px-3.5 py-2.5">
               <span aria-hidden className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-full bg-reward-gold shadow-[inset_0_-2px_0_#d99a0b]">
                 <StarIcon className="h-4 w-4 text-reward-gold-ink" />
               </span>
               <span className="flex flex-1 flex-col">
                 <span className="text-sm font-semibold">{t("pointsTitle")}</span>
                 {summary.attempts > 1 && (
-                  <span className="text-xs text-[#8a8399]">{t("attempts", { count: summary.attempts })}</span>
+                  <span className="text-xs text-skin-faint">{t("attempts", { count: summary.attempts })}</span>
                 )}
               </span>
-              <span dir="ltr" className="font-display text-[26px] font-bold text-reward-gold-ink">
+              <span dir="ltr" className="font-display text-[26px] font-bold text-skin-gold-ink">
                 +{summary.pointsAwarded}
               </span>
             </div>
@@ -238,7 +238,7 @@ export function WorkoutSummaryModal({
                 </svg>
                 {full ? t("replay") : t("replayToFill")}
               </button>
-              <p className="text-center text-[12.5px] text-[#6c6580]">{full ? t("replayHintDone") : t("replayHint")}</p>
+              <p className="text-center text-[12.5px] text-skin-muted">{full ? t("replayHintDone") : t("replayHint")}</p>
             </div>
           </>
         )}

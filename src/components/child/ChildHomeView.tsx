@@ -33,7 +33,7 @@ interface ChildHomeViewProps {
 
 // Bracelet white vanishes on white, so it's drawn in its outline shade.
 function stageColor(color: BraceletColor): string {
-  return color === "white" ? "var(--color-bracelet-white-outline)" : BRACELET_CSS_VAR[color];
+  return color === "white" ? "var(--skin-stage-white)" : BRACELET_CSS_VAR[color];
 }
 
 // A streak only reads as one from two days on.
@@ -102,13 +102,13 @@ export async function ChildHomeView({
             style={{ backgroundColor: stageColor(color) }}
           />
           <div
-            className="relative flex h-24 w-24 items-center justify-center rounded-full border-[5px] bg-zinc-100 font-display text-4xl font-semibold text-zinc-600"
+            className="relative flex h-24 w-24 items-center justify-center rounded-full border-[5px] bg-skin-surface-2 font-display text-4xl font-semibold text-skin-ink-2"
             style={{ borderColor: stageColor(color) }}
           >
             {name?.trim().charAt(0)}
           </div>
           {powerRevealed && (
-            <div className="animate-power-badge-pop absolute -end-1 -top-1 flex h-[34px] w-[34px] items-center justify-center rounded-full bg-white shadow-md">
+            <div className="animate-power-badge-pop absolute -end-1 -top-1 flex h-[34px] w-[34px] items-center justify-center rounded-full bg-skin-surface shadow-md">
               <PowerIcon className="h-5 w-5" style={{ color: stageColor(color) }} />
             </div>
           )}
@@ -127,12 +127,12 @@ export async function ChildHomeView({
           </span>
         </Link>
         <div
-          className="animate-power-fade-up relative flex-1 rounded-2xl border border-zinc-200 bg-white px-3.5 py-3 text-sm leading-relaxed shadow-[0_4px_14px_rgba(52,30,99,0.07)]"
+          className="animate-power-fade-up relative flex-1 rounded-2xl border border-skin-line bg-skin-surface px-3.5 py-3 text-sm leading-relaxed shadow-[0_4px_14px_rgba(52,30,99,0.07)]"
           style={{ ["--power-fade-delay" as string]: "0.4s" } as CSSProperties}
         >
           <span
             aria-hidden
-            className="absolute -right-[7px] top-[38px] h-3 w-3 rotate-45 border-r border-t border-zinc-200 bg-white"
+            className="absolute -right-[7px] top-[38px] h-3 w-3 rotate-45 border-r border-t border-skin-line bg-skin-surface"
           />
           <span className="relative">{encouragement}</span>
         </div>
@@ -145,10 +145,10 @@ export async function ChildHomeView({
         lastWorkoutLabel={t("lastWorkout")}
       />
 
-      <section className="flex flex-col gap-2.5 rounded-2xl border border-zinc-200 bg-white px-4 py-3">
+      <section className="flex flex-col gap-2.5 rounded-2xl border border-skin-line bg-skin-surface px-4 py-3">
         <div className="flex justify-between text-sm">
           <span className="font-semibold">{t("stageTitle", { color: tColors(color) })}</span>
-          <span className="text-text-muted">{t("stageWorkouts", { done: workoutsDone, total: requiredWorkouts })}</span>
+          <span className="text-skin-muted">{t("stageWorkouts", { done: workoutsDone, total: requiredWorkouts })}</span>
         </div>
         <div className="flex items-center gap-2.5">
           <div className="flex-1">
@@ -158,14 +158,14 @@ export async function ChildHomeView({
             <span
               role="img"
               aria-label={t("nextStage", { color: tColors(nextColor) })}
-              className="flex h-9 w-9 flex-none items-center justify-center rounded-full border-[3px] bg-white"
+              className="flex h-9 w-9 flex-none items-center justify-center rounded-full border-[3px] bg-skin-surface"
               style={{ borderColor: BRACELET_CSS_VAR[nextColor] }}
             >
-              <LockIcon className="h-3.5 w-3.5 text-zinc-600" />
+              <LockIcon className="h-3.5 w-3.5 text-skin-ink-2" />
             </span>
           )}
         </div>
-        {remaining && <span className="text-[13px] text-text-muted">{remaining}</span>}
+        {remaining && <span className="text-[13px] text-skin-muted">{remaining}</span>}
       </section>
 
       {powerRevealed && (
@@ -190,9 +190,9 @@ export async function ChildHomeView({
       {childCode && <ChildCodeCard code={childCode} />}
 
       {nextWorkout ? (
-        <section className="flex flex-col gap-3 rounded-[20px] border border-zinc-200 bg-white px-4 py-3.5 shadow-[0_6px_18px_rgba(52,30,99,0.08)]">
+        <section className="flex flex-col gap-3 rounded-[20px] border border-skin-line bg-skin-surface px-4 py-3.5 shadow-[0_6px_18px_rgba(52,30,99,0.08)]">
           <div className="flex items-center justify-between">
-            <span className="rounded-full bg-brand-purple/10 px-2.5 py-1 text-[13px] font-semibold text-brand-purple">
+            <span className="rounded-full bg-skin-accent/10 px-2.5 py-1 text-[13px] font-semibold text-skin-accent-ink">
               {t("nextMission")}
             </span>
             <span className="rounded-full bg-reward-gold-soft px-2.5 py-1 font-display text-[13px] font-semibold text-reward-gold-ink">
@@ -216,8 +216,8 @@ export async function ChildHomeView({
           </Link>
         </section>
       ) : (
-        <div className="rounded-2xl border border-zinc-200 bg-white p-4 text-center">
-          <p className="text-text-muted">{tNext("none")}</p>
+        <div className="rounded-2xl border border-skin-line bg-skin-surface p-4 text-center">
+          <p className="text-skin-muted">{tNext("none")}</p>
         </div>
       )}
     </div>

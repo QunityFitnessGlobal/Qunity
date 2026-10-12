@@ -199,7 +199,7 @@ export function MysteryReveal({
         ) : (
           <div
             key="card"
-            className={`relative rounded-2xl border border-zinc-200 bg-white text-right shadow-md ${large ? "p-4" : "p-3"}`}
+            className={`relative rounded-2xl border border-skin-line bg-skin-surface text-right shadow-md ${large ? "p-4" : "p-3"}`}
           >
             <span
               className={`absolute -top-2 start-3 rounded-full bg-reward-gold px-2.5 py-0.5 text-xs font-bold text-reward-gold-on shadow-sm ${animate ? "animate-reveal-badge-pop" : ""}`}
@@ -217,7 +217,7 @@ export function MysteryReveal({
               <div className="min-w-0 flex-1">
                 <h3 className="font-display text-base font-bold">{resolveLocalizedText(challenge.title, locale)}</h3>
                 {challenge.description && (
-                  <p className="mt-0.5 text-sm text-zinc-600">{resolveGenderedText(challenge.description, locale, null)}</p>
+                  <p className="mt-0.5 text-sm text-skin-ink-2">{resolveGenderedText(challenge.description, locale, null)}</p>
                 )}
               </div>
             </div>

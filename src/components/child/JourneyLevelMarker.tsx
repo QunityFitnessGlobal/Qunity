@@ -39,7 +39,7 @@ export function JourneyLevelMarker({ beltColor, gate, style }: JourneyLevelMarke
     return (
       <div
         style={{ ...style, height: STAGE_GATE_HEIGHT, borderColor: stageColor }}
-        className="absolute flex w-[200px] items-center gap-3 rounded-2xl border-2 bg-white px-3 shadow-sm"
+        className="absolute flex w-[200px] items-center gap-3 rounded-2xl border-2 bg-skin-surface px-3 shadow-sm"
       >
         <span
           className="flex h-10 w-10 flex-none items-center justify-center rounded-full"
@@ -51,7 +51,7 @@ export function JourneyLevelMarker({ beltColor, gate, style }: JourneyLevelMarke
         </span>
         <span className="min-w-0 text-right">
           <span className="block truncate font-display text-[15px] font-semibold">{tPowers(`${beltColor}.name`)}</span>
-          <span className="block text-xs text-text-muted">{tColors("badge", { color: tColors(beltColor) })}</span>
+          <span className="block text-xs text-skin-muted">{tColors("badge", { color: tColors(beltColor) })}</span>
         </span>
       </div>
     );

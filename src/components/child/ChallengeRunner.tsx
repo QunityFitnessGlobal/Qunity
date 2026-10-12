@@ -200,13 +200,13 @@ export function ChallengeRunner({
         exercise={null}
         nextExercise={null}
         card={
-          <div className="animate-power-fade-up flex w-full items-center gap-3.5 rounded-[20px] border border-zinc-200 bg-white px-4 py-4">
+          <div className="animate-power-fade-up flex w-full items-center gap-3.5 rounded-[20px] border border-skin-line bg-skin-surface px-4 py-4">
             <span className="flex h-14 w-14 flex-none items-center justify-center rounded-2xl bg-reward-gold-soft">
               <StairsIcon className="h-8 w-8 text-reward-gold-ink" aria-hidden />
             </span>
             <span className="flex min-w-0 flex-col gap-0.5">
               <span className="font-display text-xl font-semibold">{titleText}</span>
-              {descriptionText && <span className="text-sm text-text-muted">{descriptionText}</span>}
+              {descriptionText && <span className="text-sm text-skin-muted">{descriptionText}</span>}
             </span>
           </div>
         }

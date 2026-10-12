@@ -7,8 +7,8 @@ import type { ReactNode } from "react";
 export function SettingsSection({ title, children }: { title?: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-2">
-      {title && <h2 className="px-1 text-[13px] font-semibold text-[#6c6580]">{title}</h2>}
-      <div className="divide-y divide-[#f1edf5] overflow-hidden rounded-[20px] border border-[#ece6f2] bg-white">
+      {title && <h2 className="px-1 text-[13px] font-semibold text-skin-muted">{title}</h2>}
+      <div className="divide-y divide-skin-divide overflow-hidden rounded-[20px] border border-skin-line bg-skin-surface">
         {children}
       </div>
     </section>
@@ -17,7 +17,7 @@ export function SettingsSection({ title, children }: { title?: string; children:
 
 // The clickable element of a row (a <button> or a <Link>).
 export const SETTINGS_ROW =
-  "flex min-h-[56px] w-full items-center gap-3 px-4 py-2.5 text-start transition-colors hover:bg-[#faf8fc] disabled:opacity-60";
+  "flex min-h-[56px] w-full items-center gap-3 px-4 py-2.5 text-start transition-colors hover:bg-skin-page-solid disabled:opacity-60";
 
 interface SettingsRowContentProps {
   icon: ReactNode;
@@ -32,15 +32,15 @@ export function SettingsRowContent({ icon, label, hint, quiet }: SettingsRowCont
     <>
       <span
         className={`flex h-9 w-9 flex-none items-center justify-center rounded-xl ${
-          quiet ? "bg-[#f4f2f7] text-[#8a8399]" : "bg-brand-purple/[0.08] text-brand-purple"
+          quiet ? "bg-skin-surface-2 text-skin-faint" : "bg-skin-accent/[0.08] text-skin-accent-ink"
         }`}
         aria-hidden
       >
         {icon}
       </span>
       <span className="flex flex-1 flex-col">
-        <span className={quiet ? "text-sm text-[#6c6580]" : "text-[15px] font-medium text-[#221a33]"}>{label}</span>
-        {hint && <span className="text-xs text-[#8a8399]">{hint}</span>}
+        <span className={quiet ? "text-sm text-skin-muted" : "text-[15px] font-medium text-skin-ink"}>{label}</span>
+        {hint && <span className="text-xs text-skin-faint">{hint}</span>}
       </span>
       <svg viewBox="0 0 20 20" className="h-3.5 w-3.5 flex-none text-[#b5aec2] ltr:-scale-x-100" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         <path d="M12.5 5l-5 5 5 5" />
@@ -59,9 +59,9 @@ interface SettingsDialogProps {
 export function SettingsDialog({ title, icon, children }: SettingsDialogProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#221a33]/40 p-4" role="dialog" aria-modal="true">
-      <div className="animate-chat-in flex max-h-[calc(100dvh-2rem)] w-full max-w-sm flex-col gap-3 overflow-y-auto rounded-[22px] bg-white p-5 text-center shadow-[0_20px_50px_rgba(34,26,51,0.25)]">
+      <div className="animate-chat-in flex max-h-[calc(100dvh-2rem)] w-full max-w-sm flex-col gap-3 overflow-y-auto rounded-[22px] bg-skin-surface p-5 text-center shadow-[0_20px_50px_rgba(34,26,51,0.25)]">
         {icon && (
-          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-purple/[0.08] text-brand-purple" aria-hidden>
+          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-skin-accent/[0.08] text-skin-accent-ink" aria-hidden>
             {icon}
           </span>
         )}
@@ -73,11 +73,11 @@ export function SettingsDialog({ title, icon, children }: SettingsDialogProps) {
 }
 
 // A quiet text button under a popup's main action.
-export const DIALOG_CLOSE = "mx-auto min-h-10 px-4 text-sm font-semibold text-[#6c6580]";
+export const DIALOG_CLOSE = "mx-auto min-h-10 px-4 text-sm font-semibold text-skin-muted";
 
 // A 4-digit code field (the parent's PIN).
 export const PIN_INPUT =
-  "w-full rounded-2xl border-[1.5px] border-[#e4dfeb] bg-[#faf8fc] px-3 py-3 text-center font-display text-2xl tracking-[0.5em] focus:border-brand-purple focus:outline-none";
+  "w-full rounded-2xl border-[1.5px] border-[#e4dfeb] bg-skin-page-solid px-3 py-3 text-center font-display text-2xl tracking-[0.5em] focus:border-skin-accent focus:outline-none";
 
 const ICON = "h-5 w-5";
 const line = { fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round" } as const;
@@ -117,6 +117,14 @@ export const SettingsIcons = {
   childMode: (
     <svg viewBox="0 0 20 20" className={ICON} {...line}>
       <path d="M10 2.8l2.2 4.6 5 .6-3.7 3.4 1 5-4.5-2.5-4.5 2.5 1-5L2.8 8l5-.6z" />
+    </svg>
+  ),
+  skin: (
+    <svg viewBox="0 0 20 20" className={ICON} {...line}>
+      <path d="M10 2.5a7.5 7.5 0 0 0 0 15c1.2 0 1.8-.8 1.8-1.7 0-1.3-1-1.6-1-2.6 0-.9.7-1.5 1.6-1.5h1.8a3.3 3.3 0 0 0 3.3-3.3C17.5 5.2 14.1 2.5 10 2.5z" />
+      <circle cx="6.3" cy="9.3" r="1" fill="currentColor" stroke="none" />
+      <circle cx="8.8" cy="6.1" r="1" fill="currentColor" stroke="none" />
+      <circle cx="12.6" cy="6.3" r="1" fill="currentColor" stroke="none" />
     </svg>
   ),
   logout: (

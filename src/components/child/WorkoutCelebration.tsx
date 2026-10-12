@@ -187,7 +187,7 @@ export function WorkoutCelebration({
       </div>
 
       <p
-        className="animate-power-fade-up text-center text-[15px] text-zinc-600"
+        className="animate-power-fade-up text-center text-[15px] text-skin-ink-2"
         style={{ ["--power-fade-delay" as string]: "0.6s" } as CSSProperties}
       >
         {completionLine}
@@ -195,28 +195,28 @@ export function WorkoutCelebration({
 
       {totalPoints > 0 && (
         <section
-          className="animate-power-fade-up flex flex-col gap-2 rounded-2xl border border-[#f3e3b5] bg-white px-4 py-3"
+          className="animate-power-fade-up flex flex-col gap-2 rounded-2xl border border-[#f3e3b5] bg-skin-surface px-4 py-3"
           style={{ ["--power-fade-delay" as string]: "0.75s" } as CSSProperties}
         >
           <div className="flex items-center justify-between">
             <span className="text-[15px] font-semibold">{t("resultPointsTitle")}</span>
-            <span dir="ltr" className="font-display text-[34px] font-bold tabular-nums text-reward-gold-ink">
+            <span dir="ltr" className="font-display text-[34px] font-bold tabular-nums text-skin-gold-ink">
               +{shownPoints}
             </span>
           </div>
           {result.pointsAwarded > 0 && (
-            <div className="flex justify-between text-sm text-zinc-600">
+            <div className="flex justify-between text-sm text-skin-ink-2">
               <span>{t("resultPointsWorkout")}</span>
               <span dir="ltr" className="font-semibold">+{result.pointsAwarded}</span>
             </div>
           )}
           {challenges.map((challenge) => (
-            <div key={challenge.id} className="flex items-center justify-between gap-2 text-sm text-zinc-600">
+            <div key={challenge.id} className="flex items-center justify-between gap-2 text-sm text-skin-ink-2">
               <span className="inline-flex min-w-0 items-center gap-1.5">
                 <ChallengeIcon
                   conditionType={challenge.conditionType}
                   challengeType={challenge.challengeType}
-                  className="h-4 w-4 flex-none text-reward-gold-ink"
+                  className="h-4 w-4 flex-none text-skin-gold-ink"
                 />
                 <span className="truncate">
                   {t("resultPointsChallenge", { title: resolveLocalizedText(challenge.title, locale) })}
@@ -230,12 +230,12 @@ export function WorkoutCelebration({
 
       {requiredWorkouts > 0 && (
         <section
-          className="animate-power-fade-up flex flex-col gap-2 rounded-2xl border border-zinc-200 bg-white px-4 py-3"
+          className="animate-power-fade-up flex flex-col gap-2 rounded-2xl border border-skin-line bg-skin-surface px-4 py-3"
           style={{ ["--power-fade-delay" as string]: "0.9s" } as CSSProperties}
         >
           <div className="flex items-center justify-between text-sm">
             <span className="font-semibold">{t("resultStage", { color: tColors(stageColor) })}</span>
-            <span className="inline-flex items-center gap-1.5 text-text-muted">
+            <span className="inline-flex items-center gap-1.5 text-skin-muted">
               {t("resultStageProgress", { done: doneAfter, total: requiredWorkouts })}
               {result.advancedStage && (
                 <span
@@ -265,13 +265,13 @@ export function WorkoutCelebration({
       )}
 
       <section
-        className="animate-power-fade-up flex items-start gap-2.5 rounded-2xl bg-brand-purple/[0.07] px-3.5 py-3"
+        className="animate-power-fade-up flex items-start gap-2.5 rounded-2xl bg-skin-accent/[0.07] px-3.5 py-3"
         style={{ ["--power-fade-delay" as string]: "1.1s" } as CSSProperties}
       >
-        <svg viewBox="0 0 20 20" className="mt-0.5 h-5 w-5 flex-none text-brand-purple" fill="currentColor" aria-hidden>
+        <svg viewBox="0 0 20 20" className="mt-0.5 h-5 w-5 flex-none text-skin-accent-ink" fill="currentColor" aria-hidden>
           <path d="M10 17.5s-6.5-4-6.5-9.2A3.7 3.7 0 0110 6.1a3.7 3.7 0 016.5 2.2c0 5.2-6.5 9.2-6.5 9.2z" />
         </svg>
-        <p className="text-sm leading-relaxed text-[#4a1c44]">{t(EMPOWER_KEYS[feeling], { gender: gender ?? "male" })}</p>
+        <p className="text-sm leading-relaxed text-skin-accent-deep">{t(EMPOWER_KEYS[feeling], { gender: gender ?? "male" })}</p>
       </section>
     </div>
   );

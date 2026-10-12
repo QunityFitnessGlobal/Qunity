@@ -30,8 +30,8 @@ function RevealCard({ challenge, indexLabel, onContinue }: RevealCardProps) {
   const [revealed, setRevealed] = useState(prefersReducedMotion);
 
   return (
-    <div className="w-full max-w-sm rounded-3xl bg-white p-5 text-center shadow-xl">
-      <p className="text-xs font-semibold tracking-wide text-brand-purple">{t("label")}</p>
+    <div className="w-full max-w-sm rounded-3xl bg-skin-surface p-5 text-center shadow-xl">
+      <p className="text-xs font-semibold tracking-wide text-skin-accent-ink">{t("label")}</p>
       <h2 className="mt-0.5 text-lg font-bold">{revealed ? t("titleRevealed") : t("titleLocked")}</h2>
 
       <div className="mt-4">
@@ -48,7 +48,7 @@ function RevealCard({ challenge, indexLabel, onContinue }: RevealCardProps) {
         <div className="mt-4 space-y-2">
           {indexLabel && (
             <p
-              className="text-xs text-zinc-500 animate-power-fade-up"
+              className="text-xs text-skin-muted animate-power-fade-up"
               style={{ "--power-fade-delay": "0s" } as CSSProperties}
             >
               {indexLabel}

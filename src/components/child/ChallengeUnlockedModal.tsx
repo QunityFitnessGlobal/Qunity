@@ -29,10 +29,10 @@ export function ChallengeUnlockedModal({
 
   return (
     <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-sm space-y-2 rounded-lg bg-white p-5 text-center shadow-lg">
-        <p className="text-sm font-semibold text-brand-purple">{t("title")}</p>
+      <div className="w-full max-w-sm space-y-2 rounded-lg bg-skin-surface p-5 text-center shadow-lg">
+        <p className="text-sm font-semibold text-skin-accent-ink">{t("title")}</p>
         <h2 className="text-lg font-bold">{resolveLocalizedText(title, locale)}</h2>
-        <p className="text-sm text-zinc-600">{t("body", { color: colorLabel, gender: gender ?? "male" })}</p>
+        <p className="text-sm text-skin-ink-2">{t("body", { color: colorLabel, gender: gender ?? "male" })}</p>
         <div className="space-y-2 pt-2">
           <Button className="w-full" onClick={onDoNow}>
             {t("doNow", { gender: gender ?? "male" })}

@@ -52,7 +52,7 @@ export default async function JourneyPage() {
   const beltTotal = currentBeltStations.length;
   const nextStageColor = COLOR_ORDER[COLOR_ORDER.indexOf(stageColor) + 1] ?? null;
   // Bracelet white would vanish on the white header; use its dark outline.
-  const stageFill = stageColor === "white" ? "var(--color-bracelet-white-outline)" : BRACELET_CSS_VAR[stageColor];
+  const stageFill = stageColor === "white" ? "var(--skin-stage-white)" : BRACELET_CSS_VAR[stageColor];
 
   // A stage's power is revealed when its first workout starts, so its gate
   // counts as open once that workout is done.
@@ -100,12 +100,12 @@ export default async function JourneyPage() {
 
   return (
     <div className="flex flex-1 flex-col items-center">
-      <div className="sticky top-0 z-10 w-full max-w-sm bg-white/95 px-4 pb-3 pt-3.5 shadow-sm backdrop-blur">
+      <div className="sticky top-0 z-10 w-full max-w-sm bg-skin-surface/95 px-4 pb-3 pt-3.5 shadow-sm backdrop-blur">
         <div className="flex items-baseline justify-between gap-3">
           <h1 className="font-display text-lg font-bold">
             {t("stageTitle", { color: tColors(stageColor), power: tPowers(`${stageColor}.name`) })}
           </h1>
-          <p className="shrink-0 text-sm text-text-muted">
+          <p className="shrink-0 text-sm text-skin-muted">
             {t("workoutProgress", { done: beltProgress, total: beltTotal })}
           </p>
         </div>
@@ -115,7 +115,7 @@ export default async function JourneyPage() {
               <span
                 key={s.workoutId}
                 aria-hidden
-                className={`h-2 flex-1 rounded-full ${s.state === "locked" ? "bg-zinc-200" : ""} ${
+                className={`h-2 flex-1 rounded-full ${s.state === "locked" ? "bg-skin-line" : ""} ${
                   s.state === "current" ? "animate-journey-seg-pulse" : ""
                 }`}
                 style={s.state === "locked" ? undefined : { backgroundColor: stageFill }}
@@ -125,7 +125,7 @@ export default async function JourneyPage() {
               <span
                 role="img"
                 aria-label={t("nextStage", { color: tColors(nextStageColor) })}
-                className="h-[18px] w-[18px] flex-none rounded-full border-[3px] bg-white"
+                className="h-[18px] w-[18px] flex-none rounded-full border-[3px] bg-skin-surface"
                 style={{ borderColor: BRACELET_CSS_VAR[nextStageColor] }}
               />
             )}
@@ -134,7 +134,7 @@ export default async function JourneyPage() {
       </div>
 
       {stations.length === 0 ? (
-        <p className="py-8 text-center text-text-muted">{t("empty")}</p>
+        <p className="py-8 text-center text-skin-muted">{t("empty")}</p>
       ) : (
         <JourneyPath
           childId={user.id}

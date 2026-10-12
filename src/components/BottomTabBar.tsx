@@ -95,7 +95,7 @@ export function BottomTabBar({ role, userId, initialNewChallenges }: BottomTabBa
   }, [role, userId, pathname]);
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-10 border-t border-[#ece6f2] bg-white">
+    <nav className="fixed inset-x-0 bottom-0 z-10 border-t border-skin-line bg-skin-tab">
       <div className="mx-auto flex max-w-md px-2 pb-2.5 pt-1.5">
         {tabs.map((tab) => {
           // A tab's own pages (e.g. settings/code) keep it lit; home only on itself.
@@ -108,12 +108,12 @@ export function BottomTabBar({ role, userId, initialNewChallenges }: BottomTabBa
               href={`${tab.href}${suffix}`}
               aria-current={isActive ? "page" : undefined}
               className={`flex flex-1 flex-col items-center gap-[3px] pt-1 text-center font-ui text-xs ${
-                isActive ? "font-semibold text-brand-purple" : "font-medium text-[#6c6580]"
+                isActive ? "font-semibold text-skin-accent-ink" : "font-medium text-skin-muted"
               }`}
             >
               <span
                 className={`relative flex h-[30px] w-[54px] items-center justify-center rounded-full ${
-                  isActive ? "bg-brand-purple/[0.12]" : ""
+                  isActive ? "bg-skin-accent/[0.12]" : ""
                 }`}
               >
                 <tab.Icon className={tab.iconClassName ?? "h-[22px] w-[22px]"} />

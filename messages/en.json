@@ -375,6 +375,7 @@
   "settings": {
     "title": "Settings",
     "myCode": "My code",
+    "mySkin": "My skin",
     "addChild": "Add a child by code",
     "addChildDirect": "Create a new child profile",
     "pairDevice": "Connect the child's device",
@@ -396,6 +397,24 @@
       "hint": "Adds quick-finish buttons at 100% or 70% during a workout. Saved on this device only."
     },
     "qaSection": "Testing tools (temporary)"
+  },
+  "skins": {
+    "title": "My skin",
+    "subtitle": "Change how the app looks. Stages, points and workouts stay the same.",
+    "back": "Back to settings",
+    "preview": "Preview",
+    "active": "On now",
+    "open": "Yours to use",
+    "apply": "Switch to this skin",
+    "applying": "Switching…",
+    "applied": "This is your skin now",
+    "error": "We couldn't switch the skin. Try again.",
+    "storeTitle": "Coming soon: the store",
+    "storeText": "More skins, badges and avatar frames",
+    "soon": "Soon",
+    "previewGreeting": "Hi {name}!",
+    "previewMission": "Next mission",
+    "empty": "The skins aren't ready yet. Try again later."
   },
   "addChildDirect": {
     "title": "Create a new child profile",

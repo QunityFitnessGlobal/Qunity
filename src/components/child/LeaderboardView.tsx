@@ -27,7 +27,7 @@ const PODIUM: PodiumLook[] = [
 
 // Bracelet white vanishes on the white page, so it's drawn in its outline shade.
 function stageColor(color: BraceletColor): string {
-  return color === "white" ? "var(--color-bracelet-white-outline)" : BRACELET_CSS_VAR[color];
+  return color === "white" ? "var(--skin-stage-white)" : BRACELET_CSS_VAR[color];
 }
 
 const CLIMB_SENTENCES = ["climbPoints1", "climbPoints2", "climbPoints3"] as const;
@@ -91,7 +91,7 @@ export async function LeaderboardView({ ranking, userId, weekPoints, scoringEven
       <h1 className="font-display text-2xl font-bold">{t("title")}</h1>
 
       {ranking.length === 0 ? (
-        <p className="text-sm text-text-muted">{t("empty")}</p>
+        <p className="text-sm text-skin-muted">{t("empty")}</p>
       ) : (
         <>
           <div className="flex w-full max-w-sm items-end justify-center gap-2.5 pt-2">
@@ -118,15 +118,15 @@ export async function LeaderboardView({ ranking, userId, weekPoints, scoringEven
                     </svg>
                   )}
                   <span
-                    className="animate-power-badge-pop flex h-[50px] w-[50px] items-center justify-center rounded-full border-4 bg-white font-display text-xl font-semibold text-zinc-600"
+                    className="animate-power-badge-pop flex h-[50px] w-[50px] items-center justify-center rounded-full border-4 bg-skin-surface font-display text-xl font-semibold text-skin-ink-2"
                     style={{ borderColor: stageColor(entry.currentColor), animationDelay: `${look.riseDelay + 0.45}s` }}
                   >
                     {entry.nickname.trim().charAt(0)}
                   </span>
-                  <span className={`max-w-full truncate text-sm ${isYou ? "font-bold text-brand-purple" : "font-semibold"}`}>
+                  <span className={`max-w-full truncate text-sm ${isYou ? "font-bold text-skin-accent-ink" : "font-semibold"}`}>
                     {entry.nickname}
                   </span>
-                  <span className="font-display text-[13px] font-semibold text-text-muted">
+                  <span className="font-display text-[13px] font-semibold text-skin-muted">
                     {t("points", { points: entry.totalPoints })}
                   </span>
                   <div
@@ -149,7 +149,7 @@ export async function LeaderboardView({ ranking, userId, weekPoints, scoringEven
 
           {me && (
             <section
-              className="animate-power-fade-up flex w-full max-w-sm flex-col gap-2.5 rounded-2xl border-2 border-brand-purple bg-white px-3.5 py-3"
+              className="animate-power-fade-up flex w-full max-w-sm flex-col gap-2.5 rounded-2xl border-2 border-skin-accent bg-skin-surface px-3.5 py-3"
               style={{ ["--power-fade-delay" as string]: "0.9s" } as CSSProperties}
             >
               <div className="flex items-center justify-between gap-2">
@@ -164,14 +164,14 @@ export async function LeaderboardView({ ranking, userId, weekPoints, scoringEven
                 )}
               </div>
               {climbProgress !== null && (
-                <div className="h-2.5 overflow-hidden rounded-full bg-zinc-100">
+                <div className="h-2.5 overflow-hidden rounded-full bg-skin-surface-2">
                   <div
                     className="animate-leader-fill h-full rounded-full bg-reward-gold"
                     style={{ width: `${climbProgress}%` }}
                   />
                 </div>
               )}
-              <p className="text-sm text-zinc-700">
+              <p className="text-sm text-skin-ink-2">
                 {myIndex === 0
                   ? t("top", { gender })
                   : pointsToPass !== null
@@ -199,7 +199,7 @@ export async function LeaderboardView({ ranking, userId, weekPoints, scoringEven
             ))}
             {me && outsideShown && (
               <>
-                <li aria-hidden className="text-center text-sm font-bold tracking-widest text-text-muted">
+                <li aria-hidden className="text-center text-sm font-bold tracking-widest text-skin-muted">
                   ···
                 </li>
                 <LeaderboardRow
@@ -232,11 +232,11 @@ function LeaderboardRow({ entry, rank, isYou, youLabel, pointsLabel, delay }: Le
   return (
     <li
       className={`animate-power-fade-up flex min-h-11 items-center gap-3 rounded-2xl border px-3.5 py-1.5 ${
-        isYou ? "border-brand-purple bg-brand-purple/5" : "border-zinc-200 bg-white"
+        isYou ? "border-skin-accent bg-skin-accent/5" : "border-skin-line bg-skin-surface"
       }`}
       style={{ ["--power-fade-delay" as string]: `${delay}s` } as CSSProperties}
     >
-      <span className="w-6 text-center font-display font-semibold text-text-muted">{rank}</span>
+      <span className="w-6 text-center font-display font-semibold text-skin-muted">{rank}</span>
       <span
         aria-hidden
         className="h-3.5 w-3.5 flex-none rounded-full"
@@ -248,7 +248,7 @@ function LeaderboardRow({ entry, rank, isYou, youLabel, pointsLabel, delay }: Le
       <span className={`flex-1 truncate text-[15px] ${isYou ? "font-bold" : "font-medium"}`}>
         {entry.nickname} {isYou && youLabel}
       </span>
-      <span className="font-display text-sm font-semibold text-brand-purple">{pointsLabel}</span>
+      <span className="font-display text-sm font-semibold text-skin-accent-ink">{pointsLabel}</span>
     </li>
   );
 }

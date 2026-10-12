@@ -38,9 +38,9 @@ export function PointsCounter({ total, lastWorkoutPoints, label, lastWorkoutLabe
   }, [animate, start, total]);
 
   return (
-    <div className="flex items-center justify-between rounded-2xl border border-zinc-200 bg-white px-4 py-3">
+    <div className="flex items-center justify-between rounded-2xl border border-skin-line bg-skin-surface px-4 py-3">
       <div className="flex flex-col">
-        <span className="text-[13px] text-text-muted">{label}</span>
+        <span className="text-[13px] text-skin-muted">{label}</span>
         <span dir="ltr" className="text-right font-display text-[32px] font-bold tabular-nums">
           {shown.toLocaleString("en-US")}
         </span>
@@ -56,7 +56,7 @@ export function PointsCounter({ total, lastWorkoutPoints, label, lastWorkoutLabe
           >
             +{lastWorkoutPoints}
           </span>
-          <span className="text-xs text-text-muted">{lastWorkoutLabel}</span>
+          <span className="text-xs text-skin-muted">{lastWorkoutLabel}</span>
         </div>
       )}
     </div>

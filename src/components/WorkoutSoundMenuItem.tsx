@@ -61,7 +61,7 @@ export function WorkoutSoundMenuItem() {
                 <div
                   key={kind}
                   className={`flex items-center gap-2 rounded-2xl border-[1.5px] px-3 ${
-                    selected ? "border-brand-purple bg-brand-purple/[0.06]" : "border-[#ece6f2] bg-white"
+                    selected ? "border-skin-accent bg-skin-accent/[0.06]" : "border-skin-line bg-skin-surface"
                   }`}
                 >
                   <label className="flex min-h-12 flex-1 cursor-pointer items-center gap-2.5 text-[15px] font-medium">
@@ -80,7 +80,7 @@ export function WorkoutSoundMenuItem() {
                       type="button"
                       onClick={() => handlePreview(kind)}
                       aria-label={t("preview", { name: t(kind) })}
-                      className="flex h-10 w-10 items-center justify-center rounded-full text-brand-purple hover:bg-brand-purple/10"
+                      className="flex h-10 w-10 items-center justify-center rounded-full text-skin-accent-ink hover:bg-skin-accent/10"
                     >
                       <SpeakerIcon className="h-5 w-5" />
                     </button>
