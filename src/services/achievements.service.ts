@@ -1,10 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { COLOR_ORDER } from "@/services/progression.service";
 import { getJourneyStations } from "@/services/journey.service";
+import { BONUS_POWER_CHALLENGE_ID } from "@/data/challenges.data";
 import type { BraceletColor } from "@/lib/types";
 
 // The child's "ההישגים שלי" screen: the five stage powers as a collection
-// (a medallion), and three totals — stars, challenges and the longest streak.
+// (a medallion) plus the bonus power for finishing them all, and three
+// totals — stars, challenges and the longest streak.
 
 export type PowerState = "earned" | "current" | "waiting" | "locked";
 
@@ -20,6 +22,8 @@ export interface AchievementsData {
   currentColor: BraceletColor;
   slots: PowerSlot[];
   collected: number;
+  // The bonus power ("כוח ההצלחה"), earned by finishing the last stage.
+  bonusPower: boolean;
   // One per journey station the child has completed — the stars on the map.
   stars: number;
   // Different challenges achieved: one-time ones earned, plus repeatable
@@ -103,6 +107,7 @@ export async function getAchievements(supabase: SupabaseClient, childId: string)
     currentColor,
     slots,
     collected: collectedCount(slots),
+    bonusPower: unlockedIds.has(BONUS_POWER_CHALLENGE_ID),
     stars: journey.completedCount,
     challenges: oneTime + repeatableDone,
     longestStreak: longestStreakDays((sessions ?? []).map((row) => new Date(row.start_time as string))),

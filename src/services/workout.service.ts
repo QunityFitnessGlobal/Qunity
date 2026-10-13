@@ -8,7 +8,7 @@ import {
   scaleBreakdown,
 } from "@/services/points.service";
 import { checkColorProgression } from "@/services/progression.service";
-import { checkAndAwardChallenges, unlockColorChallenge } from "@/services/challenge.service";
+import { checkAndAwardChallenges, unlockBonusPower, unlockColorChallenge } from "@/services/challenge.service";
 import type { ChallengeDefinition } from "@/data/challenges.data";
 import type { BraceletColor, Exercise, Workout } from "@/lib/types";
 
@@ -219,6 +219,9 @@ export interface CompleteWorkoutResult {
   nextStage?: { workouts: number; points: number };
   newChallenges: ChallengeDefinition[];
   unlockedChallenge: ChallengeDefinition | null;
+  // Set when this workout finished the last stage: the bonus power, newly
+  // unlocked — celebrated in its own screen after the result.
+  bonusPower: ChallengeDefinition | null;
 }
 
 // The best "paid" completion a station has had so far: sessions that passed
@@ -413,6 +416,7 @@ export async function completeWorkout(params: {
       didLevelUp: false,
       newChallenges,
       unlockedChallenge: null,
+      bonusPower: null,
     };
   }
 
@@ -432,6 +436,10 @@ export async function completeWorkout(params: {
     ? await unlockColorChallenge(supabase, childId, progression.completedColor)
     : null;
 
+  // The last stage has nowhere to move up to: finishing it unlocks the bonus
+  // power instead (only once — null if it was already unlocked).
+  const bonusPower = progression.finishedLastStage ? await unlockBonusPower(supabase, childId) : null;
+
   return {
     pointsAwarded,
     completionPercent,
@@ -449,5 +457,6 @@ export async function completeWorkout(params: {
       : undefined,
     newChallenges,
     unlockedChallenge,
+    bonusPower,
   };
 }

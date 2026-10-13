@@ -4,6 +4,7 @@ import { getProfile, getSupabase, requireUser } from "@/lib/session";
 import { getJourneyStations } from "@/services/journey.service";
 import { COLOR_ORDER } from "@/services/progression.service";
 import { BRACELET_CSS_VAR } from "@/lib/colors";
+import { BONUS_POWER_CHALLENGE_ID } from "@/data/challenges.data";
 import { JourneyPath, type JourneyRenderItem } from "@/components/child/JourneyPath";
 import type { BraceletColor } from "@/lib/types";
 
@@ -22,7 +23,7 @@ export default async function JourneyPage() {
 
   // The child's row and the stations don't need the role, so they're fetched
   // alongside the profile rather than after it.
-  const [profile, { data: child }, { stations }] = await Promise.all([
+  const [profile, { data: child }, { stations }, { data: bonusPowerRow }] = await Promise.all([
     getProfile(user.id),
     supabase
       .from("children")
@@ -30,6 +31,12 @@ export default async function JourneyPage() {
       .eq("id", user.id)
       .maybeSingle<{ current_color: BraceletColor }>(),
     getJourneyStations(supabase, user.id),
+    supabase
+      .from("child_challenges")
+      .select("challenge_id")
+      .eq("child_id", user.id)
+      .eq("challenge_id", BONUS_POWER_CHALLENGE_ID)
+      .maybeSingle(),
   ]);
 
   if (profile?.role !== "child") {
@@ -69,6 +76,12 @@ export default async function JourneyPage() {
   let top = 0;
   let lastBeltColor: BraceletColor | null = null;
 
+  // At the very top, past the last stage: the bonus power's gate.
+  if (stations.length > 0) {
+    items.push({ type: "bonus", gate: bonusPowerRow ? "open" : "locked", top, left: PATH_WIDTH_PX / 2 });
+    top += STATION_SPACING_PX;
+  }
+
   descending.forEach((station, index) => {
     if (lastBeltColor !== null && station.beltColor !== lastBeltColor) {
       items.push({
@@ -87,10 +100,11 @@ export default async function JourneyPage() {
   });
 
   // The closed gate nearest the child (lowest on the page) is the one they're
-  // heading for: it gets the live mystery-box treatment.
+  // heading for: it gets the live mystery-box treatment — the bonus power's
+  // gate too, once every stage's gate is open.
   for (let i = items.length - 1; i >= 0; i--) {
     const item = items[i];
-    if (item.type === "marker" && item.gate === "locked") {
+    if (item.type !== "station" && item.gate === "locked") {
       items[i] = { ...item, gate: "next" };
       break;
     }

@@ -31,9 +31,13 @@ export type ChallengeConditionType =
   | "power_green"
   | "power_blue"
   | "power_purple"
+  | "power_success"
   | "color_finisher";
 
 export type ChallengeType = "condition" | "repeatable_workout";
+
+// The bonus power ("כוח ההצלחה"), earned by finishing the last stage.
+export const BONUS_POWER_CHALLENGE_ID = "power_success";
 
 export interface ChallengeDefinition {
   id: string;
@@ -139,6 +143,18 @@ export const CHALLENGES: ChallengeDefinition[] = [
     description: { he: "גילית את כוח ההוקרה.", en: "You discovered the power of appreciation." },
     bonusPoints: 10,
     conditionType: "power_purple",
+    challengeType: "condition",
+    unlockColor: null,
+  },
+  {
+    id: "power_success",
+    title: { he: "קבלת כוח ההצלחה", en: "Received the power of success" },
+    description: {
+      he: "סיימת את כל חמשת השלבים וגילית את כוח ההצלחה.",
+      en: "You finished all five stages and discovered the power of success.",
+    },
+    bonusPoints: 50,
+    conditionType: "power_success",
     challengeType: "condition",
     unlockColor: null,
   },

@@ -7,6 +7,7 @@ import { LogoutButton } from "@/components/LogoutButton";
 import { WorkoutSoundMenuItem } from "@/components/WorkoutSoundMenuItem";
 import { PowerPreviewTester } from "@/components/child/PowerPreviewTester";
 import { LevelUpPreviewTester, type StageRequirements } from "@/components/child/LevelUpPreviewTester";
+import { BonusPowerPreviewTester } from "@/components/child/BonusPowerPreviewTester";
 import { QaToolsToggle } from "@/components/child/QaToolsToggle";
 import { ReturnToParentButton } from "@/components/child/ReturnToParentButton";
 import { ParentPinMenuItem } from "@/components/parent/ParentPinMenuItem";
@@ -109,6 +110,7 @@ export default async function SettingsPage() {
             <h2 className="px-1 text-[13px] font-semibold text-skin-muted">{t("qaSection")}</h2>
             <PowerPreviewTester />
             <LevelUpPreviewTester stages={stageRequirements} />
+            <BonusPowerPreviewTester />
             <QaToolsToggle />
           </section>
         )}

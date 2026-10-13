@@ -22,6 +22,7 @@ import { ChallengeRevealPopup } from "@/components/child/ChallengeRevealPopup";
 import { WorkoutCelebration } from "@/components/child/WorkoutCelebration";
 import { WorkoutCheckin, type CheckinAnswers } from "@/components/child/WorkoutCheckin";
 import { LevelUpScreen } from "@/components/child/LevelUpScreen";
+import { BonusPowerScreen } from "@/components/child/BonusPowerScreen";
 import { readQaTools } from "@/lib/qa-tools";
 import { unlockPowerChallenge } from "@/services/challenge.service";
 import { calculateCompletionPercent, meetsCompletionThreshold } from "@/services/points.service";
@@ -254,8 +255,9 @@ function WorkoutRun({
   useEffect(() => () => stopWorkoutSound(), []);
 
   // Let the result screen's star, points and stage bar play out first (the
-  // bar finishes filling at about 2.3s), then bring in the level-up screen.
-  const leveledUp = stage === "result" && result?.didLevelUp === true;
+  // bar finishes filling at about 2.3s), then bring in the level-up screen —
+  // or, when the last stage was just finished, the bonus power's.
+  const leveledUp = stage === "result" && (result?.didLevelUp === true || result?.bonusPower != null);
   useEffect(() => {
     if (!leveledUp || levelUpPhase !== "pending") return;
     const timer = setTimeout(() => setLevelUpPhase("open"), 2600);
@@ -481,7 +483,17 @@ function WorkoutRun({
           />
         )}
 
-        {!revealDismissed && result.newChallenges.length > 0 && (!result.didLevelUp || levelUpPhase === "done") && (
+        {levelUpPhase === "open" && result.bonusPower && (
+          <BonusPowerScreen
+            gender={gender}
+            bonusPoints={result.bonusPower.bonusPoints}
+            onContinue={() => setLevelUpPhase("done")}
+          />
+        )}
+
+        {!revealDismissed &&
+          result.newChallenges.length > 0 &&
+          ((!result.didLevelUp && !result.bonusPower) || levelUpPhase === "done") && (
           <ChallengeRevealPopup
             challenges={result.newChallenges}
             onDone={() => setRevealDismissed(true)}

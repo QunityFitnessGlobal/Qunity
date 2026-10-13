@@ -31,3 +31,13 @@ export function SparkleIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+// The bonus power's ("כוח ההצלחה") trophy — a line icon, like the trophy
+// on the challenge result.
+export function TrophyIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M6 3.5h8V8a4 4 0 01-8 0zM6 5H3.5v1.5A2.5 2.5 0 006 9M14 5h2.5v1.5A2.5 2.5 0 0114 9M10 12v3M7 17h6" />
+    </svg>
+  );
+}

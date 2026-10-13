@@ -3,7 +3,7 @@
 import type { CSSProperties } from "react";
 import { useTranslations } from "next-intl";
 import { BRACELET_CSS_VAR } from "@/lib/colors";
-import { POWER_ICON } from "@/lib/powers";
+import { BONUS_POWER_GOLD, BONUS_POWER_ICON, POWER_ICON } from "@/lib/powers";
 import type { BraceletColor } from "@/lib/types";
 
 // "open": the stage's first workout is done, so its power was already
@@ -97,6 +97,75 @@ export function JourneyLevelMarker({ beltColor, gate, style }: JourneyLevelMarke
           </span>
         </span>
         <span className="block text-xs text-zinc-600">{t("gateHint")}</span>
+      </span>
+    </div>
+  );
+}
+
+// The gate past the last stage, at the top of the map: the bonus power
+// ("כוח ההצלחה") for finishing the whole journey. The same gate as the
+// stages' — a mystery box until it's earned, then the power — in gold.
+export function BonusPowerGate({ gate, style }: { gate: StageGateState; style?: CSSProperties }) {
+  const t = useTranslations("journey");
+  const tPowers = useTranslations("powers");
+  const Icon = BONUS_POWER_ICON;
+
+  if (gate === "open") {
+    return (
+      <div
+        style={{ ...style, height: STAGE_GATE_HEIGHT }}
+        className="absolute flex w-[200px] items-center gap-3 rounded-2xl border-2 border-[#d99a0b] bg-skin-surface px-3 shadow-sm"
+      >
+        <span
+          className="flex h-10 w-10 flex-none items-center justify-center rounded-full"
+          style={{ background: BONUS_POWER_GOLD }}
+        >
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white">
+            <Icon className="h-4 w-4 text-[#d99a0b]" />
+          </span>
+        </span>
+        <span className="min-w-0 text-right">
+          <span className="block truncate font-display text-[15px] font-semibold">{tPowers("success.name")}</span>
+          <span className="block text-xs text-skin-muted">{t("bonusGateOpen")}</span>
+        </span>
+      </div>
+    );
+  }
+
+  const live = gate === "next";
+
+  return (
+    <div
+      style={{ ...style, height: STAGE_GATE_HEIGHT }}
+      className="absolute flex w-[220px] items-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-br from-[#ffe08a] to-reward-gold px-3 text-right shadow-[0_4px_0_#d99a0b,0_8px_18px_rgba(52,30,99,0.12)]"
+    >
+      {live && (
+        <>
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -translate-x-[120%] bg-gradient-to-r from-transparent via-white/70 to-transparent animate-mystery-shine"
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute left-10 top-2 h-2.5 w-2.5 bg-white/80 animate-mystery-twinkle"
+            style={{ clipPath: STAR_CLIP }}
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute bottom-2 left-3 h-2 w-2 bg-white/80 animate-mystery-twinkle"
+            style={{ clipPath: STAR_CLIP, ["--twinkle-delay" as string]: "1.4s" }}
+          />
+        </>
+      )}
+      <span className="relative flex h-11 w-11 flex-none items-center justify-center rounded-xl bg-gradient-to-br from-reward-gold-soft to-[#ffe08a] shadow-[inset_0_-3px_0_#d99a0b]">
+        <span className={`inline-block font-display text-[26px] font-bold text-reward-gold-ink ${live ? "animate-mystery-bob" : ""}`}>?</span>
+      </span>
+      <span className="relative min-w-0">
+        <span className="flex items-center gap-1.5">
+          <Icon aria-hidden className="h-3.5 w-3.5 flex-none text-reward-gold-ink" />
+          <span className="truncate font-display text-[15px] font-semibold text-[#5c4200]">{t("bonusGateTitle")}</span>
+        </span>
+        <span className="block text-xs text-reward-gold-ink">{t("bonusGateHint")}</span>
       </span>
     </div>
   );

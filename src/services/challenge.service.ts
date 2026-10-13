@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { awardPoints, meetsCompletionThreshold } from "@/services/points.service";
-import type { ChallengeDefinition, ChallengeConditionType, ChallengeType } from "@/data/challenges.data";
+import { BONUS_POWER_CHALLENGE_ID, type ChallengeDefinition, type ChallengeConditionType, type ChallengeType } from "@/data/challenges.data";
 import type { LocalizedText } from "@/lib/i18n-content";
 import type { BraceletColor } from "@/lib/types";
 
@@ -179,6 +179,7 @@ async function unlockChallenge(
   supabase: SupabaseClient,
   childId: string,
   challengeId: string,
+  options?: { countTowardColor?: boolean },
 ): Promise<ChallengeDefinition | null> {
   const { data } = await supabase
     .from("challenges")
@@ -201,9 +202,12 @@ async function unlockChallenge(
     return null;
   }
 
-  await awardPoints(childId, null, [
-    { points: challenge.bonusPoints, reason: `challenge_${challenge.id}` },
-  ]);
+  await awardPoints(
+    childId,
+    null,
+    [{ points: challenge.bonusPoints, reason: `challenge_${challenge.id}` }],
+    { countTowardColor: options?.countTowardColor ?? true },
+  );
 
   return challenge;
 }
@@ -219,6 +223,14 @@ export function unlockPowerChallenge(
   color: BraceletColor,
 ): Promise<ChallengeDefinition | null> {
   return unlockChallenge(supabase, childId, `power_${color}`);
+}
+
+// The bonus power ("כוח ההצלחה"): unlocked when the last stage is finished
+// (see finishedLastStage), and revealed then in its own celebration. Its
+// points go to the total only — there's no stage left to fill. Returns the
+// challenge only when newly unlocked, so it's celebrated once.
+export function unlockBonusPower(supabase: SupabaseClient, childId: string): Promise<ChallengeDefinition | null> {
+  return unlockChallenge(supabase, childId, BONUS_POWER_CHALLENGE_ID, { countTowardColor: false });
 }
 
 // Called alongside checkAndAwardChallenges right after a level-up — looks

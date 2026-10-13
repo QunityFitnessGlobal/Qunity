@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateProgressPercent, evaluateProgression } from "@/services/progression.service";
+import { calculateProgressPercent, evaluateProgression, finishedLastStage } from "@/services/progression.service";
 
 const WHITE_LEVEL = { requiredWorkouts: 10, requiredPoints: 200 };
 
@@ -47,6 +47,31 @@ describe("evaluateProgression", () => {
     );
 
     expect(result).toEqual({ didLevelUp: false, nextColor: null });
+  });
+});
+
+describe("finishedLastStage", () => {
+  const PURPLE_LEVEL = { requiredWorkouts: 26, requiredPoints: 520 };
+
+  it("is true once the last stage's workouts and points are both met", () => {
+    expect(
+      finishedLastStage({ currentColor: "purple", pointsInColor: 520, workoutsCompletedInColor: 26 }, PURPLE_LEVEL),
+    ).toBe(true);
+  });
+
+  it("waits for both requirements", () => {
+    expect(
+      finishedLastStage({ currentColor: "purple", pointsInColor: 519, workoutsCompletedInColor: 26 }, PURPLE_LEVEL),
+    ).toBe(false);
+    expect(
+      finishedLastStage({ currentColor: "purple", pointsInColor: 600, workoutsCompletedInColor: 25 }, PURPLE_LEVEL),
+    ).toBe(false);
+  });
+
+  it("is never true before the last stage, whatever the numbers", () => {
+    expect(
+      finishedLastStage({ currentColor: "blue", pointsInColor: 999, workoutsCompletedInColor: 99 }, PURPLE_LEVEL),
+    ).toBe(false);
   });
 });
 

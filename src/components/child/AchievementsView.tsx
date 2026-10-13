@@ -4,7 +4,7 @@ import { useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { BRACELET_CSS_VAR, LEVEL_UP_THEME } from "@/lib/colors";
-import { POWER_ICON } from "@/lib/powers";
+import { BONUS_POWER_GOLD, BONUS_POWER_ICON, BONUS_POWER_RING, POWER_ICON } from "@/lib/powers";
 import { COLOR_ORDER } from "@/services/progression.service";
 import { FlameIcon } from "@/components/child/powerIcons";
 import { StarIcon } from "@/components/child/journeyIcons";
@@ -19,7 +19,18 @@ interface AchievementsViewProps {
 const MEDALLION = 300;
 const CENTER = 128;
 const SLOT = 48;
+const BONUS_SLOT = 52;
 const RADIUS = 115;
+
+// Six places evenly around the ring: the five stages clockwise from the top,
+// then the bonus power, right after the last stage — closing the circle.
+function ringPlace(index: number, size: number) {
+  const angle = ((-90 + index * 60) * Math.PI) / 180;
+  return {
+    left: Math.round(MEDALLION / 2 + RADIUS * Math.cos(angle) - size / 2),
+    top: Math.round(MEDALLION / 2 + RADIUS * Math.sin(angle) - size / 2),
+  };
+}
 
 // Bracelet white vanishes on white, so it's drawn in its outline shade.
 function ink(color: BraceletColor): string {
@@ -36,8 +47,9 @@ function delay(seconds: number): CSSProperties {
 
 // "ההישגים שלי": the five stage powers set around a medallion — the newest
 // collected one in the middle, collected ones in their colors, the current
-// one pulsing, the rest "?" — with a caption for whichever is tapped, then
-// the collection count, three totals and what's waiting next.
+// one pulsing, the rest "?" — and after them the gold bonus power, a secret
+// until the last stage is finished; with a caption for whichever is tapped,
+// then the collection count, three totals and what's waiting next.
 export function AchievementsView({ data, gender }: AchievementsViewProps) {
   const t = useTranslations("achievements");
   const tPowers = useTranslations("powers");
@@ -47,8 +59,13 @@ export function AchievementsView({ data, gender }: AchievementsViewProps) {
   const currentIndex = COLOR_ORDER.indexOf(data.currentColor);
   const collectedSlots = data.slots.filter(isCollected);
   const newest = collectedSlots.at(-1) ?? null;
-  const [selected, setSelected] = useState<BraceletColor>(newest?.color ?? data.currentColor);
+  const [selected, setSelected] = useState<BraceletColor | "bonus">(
+    data.bonusPower ? "bonus" : (newest?.color ?? data.currentColor),
+  );
+  const bonusSelected = selected === "bonus";
   const selectedSlot = data.slots.find((s) => s.color === selected) ?? data.slots[currentIndex];
+  const BonusIcon = BONUS_POWER_ICON;
+  const bonusPlace = ringPlace(COLOR_ORDER.length, BONUS_SLOT);
   const CenterIcon = newest ? POWER_ICON[newest.color] : null;
   const centerTheme = LEVEL_UP_THEME[newest?.color ?? data.currentColor];
 
@@ -61,6 +78,14 @@ export function AchievementsView({ data, gender }: AchievementsViewProps) {
 
   const nextColor = COLOR_ORDER[currentIndex + 1] ?? null;
   const currentWaiting = data.slots[currentIndex]?.state === "waiting";
+  const remainingLine =
+    data.workoutsLeft > 0 && data.pointsLeft > 0
+      ? t("nextBoth", { workouts: data.workoutsLeft, points: data.pointsLeft })
+      : data.workoutsLeft > 0
+        ? t("nextWorkouts", { workouts: data.workoutsLeft })
+        : data.pointsLeft > 0
+          ? t("nextPoints", { points: data.pointsLeft })
+          : t("nextAlmost");
 
   return (
     <div className="flex w-full max-w-sm flex-col gap-3">
@@ -80,35 +105,53 @@ export function AchievementsView({ data, gender }: AchievementsViewProps) {
       <div className="relative mx-auto" style={{ width: MEDALLION, height: MEDALLION }}>
         <div className="animate-achieve-spin absolute inset-[35px] rounded-full border-2 border-dashed border-skin-line" aria-hidden />
         <div className="absolute" style={{ left: (MEDALLION - CENTER) / 2, top: (MEDALLION - CENTER) / 2, width: CENTER, height: CENTER }}>
-          {newest && (
-            <div
-              className="animate-power-glow-pulse absolute -inset-1.5 rounded-full blur-[14px]"
-              style={{ backgroundColor: BRACELET_CSS_VAR[newest.color] }}
-              aria-hidden
-            />
-          )}
-          <div
-            className="animate-power-badge-pop relative flex h-full w-full items-center justify-center rounded-full shadow-[inset_0_0_0_5px_rgba(255,255,255,0.25)]"
-            style={{
-              background: newest
-                ? `linear-gradient(145deg, ${centerTheme.gradientFrom}, ${centerTheme.gradientTo})`
-                : "linear-gradient(160deg, var(--color-box-a), var(--color-box-b))",
-            }}
-          >
-            <div className="flex h-[84px] w-[84px] items-center justify-center rounded-full bg-skin-surface">
-              {CenterIcon && newest ? (
-                <CenterIcon className="h-[46px] w-[46px]" style={{ color: ink(newest.color) }} aria-hidden />
-              ) : (
-                <span className="animate-mystery-bob inline-block font-display text-[44px] font-bold text-box-ink" aria-hidden>
-                  ?
-                </span>
+          {data.bonusPower ? (
+            <>
+              <div className="animate-power-glow-pulse absolute -inset-1.5 rounded-full bg-reward-gold blur-[14px]" aria-hidden />
+              <div
+                className="animate-power-badge-pop relative flex h-full w-full items-center justify-center rounded-full p-[7px] shadow-[inset_0_0_0_5px_rgba(255,255,255,0.25)]"
+                style={{ background: BONUS_POWER_RING }}
+              >
+                <div className="flex h-full w-full items-center justify-center rounded-full" style={{ background: BONUS_POWER_GOLD }}>
+                  <div className="flex h-[84px] w-[84px] items-center justify-center rounded-full bg-skin-surface">
+                    <BonusIcon className="h-[46px] w-[46px] text-[#d99a0b]" aria-hidden />
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {newest && (
+                <div
+                  className="animate-power-glow-pulse absolute -inset-1.5 rounded-full blur-[14px]"
+                  style={{ backgroundColor: BRACELET_CSS_VAR[newest.color] }}
+                  aria-hidden
+                />
               )}
-            </div>
-          </div>
+              <div
+                className="animate-power-badge-pop relative flex h-full w-full items-center justify-center rounded-full shadow-[inset_0_0_0_5px_rgba(255,255,255,0.25)]"
+                style={{
+                  background: newest
+                    ? `linear-gradient(145deg, ${centerTheme.gradientFrom}, ${centerTheme.gradientTo})`
+                    : "linear-gradient(160deg, var(--color-box-a), var(--color-box-b))",
+                }}
+              >
+                <div className="flex h-[84px] w-[84px] items-center justify-center rounded-full bg-skin-surface">
+                  {CenterIcon && newest ? (
+                    <CenterIcon className="h-[46px] w-[46px]" style={{ color: ink(newest.color) }} aria-hidden />
+                  ) : (
+                    <span className="animate-mystery-bob inline-block font-display text-[44px] font-bold text-box-ink" aria-hidden>
+                      ?
+                    </span>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {data.slots.map((slot, i) => {
-          const angle = ((-90 + i * 72) * Math.PI) / 180;
+          const place = ringPlace(i, SLOT);
           const Icon = POWER_ICON[slot.color];
           const open = isCollected(slot);
           const isSelected = slot.color === selected;
@@ -124,8 +167,8 @@ export function AchievementsView({ data, gender }: AchievementsViewProps) {
                 slot.state === "current" ? "animate-achieve-pulse" : ""
               }`}
               style={{
-                left: Math.round(MEDALLION / 2 + RADIUS * Math.cos(angle) - SLOT / 2),
-                top: Math.round(MEDALLION / 2 + RADIUS * Math.sin(angle) - SLOT / 2),
+                left: place.left,
+                top: place.top,
                 width: SLOT,
                 height: SLOT,
                 border: isSelected
@@ -155,26 +198,77 @@ export function AchievementsView({ data, gender }: AchievementsViewProps) {
             </button>
           );
         })}
+
+        <button
+          type="button"
+          onClick={() => setSelected("bonus")}
+          aria-pressed={bonusSelected}
+          aria-label={data.bonusPower ? tPowers("success.name") : t("bonusTitleLocked")}
+          className="absolute flex items-center justify-center rounded-full"
+          style={{
+            left: bonusPlace.left,
+            top: bonusPlace.top,
+            width: BONUS_SLOT,
+            height: BONUS_SLOT,
+            border: bonusSelected ? "3px solid var(--color-brand-purple)" : "2px solid #d99a0b",
+            background: data.bonusPower ? BONUS_POWER_GOLD : "linear-gradient(160deg, #ffe08a, var(--color-reward-gold))",
+            boxShadow: data.bonusPower
+              ? "0 4px 10px rgba(217,154,11,0.45)"
+              : "inset 0 -3px 0 #d99a0b, 0 0 14px rgba(255,194,51,0.6)",
+          }}
+        >
+          {data.bonusPower ? (
+            <BonusIcon className="h-[26px] w-[26px] text-white" aria-hidden />
+          ) : (
+            <span className="animate-mystery-bob inline-block font-display text-2xl font-bold text-reward-gold-ink" aria-hidden>
+              ?
+            </span>
+          )}
+        </button>
+        <span
+          className="pointer-events-none absolute w-[52px] text-center text-[11px] font-bold text-skin-gold-ink"
+          style={{ left: bonusPlace.left + BONUS_SLOT / 2 - 26, top: bonusPlace.top + BONUS_SLOT + 1 }}
+          aria-hidden
+        >
+          {t("bonusLabel")}
+        </span>
       </div>
 
       <div key={selected} className="animate-power-fade-up flex min-h-[78px] flex-col items-center gap-0.5 text-center">
-        <span className={`text-[13px] font-semibold ${isCollected(selectedSlot) ? "text-skin-accent-ink" : "text-box-ink"}`}>
-          {t("captionStage", { color: tColors(selectedSlot.color), state: stateLabel })}
-        </span>
-        <span className="font-display text-[22px] font-bold">
-          {isCollected(selectedSlot) ? tPowers(`${selectedSlot.color}.name`) : t("mysteryTitle")}
-        </span>
-        <span className="text-[15px] text-skin-ink-2">
-          {isCollected(selectedSlot)
-            ? `"${tPowers(`${selectedSlot.color}.quote`, { gender: genderForm })}"`
-            : selectedSlot.state === "waiting"
-              ? t("waitingLine")
-              : t("lockedLine", { color: tColors(selectedSlot.color), gender: genderForm })}
-        </span>
+        {bonusSelected ? (
+          <>
+            <span className="text-[13px] font-semibold text-skin-gold-ink">
+              {t(data.bonusPower ? "bonusCaptionEarned" : "bonusCaptionLocked")}
+            </span>
+            <span className="font-display text-[22px] font-bold">
+              {data.bonusPower ? tPowers("success.name") : t("bonusTitleLocked")}
+            </span>
+            <span className="text-[15px] text-skin-ink-2">
+              {data.bonusPower ? `"${tPowers("success.quote")}"` : t("bonusLockedLine", { gender: genderForm })}
+            </span>
+          </>
+        ) : (
+          <>
+            <span className={`text-[13px] font-semibold ${isCollected(selectedSlot) ? "text-skin-accent-ink" : "text-box-ink"}`}>
+              {t("captionStage", { color: tColors(selectedSlot.color), state: stateLabel })}
+            </span>
+            <span className="font-display text-[22px] font-bold">
+              {isCollected(selectedSlot) ? tPowers(`${selectedSlot.color}.name`) : t("mysteryTitle")}
+            </span>
+            <span className="text-[15px] text-skin-ink-2">
+              {isCollected(selectedSlot)
+                ? `"${tPowers(`${selectedSlot.color}.quote`, { gender: genderForm })}"`
+                : selectedSlot.state === "waiting"
+                  ? t("waitingLine")
+                  : t("lockedLine", { color: tColors(selectedSlot.color), gender: genderForm })}
+            </span>
+          </>
+        )}
       </div>
 
       <span className="self-center rounded-full bg-skin-accent/[0.08] px-3.5 py-1.5 text-[13px] font-semibold text-skin-accent-deep">
-        {t("collection", { count: data.collected, total: COLOR_ORDER.length })}
+        {t("collection", { count: data.collected, total: COLOR_ORDER.length })}{" "}
+        <span className="text-skin-gold-ink">{t(data.bonusPower ? "bonusCollected" : "bonusSecret")}</span>
       </span>
 
       <div className="animate-power-fade-up mt-1.5 grid grid-cols-3 gap-2" style={delay(0.4)}>
@@ -202,11 +296,17 @@ export function AchievementsView({ data, gender }: AchievementsViewProps) {
         style={delay(0.55)}
       >
         {!currentWaiting && !nextColor ? (
-          <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-reward-gold text-reward-gold-on">
-            <svg viewBox="0 0 20 20" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M6 3.5h8V8a4 4 0 0 1-8 0zM6 5H3.5v1.5A2.5 2.5 0 0 0 6 9M14 5h2.5v1.5A2.5 2.5 0 0 1 14 9M10 12v3M7 17h6" />
-            </svg>
-          </span>
+          data.bonusPower ? (
+            <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full" style={{ background: BONUS_POWER_GOLD }}>
+              <BonusIcon className="h-6 w-6 text-white" aria-hidden />
+            </span>
+          ) : (
+            <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-gradient-to-br from-[#ffe08a] to-reward-gold shadow-[inset_0_-3px_0_#d99a0b]">
+              <span className="animate-mystery-bob inline-block font-display text-xl font-bold text-reward-gold-ink" aria-hidden>
+                ?
+              </span>
+            </span>
+          )
         ) : (
           <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full border-2 border-box-edge bg-gradient-to-br from-box-a to-box-b">
             <span className="animate-mystery-bob inline-block font-display text-xl font-bold text-box-ink" aria-hidden>
@@ -223,20 +323,17 @@ export function AchievementsView({ data, gender }: AchievementsViewProps) {
           ) : nextColor ? (
             <>
               <span className="text-sm font-semibold">{t("nextTitle", { color: tColors(nextColor) })}</span>
-              <span className="text-[13px] text-skin-muted">
-                {data.workoutsLeft > 0 && data.pointsLeft > 0
-                  ? t("nextBoth", { workouts: data.workoutsLeft, points: data.pointsLeft })
-                  : data.workoutsLeft > 0
-                    ? t("nextWorkouts", { workouts: data.workoutsLeft })
-                    : data.pointsLeft > 0
-                      ? t("nextPoints", { points: data.pointsLeft })
-                      : t("nextAlmost")}
-              </span>
+              <span className="text-[13px] text-skin-muted">{remainingLine}</span>
+            </>
+          ) : data.bonusPower ? (
+            <>
+              <span className="text-sm font-semibold">{t("bonusAllTitle")}</span>
+              <span className="text-[13px] text-skin-muted">{t("bonusAllLine")}</span>
             </>
           ) : (
             <>
-              <span className="text-sm font-semibold">{t("allTitle")}</span>
-              <span className="text-[13px] text-skin-muted">{t("allLine", { gender: genderForm })}</span>
+              <span className="text-sm font-semibold">{t("bonusNextTitle")}</span>
+              <span className="text-[13px] text-skin-muted">{remainingLine}</span>
             </>
           )}
         </span>

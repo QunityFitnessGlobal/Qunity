@@ -366,8 +366,16 @@
     "nextWorkouts": "עוד {workouts, plural, one {אימון אחד} other {# אימונים}}",
     "nextPoints": "עוד {points, number} נק'",
     "nextAlmost": "כמעט שם!",
-    "allTitle": "אספת את כל 5 הכוחות!",
-    "allLine": "{gender, select, female {את אלופה אמיתית} other {אתה אלוף אמיתי}}"
+    "bonusLabel": "בונוס",
+    "bonusCaptionLocked": "כוח בונוס · סודי",
+    "bonusCaptionEarned": "כוח בונוס · נאסף",
+    "bonusTitleLocked": "כוח בונוס סודי",
+    "bonusLockedLine": "{gender, select, female {ייחשף כשתסיימי את השלב הסגול} other {ייחשף כשתסיים את השלב הסגול}}",
+    "bonusSecret": "+ כוח בונוס סודי",
+    "bonusCollected": "+ כוח הבונוס",
+    "bonusNextTitle": "כוח בונוס סודי מחכה בסוף השלב הסגול",
+    "bonusAllTitle": "אספת את כל הכוחות, גם את כוח הבונוס!",
+    "bonusAllLine": "הגעת עד הסוף. איזו הצלחה!"
   },
   "workoutHistory": {
     "feelingsHeading": "{gender, select, female {איך {name} הרגישה בשבועיים האחרונים} other {איך {name} הרגיש בשבועיים האחרונים}}",
@@ -404,6 +412,10 @@
     "levelUpPreview": {
       "label": "תצוגה מקדימה של מסך עליית שלב (TEMP)",
       "placeholder": "2-5",
+      "button": "הצג"
+    },
+    "bonusPowerPreview": {
+      "label": "תצוגה מקדימה של כוח 6 · כוח ההצלחה (TEMP)",
       "button": "הצג"
     },
     "qaTools": {
@@ -503,6 +515,9 @@
     "youAreHere": "{gender, select, female {את כאן} other {אתה כאן}}",
     "gateTitle": "השער לשלב ה{color}",
     "gateHint": "כוח חדש מחכה בפנים",
+    "bonusGateTitle": "כוח בונוס סודי",
+    "bonusGateHint": "מחכה בסוף השלב הסגול",
+    "bonusGateOpen": "כוח בונוס",
     "summary": {
       "loading": "טוען...",
       "notFound": "לא נמצא מידע על האימון הזה",
@@ -560,6 +575,21 @@
       "name": "כוח ההוקרה",
       "code": "CELEBRATE",
       "quote": "{gender, select, female {אני יודעת לעצור ולשמוח בדרך שעשיתי} other {אני יודע לעצור ולשמוח בדרך שעשיתי}}"
+    },
+    "success": {
+      "name": "כוח ההצלחה",
+      "code": "I DID IT",
+      "quote": "הצלחתי! הגעתי עד הסוף!"
+    },
+    "bonusPower": {
+      "eyebrow": "סיימת את כל חמשת השלבים!",
+      "stagesDone": "כל חמשת השלבים הושלמו",
+      "boxTitle": "כוח בונוס מחכה לך",
+      "boxText": "רק מי שעובר את כל הדרך, מהשלב הלבן ועד הסגול, מגלה אותו.",
+      "discoveredLabel": "גילית כוח בונוס!",
+      "collection": "האוסף שלי · {count} מתוך {total} כוחות + כוח הבונוס",
+      "bonus": "<num>+{points}</num> נק' על כוח ההצלחה",
+      "continue": "יש! להמשיך"
     }
   },
   "workoutSound": {

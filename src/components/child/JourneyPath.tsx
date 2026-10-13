@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { JourneyStation } from "@/components/child/JourneyStation";
 import {
+  BonusPowerGate,
   JourneyLevelMarker,
   STAGE_GATE_HEIGHT,
   type StageGateState,
@@ -17,7 +18,9 @@ import type { BraceletColor, Gender, JourneyStation as JourneyStationData } from
 
 export type JourneyRenderItem =
   | { type: "station"; station: JourneyStationData; top: number; left: number }
-  | { type: "marker"; beltColor: BraceletColor; gate: StageGateState; top: number; left: number };
+  | { type: "marker"; beltColor: BraceletColor; gate: StageGateState; top: number; left: number }
+  // The bonus power's gate, past the last stage at the top of the map.
+  | { type: "bonus"; gate: StageGateState; top: number; left: number };
 
 const CURRENT_STATION_DOM_ID = "journey-current-station";
 
@@ -25,7 +28,7 @@ const CURRENT_STATION_DOM_ID = "journey-current-station";
 // "current", h-12 otherwise; a gate: STAGE_GATE_HEIGHT) so the road's
 // points land exactly on each station/gate's visual center.
 function centerYOffset(item: JourneyRenderItem): number {
-  if (item.type === "marker") return STAGE_GATE_HEIGHT / 2;
+  if (item.type !== "station") return STAGE_GATE_HEIGHT / 2;
   return item.station.state === "current" ? 32 : 24;
 }
 
@@ -143,6 +146,10 @@ export function JourneyPath({ childId, gender, childInitial, items, contentHeigh
             left: item.left,
             transform: "translateX(-50%)",
           };
+
+          if (item.type === "bonus") {
+            return <BonusPowerGate key="bonus-gate" gate={item.gate} style={positionStyle} />;
+          }
 
           if (item.type === "marker") {
             return (

@@ -366,8 +366,16 @@
     "nextWorkouts": "{workouts, plural, one {One more workout} other {# more workouts}}",
     "nextPoints": "{points, number} more pts",
     "nextAlmost": "Almost there!",
-    "allTitle": "You collected all 5 powers!",
-    "allLine": "You're a real champion"
+    "bonusLabel": "Bonus",
+    "bonusCaptionLocked": "Bonus power · secret",
+    "bonusCaptionEarned": "Bonus power · collected",
+    "bonusTitleLocked": "A secret bonus power",
+    "bonusLockedLine": "Revealed when you finish the purple stage",
+    "bonusSecret": "+ a secret bonus power",
+    "bonusCollected": "+ the bonus power",
+    "bonusNextTitle": "A secret bonus power waits at the end of the purple stage",
+    "bonusAllTitle": "You collected every power, the bonus one too!",
+    "bonusAllLine": "You made it to the end. What a success!"
   },
   "workoutHistory": {
     "feelingsHeading": "How {name} felt over the last two weeks",
@@ -404,6 +412,10 @@
     "levelUpPreview": {
       "label": "Stage level-up screen preview (TEMP)",
       "placeholder": "2-5",
+      "button": "Show"
+    },
+    "bonusPowerPreview": {
+      "label": "Preview power 6 · the power of success (TEMP)",
       "button": "Show"
     },
     "qaTools": {
@@ -503,6 +515,9 @@
     "youAreHere": "You are here",
     "gateTitle": "Gate to the {color} stage",
     "gateHint": "A new power waits inside",
+    "bonusGateTitle": "A secret bonus power",
+    "bonusGateHint": "Waiting at the end of the purple stage",
+    "bonusGateOpen": "Bonus power",
     "summary": {
       "loading": "Loading...",
       "notFound": "No information found for this workout",
@@ -560,6 +575,21 @@
       "name": "The power of appreciation",
       "code": "CELEBRATE",
       "quote": "I know how to stop and enjoy the journey"
+    },
+    "success": {
+      "name": "The power of success",
+      "code": "I DID IT",
+      "quote": "I did it! I made it to the end!"
+    },
+    "bonusPower": {
+      "eyebrow": "You finished all five stages!",
+      "stagesDone": "All five stages done",
+      "boxTitle": "A bonus power is waiting for you",
+      "boxText": "Only those who go all the way, from white to purple, discover it.",
+      "discoveredLabel": "You discovered a bonus power!",
+      "collection": "My collection · {count} of {total} powers + the bonus power",
+      "bonus": "<num>+{points}</num> pts for the power of success",
+      "continue": "Yes! Continue"
     }
   },
   "workoutSound": {

@@ -37,6 +37,16 @@ export function evaluateProgression(
   return { didLevelUp: nextColor !== null, nextColor };
 }
 
+// The last stage has no stage to move up to: meeting its requirements
+// finishes the journey instead, which reveals the bonus power.
+export function finishedLastStage(state: ChildProgressionState, requirement: BraceletLevelRequirement): boolean {
+  return (
+    state.currentColor === COLOR_ORDER[COLOR_ORDER.length - 1] &&
+    state.workoutsCompletedInColor >= requirement.requiredWorkouts &&
+    state.pointsInColor >= requirement.requiredPoints
+  );
+}
+
 // Dashboard progress bar: since leveling up requires BOTH enough workouts AND
 // enough points (see evaluateProgression), the requirement that's actually
 // still blocking the level-up is whichever of the two is FURTHER BEHIND, not
@@ -77,6 +87,8 @@ export async function checkColorProgression(childId: string): Promise<{
   completedColor?: BraceletColor;
   // What the stage just entered asks for — shown on the level-up screen.
   nextStageRequirement?: BraceletLevelRequirement;
+  // The last stage's requirements are met (see finishedLastStage).
+  finishedLastStage?: boolean;
 }> {
   const supabase = createClient();
 
@@ -100,14 +112,13 @@ export async function checkColorProgression(childId: string): Promise<{
     return { didLevelUp: false };
   }
 
-  const result = evaluateProgression(
-    {
-      currentColor: child.current_color,
-      pointsInColor: child.points_in_color,
-      workoutsCompletedInColor: child.workouts_completed_in_color,
-    },
-    { requiredWorkouts: level.required_workouts, requiredPoints: level.required_points },
-  );
+  const state: ChildProgressionState = {
+    currentColor: child.current_color,
+    pointsInColor: child.points_in_color,
+    workoutsCompletedInColor: child.workouts_completed_in_color,
+  };
+  const requirement = { requiredWorkouts: level.required_workouts, requiredPoints: level.required_points };
+  const result = evaluateProgression(state, requirement);
 
   if (result.didLevelUp && result.nextColor) {
     // Guarded by the same thresholds (and current_color) in the WHERE clause
@@ -148,5 +159,5 @@ export async function checkColorProgression(childId: string): Promise<{
     };
   }
 
-  return { didLevelUp: false };
+  return { didLevelUp: false, finishedLastStage: finishedLastStage(state, requirement) };
 }
