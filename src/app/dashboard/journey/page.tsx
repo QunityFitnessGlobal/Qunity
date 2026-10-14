@@ -23,7 +23,7 @@ export default async function JourneyPage() {
 
   // The child's row and the stations don't need the role, so they're fetched
   // alongside the profile rather than after it.
-  const [profile, { data: child }, { stations }, { data: bonusPowerRow }] = await Promise.all([
+  const [profile, { data: child }, { stations }, { data: powerRows }] = await Promise.all([
     getProfile(user.id),
     supabase
       .from("children")
@@ -31,12 +31,9 @@ export default async function JourneyPage() {
       .eq("id", user.id)
       .maybeSingle<{ current_color: BraceletColor }>(),
     getJourneyStations(supabase, user.id),
-    supabase
-      .from("child_challenges")
-      .select("challenge_id")
-      .eq("child_id", user.id)
-      .eq("challenge_id", BONUS_POWER_CHALLENGE_ID)
-      .maybeSingle(),
+    // The powers revealed so far (each one's "received power" challenge,
+    // unlocked the moment its box is opened), the bonus power included.
+    supabase.from("child_challenges").select("challenge_id").eq("child_id", user.id).like("challenge_id", "power_%"),
   ]);
 
   if (profile?.role !== "child") {
@@ -61,9 +58,13 @@ export default async function JourneyPage() {
   // Bracelet white would vanish on the white header; use its dark outline.
   const stageFill = stageColor === "white" ? "var(--skin-stage-white)" : BRACELET_CSS_VAR[stageColor];
 
-  // A stage's power is revealed when its first workout starts, so its gate
-  // counts as open once that workout is done.
+  // A stage's gate opens the moment its power is revealed — at the start of
+  // its first workout, even if that workout then falls short (the same record
+  // the home and achievements screens go by). A stage whose first workout is
+  // done counts too, for anything recorded before powers had their record.
+  const revealedPowers = new Set(((powerRows ?? []) as { challenge_id: string }[]).map((row) => row.challenge_id));
   const powerRevealed = (color: BraceletColor) =>
+    revealedPowers.has(`power_${color}`) ||
     stations.some((s) => s.beltColor === color && s.localNumber === 1 && s.state === "done");
 
   // Rendered top-to-bottom = descending global_number, so the highest
@@ -78,7 +79,12 @@ export default async function JourneyPage() {
 
   // At the very top, past the last stage: the bonus power's gate.
   if (stations.length > 0) {
-    items.push({ type: "bonus", gate: bonusPowerRow ? "open" : "locked", top, left: PATH_WIDTH_PX / 2 });
+    items.push({
+      type: "bonus",
+      gate: revealedPowers.has(BONUS_POWER_CHALLENGE_ID) ? "open" : "locked",
+      top,
+      left: PATH_WIDTH_PX / 2,
+    });
     top += STATION_SPACING_PX;
   }
 

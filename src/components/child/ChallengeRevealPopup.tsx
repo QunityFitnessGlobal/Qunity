@@ -2,7 +2,6 @@
 
 import { useState, type CSSProperties } from "react";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/Button";
 import { MysteryReveal, prefersReducedMotion } from "@/components/child/MysteryReveal";
 import type { ChallengeDefinition } from "@/data/challenges.data";
 
@@ -30,9 +29,9 @@ function RevealCard({ challenge, indexLabel, onContinue }: RevealCardProps) {
   const [revealed, setRevealed] = useState(prefersReducedMotion);
 
   return (
-    <div className="w-full max-w-sm rounded-3xl bg-skin-surface p-5 text-center shadow-xl">
-      <p className="text-xs font-semibold tracking-wide text-skin-accent-ink">{t("label")}</p>
-      <h2 className="mt-0.5 text-lg font-bold">{revealed ? t("titleRevealed") : t("titleLocked")}</h2>
+    <div className="w-full max-w-sm rounded-[26px] bg-skin-surface p-5 text-center shadow-[0_20px_50px_rgba(34,26,51,0.25)]">
+      <p className="text-[13px] font-semibold text-skin-accent-ink">{t("label")}</p>
+      <h2 className="mt-0.5 font-display text-2xl font-bold">{revealed ? t("titleRevealed") : t("titleLocked")}</h2>
 
       <div className="mt-4">
         <MysteryReveal
@@ -55,9 +54,13 @@ function RevealCard({ challenge, indexLabel, onContinue }: RevealCardProps) {
             </p>
           )}
           <div className="animate-power-fade-up" style={{ "--power-fade-delay": "0.12s" } as CSSProperties}>
-            <Button className="w-full" onClick={onContinue}>
+            <button
+              type="button"
+              onClick={onContinue}
+              className="flex min-h-[52px] w-full items-center justify-center rounded-2xl bg-green-600 font-display text-lg font-semibold text-white shadow-[0_4px_0_theme(colors.green.800)] transition-transform hover:bg-green-700 active:translate-y-[3px]"
+            >
               {t("continue")}
-            </Button>
+            </button>
           </div>
         </div>
       )}
@@ -85,7 +88,7 @@ export function ChallengeRevealPopup({ challenges, onDone }: ChallengeRevealPopu
 
   return (
     <div
-      className="fixed inset-0 z-30 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]"
+      className="fixed inset-0 z-30 flex items-center justify-center bg-[#221a33]/45 p-4 backdrop-blur-[2px]"
       role="dialog"
       aria-modal="true"
     >

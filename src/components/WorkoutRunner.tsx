@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import {
   startWorkoutSession,
@@ -12,18 +12,19 @@ import {
   type CompleteWorkoutResult,
   type WorkoutExerciseEntry,
 } from "@/services/workout.service";
-import { Button } from "@/components/ui/Button";
 import { WorkoutIntro } from "@/components/child/WorkoutIntro";
 import { useReadyCountdown } from "@/components/child/ReadyCountdown";
 import { WorkoutTimerView } from "@/components/child/WorkoutTimerView";
 import { BonusRoundOffer } from "@/components/child/BonusRoundOffer";
 import { ChallengeUnlockedModal } from "@/components/child/ChallengeUnlockedModal";
+import { StairsIcon } from "@/components/child/challengeIcons";
 import { ChallengeRevealPopup } from "@/components/child/ChallengeRevealPopup";
 import { WorkoutCelebration } from "@/components/child/WorkoutCelebration";
 import { WorkoutCheckin, type CheckinAnswers } from "@/components/child/WorkoutCheckin";
 import { LevelUpScreen } from "@/components/child/LevelUpScreen";
 import { BonusPowerScreen } from "@/components/child/BonusPowerScreen";
 import { readQaTools } from "@/lib/qa-tools";
+import { resolveLocalizedText } from "@/lib/i18n-content";
 import { unlockPowerChallenge } from "@/services/challenge.service";
 import { calculateCompletionPercent, meetsCompletionThreshold } from "@/services/points.service";
 import type { ChallengeDefinition } from "@/data/challenges.data";
@@ -114,6 +115,7 @@ function WorkoutRun({
 }: WorkoutRunnerProps & { onRepeat: () => void }) {
   const t = useTranslations("workout");
   const tColors = useTranslations("colors");
+  const locale = useLocale();
   const router = useRouter();
   const [stage, setStage] = useState<Stage>("idle");
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -460,9 +462,16 @@ function WorkoutRun({
             {nextWorkoutLoading ? t("loading") : passed ? t("nextWorkout") : t("repeatWorkout")}
           </button>
           {result.unlockedChallenge && result.newColor && (
-            <Button className="w-full" onClick={() => setShowChallengeModal(true)}>
-              {t("advanceToChallenge", { color: tColors(result.newColor) })}
-            </Button>
+            // The stage just finished opened its repeatable challenge (its
+            // stairs): a gold "challenge" button, opening it in a popup.
+            <button
+              type="button"
+              onClick={() => setShowChallengeModal(true)}
+              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-reward-gold bg-reward-gold-soft font-display text-base font-semibold text-reward-gold-ink transition-transform active:translate-y-[2px]"
+            >
+              <StairsIcon className="h-5 w-5 flex-none" aria-hidden />
+              {t("newChallengeButton", { title: resolveLocalizedText(result.unlockedChallenge.title, locale) })}
+            </button>
           )}
           <button
             type="button"
@@ -503,7 +512,8 @@ function WorkoutRun({
         {showChallengeModal && result.unlockedChallenge && result.newColor && (
           <ChallengeUnlockedModal
             title={result.unlockedChallenge.title}
-            colorLabel={tColors(result.newColor)}
+            bonusPoints={result.unlockedChallenge.bonusPoints}
+            colorLabel={tColors(color)}
             gender={gender}
             onDoNow={() => router.push(`/challenge/${result.unlockedChallenge!.id}`)}
             onPostpone={() => router.push("/dashboard/journey")}
@@ -624,17 +634,38 @@ function WorkoutRun({
         </WorkoutTimerView>
 
         {stopConfirmOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-            <div className="w-full max-w-xs space-y-4 rounded-2xl bg-skin-surface p-5 text-center">
-              <p className="text-base font-semibold">{t("stopConfirmMessage")}</p>
-              <div className="flex gap-2">
-                <Button className="flex-1" onClick={() => setStopConfirmOpen(false)}>
-                  {t("stopConfirmContinue")}
-                </Button>
-                <Button className="flex-1 bg-zinc-700 hover:bg-zinc-800" onClick={handleConfirmStop}>
-                  {t("stopConfirmStop")}
-                </Button>
-              </div>
+          // Like the pause popup: carrying on is the main action.
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#221a33]/75 px-6">
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="stop-confirm-title"
+              className="animate-power-fade-up flex w-full max-w-xs flex-col items-center gap-3 rounded-3xl bg-skin-surface px-5 py-6 text-center"
+            >
+              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-skin-accent/10 text-skin-accent-ink" aria-hidden>
+                <svg viewBox="0 0 20 20" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="10" cy="10.5" r="6.5" />
+                  <path d="M10 7v3.5l2.3 1.6M8 2.5h4" />
+                </svg>
+              </span>
+              <h2 id="stop-confirm-title" className="font-display text-xl font-bold leading-snug">
+                {t("stopConfirmMessage")}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setStopConfirmOpen(false)}
+                autoFocus
+                className="mt-1 flex min-h-[52px] w-full items-center justify-center rounded-2xl bg-green-600 font-display text-lg font-semibold text-white shadow-[0_4px_0_theme(colors.green.800)] transition-transform hover:bg-green-700 active:translate-y-[3px]"
+              >
+                {t("stopConfirmContinue")}
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmStop}
+                className="min-h-11 text-sm font-medium text-skin-muted hover:text-skin-ink"
+              >
+                {t("stopConfirmStop")}
+              </button>
             </div>
           </div>
         )}

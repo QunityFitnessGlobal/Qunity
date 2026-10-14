@@ -159,7 +159,7 @@
   },
   "workout": {
     "resultTitle": "Well done!",
-    "advanceToChallenge": "Advance to the {color} level",
+    "newChallengeButton": "New challenge: {title}",
     "nextWorkout": "Next workout",
     "repeatWorkout": "Repeat workout",
     "finishSession": "Done",

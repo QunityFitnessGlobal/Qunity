@@ -159,7 +159,7 @@
   },
   "workout": {
     "resultTitle": "כל הכבוד!",
-    "advanceToChallenge": "התקדם לשלב ה{color}",
+    "newChallengeButton": "אתגר חדש: {title}",
     "nextWorkout": "אימון הבא",
     "repeatWorkout": "אימון חוזר",
     "finishSession": "סיום",
